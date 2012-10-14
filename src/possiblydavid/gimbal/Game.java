@@ -5,8 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.Random;
-
 import javax.swing.JFrame;
 
 /**
@@ -25,11 +26,18 @@ public class Game extends Canvas implements Runnable {
 	private JFrame frame;
 	boolean running = false;
 
+	private Render render;
+	private BufferedImage image;
+	private int[] pixels;
+
 	public Game() {
 		Dimension size = new Dimension(width, height);
 		setPreferredSize(size);
 
 		frame = new JFrame();
+		render = new Render(width, height);
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	}
 
 	public synchronized void start() {
@@ -66,10 +74,18 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 
+		render.render();
+
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = render.pixels[i];
+		}
+
 		Graphics g = strategy.getDrawGraphics();
 
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, getWidth(), getHeight());
+
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 
 		// generate colored test rectangles
 		Random rand = new Random(System.nanoTime());
