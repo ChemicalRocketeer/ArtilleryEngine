@@ -13,11 +13,18 @@ public class Render {
 	}
 
 	public void render() {
+		
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				pixels[x + (y * width)] = (x * (width + y) / (width * 5 - y) * 34) % (y * 2 + 4) % 0xFFFFFF;
 			}
 		}
 		pixels[700 + 200 * width] = 0xFFFFFF;
+	}
+
+	public void clear() {
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = 0;
+		}
 	}
 }
