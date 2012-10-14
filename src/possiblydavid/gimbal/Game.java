@@ -19,7 +19,7 @@ public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static int width = 800;
-	public static int height = width / 16 * 10;
+	public static int height = width * 10 / 16;
 	public static String title = "Gimbal";
 
 	private Thread thread;
