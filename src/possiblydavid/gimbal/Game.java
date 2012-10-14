@@ -56,10 +56,23 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	@Override
-	public void run() {		
+	public void run() {
+		// FPS timer variables
+		int frameCount = 0;
+		long lastTime = System.currentTimeMillis();
+		
 		while (running) {
 			tick();
 			render();
+			
+			// count and print the FPS to console
+			if (System.currentTimeMillis() >= lastTime+1000) {
+				System.out.println(frameCount);
+				frameCount = 0;
+				lastTime = System.currentTimeMillis();
+			} else {
+				frameCount ++;
+			}
 		}
 	}
 
