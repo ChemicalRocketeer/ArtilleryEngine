@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import possiblydavid.gimbal.graphics.Render;
 
 /**
- * The Game class displays and runs the game
+ * The Game handles display and management of game objects.
  * 
  * @author David Aaron Suddjian
  */
@@ -43,12 +43,18 @@ public class Game extends Canvas implements Runnable {
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	}
 
+	/**
+	 * Starts running this Game
+	 */
 	public synchronized void start() {
 		running = true;
 		thread = new Thread(this);
 		thread.start();
 	}
 
+	/**
+	 * Stops running the game
+	 */
 	public synchronized void stop() {
 		running = false;
 		try {
@@ -58,7 +64,11 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 
-	@Override
+	/**
+	 * This is it. The game loop. If something happens in the game, it begins here.
+	 * 
+	 * Called by this Game's thread.
+	 */
 	public void run() {
 		// FPS timer variables
 		int frameCount = 0;
@@ -70,7 +80,7 @@ public class Game extends Canvas implements Runnable {
 
 			// count and print the FPS to console
 			if (System.currentTimeMillis() >= lastTime + 1000) {
-				System.out.println(frameCount);
+				System.out.println("FPS: " + frameCount);
 				frameCount = 0;
 				lastTime = System.currentTimeMillis();
 			} else {

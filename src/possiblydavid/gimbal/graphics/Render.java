@@ -18,11 +18,13 @@ public class Render {
 	}
 
 	public void render() {
+		// make trippy background thing
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				pixels[x + (y * width)] = (x * (width + y) / (width * 5 - y) * 34) % (y * 2 + 4) % 0xFFFFFF;
 			}
 		}
+		// make white pixel
 		pixels[700 + 200 * width] = 0xFFFFFF;
 	}
 
