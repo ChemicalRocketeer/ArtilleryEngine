@@ -10,6 +10,8 @@ import java.awt.image.DataBufferInt;
 import java.util.Random;
 import javax.swing.JFrame;
 
+import possiblydavid.gimbal.graphics.Render;
+
 /**
  * The Game class displays and runs the game
  * 
@@ -37,6 +39,7 @@ public class Game extends Canvas implements Runnable {
 		frame = new JFrame();
 		render = new Render(width, height);
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		System.out.println("Game image: " + image.getType()); // testing
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	}
 
@@ -60,18 +63,18 @@ public class Game extends Canvas implements Runnable {
 		// FPS timer variables
 		int frameCount = 0;
 		long lastTime = System.currentTimeMillis();
-		
+
 		while (running) {
 			tick();
 			render();
-			
+
 			// count and print the FPS to console
-			if (System.currentTimeMillis() >= lastTime+1000) {
+			if (System.currentTimeMillis() >= lastTime + 1000) {
 				System.out.println(frameCount);
 				frameCount = 0;
 				lastTime = System.currentTimeMillis();
 			} else {
-				frameCount ++;
+				frameCount++;
 			}
 		}
 	}
@@ -86,7 +89,7 @@ public class Game extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
-		
+
 		render.clear();
 		render.render();
 
@@ -95,16 +98,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		Graphics g = strategy.getDrawGraphics();
-
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-
-		// generate colored test rectangles
-		Random rand = new Random(System.nanoTime());
-		g.setColor(new Color(rand.nextInt(255) + 1, rand.nextInt(255) + 1, rand.nextInt(255) + 1));
-		int xPos = rand.nextInt(getWidth());
-		int yPos = rand.nextInt(getHeight());
-		g.fillRect(xPos, yPos, rand.nextInt(getWidth() - xPos), rand.nextInt(getHeight() - yPos));
-
 		g.dispose();
 
 		strategy.show();
