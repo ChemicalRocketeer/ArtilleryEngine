@@ -3,8 +3,7 @@ package possiblydavid.gimbal.entities;
 import possiblydavid.gimbal.graphics.LightweightImage;
 
 /**
- * A VisibleEntity contains a LightweightImage and x and y coordinates.
- * Subclasses can be displayed.
+ * A VisibleEntity contains a LightweightImage and x and y coordinates. Subclasses can be displayed.
  * 
  * @author David Aaron Suddjian
  */

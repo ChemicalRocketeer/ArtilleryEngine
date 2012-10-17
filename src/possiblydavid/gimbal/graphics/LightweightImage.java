@@ -1,8 +1,7 @@
 package possiblydavid.gimbal.graphics;
 
 /**
- * An LightweightImage efficiently stores image data. Currently creates a blank
- * white 20x20 square.
+ * An LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.
  * 
  * @author David Aaron Suddjian
  */
@@ -28,8 +27,7 @@ public class LightweightImage {
 	/**
 	 * Caution: this method allows the original pixels to be edited!
 	 * 
-	 * If you do not intend to change color values but are writing or using a
-	 * method that may change them, try getPixelCopy instead.
+	 * If you do not intend to change color values but are writing or using a method that may change them, try getPixelCopy instead.
 	 * 
 	 * @return this LightweightImage's original pixel data
 	 */

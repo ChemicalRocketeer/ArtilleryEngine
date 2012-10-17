@@ -65,27 +65,40 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * This is it. The game loop. If something happens in the game, it begins
-	 * here.
+	 * This is it. The game loop. If something happens in the game, it begins here.
 	 * 
 	 * Called by this Game's thread.
 	 */
 	public void run() {
-		// FPS timer variables
-		int frameCount = 0;
-		long lastTime = System.currentTimeMillis();
+		int frameCount = 0; // FPS timer variable
+		int tickCount = 0; // TPS timer variable
+		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
+
+		// regulate tick frequency
+		double msPerTick = 1000000000D / 59.87D; // target time between ticks, adjusted to best make up for accuracy errors
+		double delta = 0; // difference between now and the last tick
+		long lastTime = System.nanoTime();
 
 		while (running) {
-			tick();
+			long now = System.nanoTime();
+			delta += (now - lastTime) / msPerTick;
+			lastTime = now;
+			
+			if (delta > 1) {
+				tick();
+				delta --;
+				tickCount++;
+			}
+			
 			render();
+			frameCount++;
 
-			// count and print the FPS to console
-			if (System.currentTimeMillis() >= lastTime + 1000) {
-				System.out.println("FPS: " + frameCount);
+			// count and print the FPS and TPS to console
+			if (System.currentTimeMillis() >= lastRecord + 1000) {
+				System.out.println("FPS: " + frameCount + ", TPS: " + tickCount);
 				frameCount = 0;
-				lastTime = System.currentTimeMillis();
-			} else {
-				frameCount++;
+				tickCount = 0;
+				lastRecord = System.currentTimeMillis();
 			}
 		}
 	}
