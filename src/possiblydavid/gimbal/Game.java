@@ -65,7 +65,8 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * This is it. The game loop. If something happens in the game, it begins here.
+	 * This is it. The game loop. If something happens in the game, it begins
+	 * here.
 	 * 
 	 * Called by this Game's thread.
 	 */

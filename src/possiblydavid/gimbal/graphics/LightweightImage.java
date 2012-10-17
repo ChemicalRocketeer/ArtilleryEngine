@@ -1,8 +1,8 @@
 package possiblydavid.gimbal.graphics;
 
 /**
- * An LightweightImage efficiently stores image data. Currently creates a blank white 20x20
- * square.
+ * An LightweightImage efficiently stores image data. Currently creates a blank
+ * white 20x20 square.
  * 
  * @author David Aaron Suddjian
  */
