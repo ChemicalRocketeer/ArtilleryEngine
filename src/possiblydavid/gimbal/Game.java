@@ -73,7 +73,7 @@ public class Game extends Canvas implements Runnable {
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
 		// regulate tick frequency
-		double msPerTick = 1000000000D / 59.87D; // target time between ticks, adjusted to best make up for accuracy errors
+		double msPerTick = 1000000000D / 59.9D; // target time between ticks, adjusted to best make up for accuracy errors
 		double delta = 0; // difference between now and the last tick
 		long lastTime = System.nanoTime();
 
@@ -82,7 +82,7 @@ public class Game extends Canvas implements Runnable {
 			delta += (now - lastTime) / msPerTick;
 			lastTime = now;
 			
-			if (delta > 1) {
+			while (delta >= 1) {
 				tick();
 				delta --;
 				tickCount++;
