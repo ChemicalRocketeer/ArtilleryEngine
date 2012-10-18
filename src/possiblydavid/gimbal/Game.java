@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+
 import javax.swing.JFrame;
 
 import possiblydavid.gimbal.graphics.Render;
@@ -13,6 +14,7 @@ import possiblydavid.gimbal.graphics.Render;
 /**
  * The Game handles display and management of game objects.
  * 
+ * @version Pre-Alpha.0.01
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
@@ -73,21 +75,21 @@ public class Game extends Canvas implements Runnable {
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
 		// regulate tick frequency
-		double msPerTick = 1000000000D / 59.9D; // target time between ticks, adjusted to best make up for accuracy errors
+		double ns = 1000000000D / 59.9D; // target time between ticks, adjusted to best make up for accuracy errors
 		double delta = 0; // difference between now and the last tick
 		long lastTime = System.nanoTime();
 
 		while (running) {
 			long now = System.nanoTime();
-			delta += (now - lastTime) / msPerTick;
+			delta += (now - lastTime) / ns;
 			lastTime = now;
-			
+
 			while (delta >= 1) {
 				tick();
-				delta --;
+				delta--;
 				tickCount++;
 			}
-			
+
 			render();
 			frameCount++;
 
@@ -99,6 +101,7 @@ public class Game extends Canvas implements Runnable {
 				lastRecord = System.currentTimeMillis();
 			}
 		}
+		stop();
 	}
 
 	public void tick() {
