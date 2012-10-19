@@ -6,9 +6,11 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import possiblydavid.gimbal.entities.Mover;
 import possiblydavid.gimbal.graphics.Render;
 
 /**
@@ -32,15 +34,23 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image;
 	private int[] pixels;
 
+	// TODO: put entities and tock in a world class or something
+	private ArrayList<Entity> entities;
+	private ArrayList<Tick> tock;
+
 	public Game() {
 		Dimension size = new Dimension(width, height);
 		setPreferredSize(size);
 
+		// initialize visual elements
 		frame = new JFrame();
 		render = new Render(width, height);
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		System.out.println("Game image: " + image.getType()); // testing
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+
+		// initialize entities and tock
+		entities = new ArrayList<Entity>(1);
+		tock = new ArrayList<Tick>(1);
 	}
 
 	/**
@@ -49,7 +59,20 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void start() {
 		running = true;
 		thread = new Thread(this);
+
+		Mover testMover = new Mover();
+		addEntity(testMover);
+		addTick(testMover);
+
 		thread.start();
+	}
+
+	private void addTick(Tick t) {
+		tock.add(t);
+	}
+
+	public void addEntity(Entity e) {
+		entities.add(e);
 	}
 
 	/**
@@ -58,7 +81,7 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void stop() {
 		running = false;
 		try {
-			thread.join(); // end thread thread
+			thread.join(); // end thread, can't have that dangling there
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,9 +90,11 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This is it. The game loop. If something happens in the game, it begins here.
 	 * 
-	 * Called by this Game's thread.
+	 * Called by this Game's Thread thread.
 	 */
 	public void run() {
+		int totalFrames = 0; // the total number of frames generated
+		int totalSeconds = 0; // the number of times totalFrames has been updated
 		int frameCount = 0; // FPS timer variable
 		int tickCount = 0; // TPS timer variable
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
@@ -93,9 +118,12 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 
-			// count and print the FPS and TPS to console
+			// count and print the FPS and TPS to console and titlebar
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
-				System.out.println("FPS: " + frameCount + ", TPS: " + tickCount);
+				totalFrames += frameCount;
+				totalSeconds++;
+				System.out.println("FPS: " + frameCount + ", TPS: " + tickCount + ", AVG: " + (totalFrames / totalSeconds) + ", SEC: " + totalSeconds);
+				frame.setTitle(title + "   -   FPS: " + frameCount + ", TPS: " + tickCount);
 				frameCount = 0;
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
@@ -105,7 +133,9 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	public void tick() {
-
+		for (int i = 0; i < tock.size(); i++) {
+			tock.get(i).tick();
+		}
 	}
 
 	public void render() {
@@ -116,7 +146,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		render.clear();
-		render.render();
+		render.render(entities);
 
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = render.pixels[i];

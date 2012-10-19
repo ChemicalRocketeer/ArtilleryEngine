@@ -1,25 +1,26 @@
 package possiblydavid.gimbal.graphics;
 
 /**
- * An LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.
+ * A LightImg efficiently stores image data. Currently creates a blank white 20x20 square.
+ * There is no height variable. Height is calculated using the width variable and the length of the pixel array.
  * 
  * @author David Aaron Suddjian
  */
-public class LightweightImage {
-	private int width, height;
+public class LightImg {
+	private int width;
 	private int[] pixels;
 
-	public LightweightImage() {
+	public LightImg() {
 		useDefaultImage();
 	}
 
 	/**
-	 * Sets this LightweightImage to the default 20x20 white square.
+	 * Sets this LightImg to the default 20x20 white square.
 	 */
 	public void useDefaultImage() {
 		width = 20;
-		height = 20;
-		for (int i = 0; i < width * height; i++) {
+		pixels = new int[width*width];
+		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 0xFFFFFF;
 		}
 	}
@@ -29,14 +30,14 @@ public class LightweightImage {
 	 * 
 	 * If you do not intend to change color values but are writing or using a method that may change them, try getPixelCopy instead.
 	 * 
-	 * @return this LightweightImage's original pixel data
+	 * @return this LightImg's original pixel data
 	 */
 	public int[] getPixels() {
 		return pixels;
 	}
 
 	/**
-	 * @return a copy of this LightweightImage's pixel data
+	 * @return a copy of this LightImg's pixel data
 	 */
 	public int[] getPixelCopy() {
 		int[] copy = new int[pixels.length];
@@ -51,6 +52,6 @@ public class LightweightImage {
 	}
 
 	public int getHeight() {
-		return height;
+		return pixels.length / width;
 	}
 }
