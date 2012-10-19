@@ -44,11 +44,12 @@ public class Render {
 	 *            the y coordinate of the top-left corner of the LightImg
 	 */
 	public void render(LightImg img, int xPos, int yPos) {
-		if (xPos + img.getWidth() < 0 || xPos >= width) {
-
+		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
+			System.out.println("LightImg OOB, did not render"); // TODO: remove this test line
+			return;
 		}
 
-		// vars used to avoid printing unnecessary pixels
+		// vars used to avoid printing unnecessary pixels or going out of bounds
 		int xIndex = 0; // x value to start at when copying pixels from img
 		int xClip = img.getWidth(); // x value to stop at when copying pixels from img
 		int yIndex = 0; // y value to start at when copying pixels from img
