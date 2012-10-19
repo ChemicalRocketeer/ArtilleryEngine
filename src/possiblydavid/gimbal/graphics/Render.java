@@ -44,19 +44,35 @@ public class Render {
 	 *            the y coordinate of the top-left corner of the LightImg
 	 */
 	public void render(LightImg img, int xPos, int yPos) {
+		if (xPos + img.getWidth() < 0 || xPos >= width) {
+
+		}
+
+		// vars used to avoid printing unnecessary pixels
+		int xIndex = 0; // x value to start at when copying pixels from img
+		int xClip = img.getWidth(); // x value to stop at when copying pixels from img
+		int yIndex = 0; // y value to start at when copying pixels from img
+		int yClip = img.getHeight(); // y value to stop at when copying pixels from img
+		// check if part of img goes out of bounds (OOB)
+		if (xPos >= width - xClip) { // OOB right
+			xClip = width - xPos;
+		}
+		if (xPos < 0) { // OOB left
+			xIndex = -xPos;
+		}
+		if (yPos < 0) { // OOB top
+			yIndex = -yPos;
+		}
+		if (yPos > height - yClip) { // OOB bottom
+			yClip = height - yPos;
+		}
+
 		yPos *= width; // yPos can now be used to shift the image down in the later equation
-		for (int y = 0; y < img.getHeight(); y++) {
-			for (int x = 0; x < img.getWidth(); x++) {
-				if (xPos + x < 0) continue; // fix image wrapping on left side of screen
-				if (xPos + x > width) break; // fix image wrapping on right side
-				int index = xPos + x + yPos + y * width;
-				if (index < 0) break; // fix negative out of bounds
-				
-				if (index < pixels.length) {
-					pixels[index] = img.getPixels()[x + y * img.getWidth()]; // place the appropriate pixel from img into pixels
-				} else {
-					return; // fix positive out of bounds
-				}
+
+		// actual img copy loop
+		for (int y = yIndex; y < yClip; y++) {
+			for (int x = xIndex; x < xClip; x++) {
+				pixels[xPos + x + yPos + y * width] = img.getPixels()[x + y * img.getWidth()]; // place the appropriate pixel from img into pixels
 			}
 		}
 	}
