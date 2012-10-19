@@ -16,7 +16,7 @@ import possiblydavid.gimbal.graphics.Render;
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.01
+ * @version Pre-Alpha.0.01_2
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
