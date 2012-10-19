@@ -118,7 +118,7 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 
-			// count and print the FPS and TPS to console and titlebar
+			// count and print the FPS, TPS, AVG, and SEC to console and titlebar
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
