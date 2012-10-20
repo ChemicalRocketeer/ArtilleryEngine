@@ -46,7 +46,7 @@ public class LightImg {
 		// copy colors from src to pixels
 		for (int y = 0; y < getHeight(); y++) {
 			for (int x = 0; x < getWidth(); x++) {
-				pixels[x + y * width] = convertARGBtoRGB(src.getRGB(x, y)); // getRGB returns an ARGB format color, so we have to convert it to RGB
+				pixels[x + y * width] = src.getRGB(x, y);
 			}
 		}
 	}
@@ -61,9 +61,10 @@ public class LightImg {
 	 * @return an RGB format int
 	 */
 	public int convertARGBtoRGB(int argb) {
+		int a = (argb >> 24) & 0xFF;
 		int r = (argb >> 16) & 0xFF;
 		int g = (argb >> 8) & 0xFF;
-		int b = (argb >> 0) & 0xFF;
+		int b = argb & 0xFF;
 		return (r << 16) | (g << 8) | b;
 	}
 

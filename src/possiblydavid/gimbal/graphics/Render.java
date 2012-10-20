@@ -74,7 +74,50 @@ public class Render {
 		// actual img copy loop
 		for (int y = yIndex; y < yClip; y++) {
 			for (int x = xIndex; x < xClip; x++) {
-				pixels[xPos + x + yPos + y * width] = img.getPixels()[x + y * img.getWidth()]; // place the appropriate pixel from img into pixels
+				int color = img.getPixels()[x + y * img.getWidth()]; // the color of the current pixel in img
+				int a = (color >> 24) & 0xFF; // alpha value of color
+
+				if (a == 0) { // if color is transparent, no action necessary
+					break;
+				}
+
+				int index = xPos + x + yPos + y * width; // the current location in pixels[]
+				if (a != 0xFF) { // if not 100% opaque
+					System.out.print("part-opaque: " + a + "  ");
+					int locColor = pixels[index]; // the current color stored in the local pixels array
+					int newColor = 0; // the color to be stored in pixels[]
+					// sub-pixel values of pixels[index]
+					int r = (locColor >> 16) & 0xFF;
+					int g = (locColor >> 8) & 0xFF;
+					int b = locColor & 0xFF;
+
+					// (color >> number & 0xFF) is the sub-pixel value of color.
+					r = (((color >> 16 & 0xFF) - r) / 0xFF) * a + r; // calculate the new r sub-pixel value
+					System.out.print(r + "  ");
+					g = (((color >> 8 & 0xFF) - g) / 0xFF) * a + g;
+					System.out.print(g + "  ");
+					b = (((color & 0xFF) - b) / 0xFF) * a + b;
+					System.out.print(b + "  ");
+					
+					newColor =  (r << 16) | (g << 8) | b;
+					pixels[index] = (r << 16) | (g << 8) | b; // place the calculated newColor into pixels
+					System.out.println(Integer.toHexString(newColor));
+					
+					/*
+					for (int i = 0; i < 3; i++) { // cycle through sub-pixels
+						int subPix = locColor >> i * 8 & 0xFF; // the current local sub-pixel value
+						System.out.print(subPix + "." + Integer.toHexString(color >> i * 8 & 0xFF) + ". ");
+						// color >> i * 8 & 0xFF is the current sub-pixel value of color. I didn't give it a variable since it's only used once per loop cycle.
+						subPix = (((color >> i * 8 & 0xFF) - subPix) / 0xFF) * a + subPix; // calculate the new sub-pixel value
+						newColor = (subPix << i * 8) | newColor; // "or" the new sub-pixel value to newColor
+					}
+					System.out.println(Integer.toHexString(newColor));
+					pixels[index] = newColor; // place the calculated newColor into pixels
+					*/
+				} else { // color must be 100% opaque
+					System.out.println("opaque");
+					pixels[index] = color; // just set pixels[index] to color
+				}
 			}
 		}
 	}
@@ -85,7 +128,7 @@ public class Render {
 	 * TODO: fill with black for final game instead of pink for testing
 	 */
 	public void clear() {
-		// fill all pixels with black
+		// fill all pixels with pink
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 0xFF00FF;
 		}

@@ -20,12 +20,12 @@ public class Mover extends Entity implements Tick {
 		deltaY = 0;
 		potentialX = 0;
 		potentialY = 0;
-		modX = 0.005;
-		modY = 0.007;
+		modX = 0.001;
+		modY = 0.003;
 	}
 
 	public void tick() {
-		move();
+		//move();
 	}
 
 	public void move() {
