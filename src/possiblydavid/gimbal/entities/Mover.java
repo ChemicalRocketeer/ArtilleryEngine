@@ -25,7 +25,7 @@ public class Mover extends Entity implements Tick {
 	}
 
 	public void tick() {
-		//move();
+		move();
 	}
 
 	public void move() {
