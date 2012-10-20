@@ -93,8 +93,8 @@ public class Render {
 			return argb & 0xFFFFFF; // return rgb-only value of argb
 		}
 
-		float alpha = (float) (a / 255.0); // alpha value of argb between 0 and 1
-		// sub-pixel values of rgb
+		float alpha = (float) (a / 255.0); // alpha value of argb between 0 and 1, has to be a float or it will only be 0 or 1!
+		// individual sub-pixel values of rgb
 		int r = (rgb >> 16) & 0xFF;
 		int g = (rgb >> 8) & 0xFF;
 		int b = rgb & 0xFF;

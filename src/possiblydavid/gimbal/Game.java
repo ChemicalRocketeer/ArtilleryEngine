@@ -49,8 +49,8 @@ public class Game extends Canvas implements Runnable {
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 		// initialize entities and tock
-		entities = new ArrayList<Entity>(1);
-		tock = new ArrayList<Tick>(1);
+		entities = new ArrayList<Entity>(2);
+		tock = new ArrayList<Tick>(2);
 	}
 
 	/**
@@ -61,8 +61,13 @@ public class Game extends Canvas implements Runnable {
 		thread = new Thread(this);
 
 		Mover testMover = new Mover();
+		Mover testMover2 = new Mover();
 		addEntity(testMover);
 		addTick(testMover);
+		addEntity(testMover2);
+		addTick(testMover2);
+		testMover2.setX(30);
+		testMover2.setY(10);
 
 		thread.start();
 	}
