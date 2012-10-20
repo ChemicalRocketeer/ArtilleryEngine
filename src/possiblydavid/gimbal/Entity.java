@@ -5,11 +5,9 @@ import possiblydavid.gimbal.graphics.LightImg;
 /**
  * An Entity contains a LightImg and x and y coordinates. Subclasses can be displayed.
  * 
- * TODO: Make Entity abstract
- * 
  * @author David Aaron Suddjian
  */
-public class Entity {
+public abstract class Entity {
 
 	protected int x, y;
 	protected LightImg image;

@@ -8,6 +8,7 @@ import possiblydavid.gimbal.Entity;
  * A Mover has the ability to move to different positions
  * 
  * TODO: Remove/clean test methods and make class abstract
+ * TODO: Take functionality out of Mover to make SmoothMover
  */
 public class Mover extends Entity implements Tick {
 

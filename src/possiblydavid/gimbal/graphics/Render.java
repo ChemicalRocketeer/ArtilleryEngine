@@ -7,6 +7,8 @@ import possiblydavid.gimbal.Entity;
 /**
  * Render handles computation of the pixels that go onto the screen.
  * 
+ * TODO add transparency support
+ * 
  * @author David Aaron Suddjian
  */
 public class Render {
@@ -45,7 +47,6 @@ public class Render {
 	 */
 	public void render(LightImg img, int xPos, int yPos) {
 		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
-			System.out.println("LightImg OOB, did not render"); // TODO: remove this test line
 			return;
 		}
 
