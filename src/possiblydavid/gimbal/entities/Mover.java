@@ -1,64 +1,61 @@
 package possiblydavid.gimbal.entities;
 
-import possiblydavid.gimbal.Game;
 import possiblydavid.gimbal.Tick;
 
 /**
- * A Mover has the ability to move to different positions
+ * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
  * 
- * TODO: Remove/clean test methods and make class abstract
- * TODO: Take functionality out of Mover to make SmoothMover
+ * The delta variables store the change in movement and can be used to manipulate a Mover's position over a period of time.
  */
-public class Mover extends Entity implements Tick {
+public abstract class Mover extends Entity implements Tick {
 
-	protected double deltaX, deltaY, potentialX, potentialY, modX, modY;
-
-	public Mover() {
-		super();
-		deltaX = 0;
-		deltaY = 0;
-		potentialX = 0;
-		potentialY = 0;
-		modX = 0.001;
-		modY = 0.003;
-	}
-
-	public void tick() {
-		move();
-	}
+	protected double deltaX = 0, deltaY = 0;
+	protected double exactX = 0, exactY = 0;
 
 	public void move() {
-		deltaX += modX;
-		deltaY += modY;
-		int lastX = x;
-		int lastY = y;
-		x += deltaX + potentialX;
-		y += deltaY + potentialY;
-		potentialX += deltaX - (x - lastX);
-		potentialY += deltaY - (y - lastY);
+		exactX += deltaX;
+		exactY += deltaY;
+	}
 
-		// check if outside arbitrary movement bounds
-		if (x <= -40) {
-			deltaX = Math.abs(deltaX);
-			potentialX = Math.abs(potentialX);
-			modX = Math.abs(modX);
-			x = -40;
-		} else if (x >= Game.width + 20) {
-			deltaX = -Math.abs(deltaX);
-			potentialX = -Math.abs(potentialX);
-			modX = -Math.abs(modX);
-			x = Game.width + 20;
-		}
-		if (y <= -20) {
-			deltaY = Math.abs(deltaY);
-			potentialY = Math.abs(potentialY);
-			modY = Math.abs(modY);
-			y = -20;
-		} else if (y >= Game.height + 50) {
-			deltaY = -Math.abs(deltaY);
-			potentialY = -Math.abs(potentialY);
-			modY = -Math.abs(modY);
-			y = Game.height + 50;
-		}
+	public double getDeltaX() {
+		return deltaX;
+	}
+
+	public double getDeltaY() {
+		return deltaY;
+	}
+
+	public void setDelta(double deltaX, double deltaY) {
+		this.deltaX = deltaX;
+		this.deltaY = deltaY;
+	}
+
+	public double getExactX() {
+		return exactX;
+	}
+
+	public double getExactY() {
+		return exactY;
+	}
+
+	public void setExactPos(double x, double y) {
+		exactX = x;
+		exactY = y;
+	}
+
+	@Override
+	public int getX() {
+		return (int) exactX;
+	}
+
+	@Override
+	public int getY() {
+		return (int) exactY;
+	}
+
+	@Override
+	public void setPos(int x, int y) {
+		exactX = x;
+		exactY = y;
 	}
 }
