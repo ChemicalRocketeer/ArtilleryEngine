@@ -38,30 +38,42 @@ public class Render {
 	 *            the y coordinate of the top-left corner of the LightweightImage
 	 */
 	public void render(LightweightImage img, int xPos, int yPos) {
+		// check if img is completely off-screen
 		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
 			return;
 		}
 
 		// vars used to avoid printing unnecessary pixels or going out of bounds
-		int xIndex = 0; // x value to start at when copying pixels from img
-		int xClip = img.getWidth(); // x value to stop at when copying pixels from img
-		int yIndex = 0; // y value to start at when copying pixels from img
-		int yClip = img.getHeight(); // y value to stop at when copying pixels from img
-		// check if part of img goes out of bounds (OOB)
-		if (xPos >= width - xClip) { // OOB right
+		int xIndex; // x value to start at when copying pixels from img
+		int xClip; // x value to stop at when copying pixels from img
+		int yIndex; // y value to start at when copying pixels from img
+		int yClip; // y value to stop at when copying pixels from img
+		// OOB right
+		if (xPos >= width - img.getWidth()) {
 			xClip = width - xPos;
+		} else {
+			xClip = img.getWidth();
 		}
-		if (xPos < 0) { // OOB left
+		// OOB left
+		if (xPos < 0) {
 			xIndex = -xPos;
+		} else {
+			xIndex = 0;
 		}
-		if (yPos < 0) { // OOB top
+		// OOB top
+		if (yPos < 0) {
 			yIndex = -yPos;
+		} else {
+			yIndex = 0;
 		}
-		if (yPos > height - yClip) { // OOB bottom
+		// OOB bottom
+		if (yPos > height - img.getHeight()) {
 			yClip = height - yPos;
+		} else {
+			yClip = img.getHeight();
 		}
 
-		yPos *= width; // yPos can now be used to shift the image down in the later equation
+		yPos *= width; // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
 
 		// actual img copy loop
 		for (int y = yIndex; y < yClip; y++) {
@@ -101,7 +113,7 @@ public class Render {
 		int r = (rgb >> 16) & 0xFF;
 		int g = (rgb >> 8) & 0xFF;
 		int b = rgb & 0xFF;
-		// (argb >> number & 0xFF) is the corresponding sub-pixel value of argb.
+		// (argb >> number & 0xFF) is the sub-pixel value of argb.
 		// return hex color made of the calculated RGB values: R << 16 or G << 8 or B
 		return ((int) (((argb >> 16 & 0xFF) - r) * alpha + r) << 16) | ((int) (((argb >> 8 & 0xFF) - g) * alpha + g) << 8) | (int) (((argb & 0xFF) - b) * alpha + b);
 	}
