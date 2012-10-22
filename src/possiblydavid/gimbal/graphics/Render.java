@@ -2,12 +2,10 @@ package possiblydavid.gimbal.graphics;
 
 import java.util.List;
 
-import possiblydavid.gimbal.Entity;
+import possiblydavid.gimbal.entities.Entity;
 
 /**
  * Render handles computation of the pixels that go onto the screen.
- * 
- * TODO add transparency support
  * 
  * @author David Aaron Suddjian
  */
@@ -23,10 +21,6 @@ public class Render {
 		pixels = new int[width * height];
 	}
 
-	public void render() {
-
-	}
-
 	public void render(List<Entity> entities) {
 		for (int i = 0; i < entities.size(); i++) {
 			render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
@@ -34,18 +28,16 @@ public class Render {
 	}
 
 	/**
-	 * Draws LightImg data at the indicated point on screen
-	 * 
-	 * TODO: add rotation support
+	 * Draws LightweightImage data at the indicated point on screen
 	 * 
 	 * @param img
-	 *            the LightImg to be drawn
+	 *            the LightweightImage to be drawn
 	 * @param xPos
-	 *            the x coordinate of the top-left corner of the LightImg
+	 *            the x coordinate of the top-left corner of the LightweightImage
 	 * @param yPos
-	 *            the y coordinate of the top-left corner of the LightImg
+	 *            the y coordinate of the top-left corner of the LightweightImage
 	 */
-	public void render(LightImg img, int xPos, int yPos) {
+	public void render(LightweightImage img, int xPos, int yPos) {
 		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
 			return;
 		}
@@ -75,12 +67,23 @@ public class Render {
 		for (int y = yIndex; y < yClip; y++) {
 			for (int x = xIndex; x < xClip; x++) {
 				int index = xPos + x + yPos + y * width; // the current location in pixels[]
-				pixels[index] = blendRGB(pixels[index], img.getPixels()[x + y * img.getWidth()]); // calculate the new pixel value and put into pixels[]
+				// calculate the new pixel value and put into pixels[]
+				pixels[index] = blendRGB(pixels[index], img.getPixels()[x + y * img.getWidth()]);
 			}
 		}
 	}
 
-	public int blendRGB(int rgb, int argb) {
+	/**
+	 * Blends two colors (provided only one has an alpha channel) using the alpha value. Alpha values closer to 255 will make the returned color closer to `argb`, while alpha values closer to 0 will
+	 * make it closer to `rgb`.
+	 * 
+	 * @param rgb
+	 *            the rgb color to be blended (if there is a "bottom" color, it's probably this)
+	 * @param argb
+	 *            the rgb color with alpha to be blended (this is probably the "top" color, if there is one)
+	 * @return the two colors blended together
+	 */
+	public static int blendRGB(int rgb, int argb) {
 		if (rgb == (argb & 0xFFFFFF)) { // if the colors are the same
 			return rgb;
 		}
@@ -99,7 +102,8 @@ public class Render {
 		int g = (rgb >> 8) & 0xFF;
 		int b = rgb & 0xFF;
 		// (argb >> number & 0xFF) is the corresponding sub-pixel value of argb.
-		return ((int) (((argb >> 16 & 0xFF) - r) * alpha + r) << 16) | ((int) (((argb >> 8 & 0xFF) - g) * alpha + g) << 8) | (int) (((argb & 0xFF) - b) * alpha + b); // return hex color made of the calculated RGB values
+		// return hex color made of the calculated RGB values: R << 16 or G << 8 or B
+		return ((int) (((argb >> 16 & 0xFF) - r) * alpha + r) << 16) | ((int) (((argb >> 8 & 0xFF) - g) * alpha + g) << 8) | (int) (((argb & 0xFF) - b) * alpha + b);
 	}
 
 	/**

@@ -7,20 +7,22 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- * A LightImg efficiently stores image data. Currently creates a blank white 20x20 square.
+ * A LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.
  * 
  * There is no height variable. Height is calculated using the width variable and the length of the pixel array.
  * 
- * TODO add transparency support
- * 
  * @author David Aaron Suddjian
  */
-public class LightImg {
+public class LightweightImage {
 	private int width;
 	private int[] pixels;
+	
+	public LightweightImage(String path) {
+		setImage(path);
+	}
 
-	public LightImg() {
-		setImage("art/test.png");
+	public LightweightImage() {
+		useDefaultImage();
 	}
 
 	/**
@@ -52,30 +54,13 @@ public class LightImg {
 	}
 
 	/**
-	 * Converts an ARGB int to an RGB int
-	 * 
-	 * TODO check for efficiency
-	 * 
-	 * @param argb
-	 *            the into to convert
-	 * @return an RGB format int
-	 */
-	public int convertARGBtoRGB(int argb) {
-		int a = (argb >> 24) & 0xFF;
-		int r = (argb >> 16) & 0xFF;
-		int g = (argb >> 8) & 0xFF;
-		int b = argb & 0xFF;
-		return (r << 16) | (g << 8) | b;
-	}
-
-	/**
-	 * Sets this LightImg to the default 20x20 white square.
+	 * Sets this LightweightImage to the default 20x20 white square.
 	 */
 	public void useDefaultImage() {
 		width = 20;
 		pixels = new int[width * width];
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0xFFFFFF;
+			pixels[i] = 0x99FFFFFF;
 		}
 	}
 
@@ -84,14 +69,14 @@ public class LightImg {
 	 * 
 	 * If you do not intend to change color values but are writing or using a method that may change them, try getPixelCopy instead.
 	 * 
-	 * @return this LightImg's original pixel data
+	 * @return this LightweightImage's original pixel data
 	 */
 	public int[] getPixels() {
 		return pixels;
 	}
 
 	/**
-	 * @return a copy of this LightImg's pixel data
+	 * @return a copy of this LightweightImage's pixel data
 	 */
 	public int[] getPixelCopy() {
 		int[] copy = new int[pixels.length];

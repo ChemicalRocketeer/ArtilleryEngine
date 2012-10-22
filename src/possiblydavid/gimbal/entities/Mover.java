@@ -2,7 +2,6 @@ package possiblydavid.gimbal.entities;
 
 import possiblydavid.gimbal.Game;
 import possiblydavid.gimbal.Tick;
-import possiblydavid.gimbal.Entity;
 
 /**
  * A Mover has the ability to move to different positions

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import possiblydavid.gimbal.entities.Entity;
 import possiblydavid.gimbal.entities.Mover;
 import possiblydavid.gimbal.graphics.Render;
 
@@ -70,26 +71,6 @@ public class Game extends Canvas implements Runnable {
 		testMover2.setY(10);
 
 		thread.start();
-	}
-
-	private void addTick(Tick t) {
-		tock.add(t);
-	}
-
-	public void addEntity(Entity e) {
-		entities.add(e);
-	}
-
-	/**
-	 * Stops running the game
-	 */
-	public synchronized void stop() {
-		running = false;
-		try {
-			thread.join(); // end thread, can't have that dangling there
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -162,6 +143,26 @@ public class Game extends Canvas implements Runnable {
 		g.dispose();
 
 		strategy.show();
+	}
+
+	private void addTick(Tick t) {
+		tock.add(t);
+	}
+
+	public void addEntity(Entity e) {
+		entities.add(e);
+	}
+
+	/**
+	 * Stops running the game
+	 */
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join(); // end thread, can't have that dangling there
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {
