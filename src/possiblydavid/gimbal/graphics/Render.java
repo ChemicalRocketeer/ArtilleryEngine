@@ -2,6 +2,7 @@ package possiblydavid.gimbal.graphics;
 
 import java.util.List;
 
+import possiblydavid.gimbal.Err;
 import possiblydavid.gimbal.entities.Entity;
 
 /**
@@ -23,7 +24,12 @@ public class Render {
 
 	public void render(List<Entity> entities) {
 		for (int i = 0; i < entities.size(); i++) {
-			render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
+			if (entities.get(i) != null) {
+				render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
+			} else {
+				System.out.println("At entities[" + i + "]:");
+				Err.error(3);
+			}
 		}
 	}
 

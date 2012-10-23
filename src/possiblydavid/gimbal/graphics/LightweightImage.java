@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import possiblydavid.gimbal.Err;
+
 /**
  * A LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.
  * 
@@ -21,8 +23,11 @@ public class LightweightImage {
 		setImage(path);
 	}
 
+	/**
+	 * This has to be here so the LightwightImage can be initialized without a call by Entity's subclasses
+	 */
 	public LightweightImage() {
-		useDefaultImage();
+		
 	}
 
 	/**
@@ -38,7 +43,7 @@ public class LightweightImage {
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
 		} catch (IOException e) {
-			// TODO replace with permanent solution
+			Err.error(2);
 			e.printStackTrace();
 			useDefaultImage(); // can't get the correct image, so use default
 			return; // can't do the rest of this method, so exit

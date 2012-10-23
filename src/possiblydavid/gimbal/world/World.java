@@ -29,7 +29,11 @@ public abstract class World {
 	public void callTick() {
 		// tick all the registered tickers
 		for (Tick tock : tickers) {
-			tock.tick();
+			if (tock == null) {
+				Err.error(4);
+			} else {
+				tock.tick();
+			}
 		}
 	}
 

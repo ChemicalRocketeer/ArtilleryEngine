@@ -14,6 +14,7 @@ public class Err {
 		"Trying to add null Ticker to World!",
 		"LightweightImage can't read the file!",
 		"Can't render a null entity!",
+		"null call to tick method!"
 	};
 	
 	// TODO replace email
