@@ -6,18 +6,17 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import possiblydavid.gimbal.entities.Entity;
-import possiblydavid.gimbal.entities.Mover;
 import possiblydavid.gimbal.graphics.Render;
+import possiblydavid.gimbal.world.World;
+import possiblydavid.gimbal.world.testWorld;
 
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.01_2
+ * @version Pre-Alpha.0.02
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
@@ -35,9 +34,7 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image;
 	private int[] pixels;
 
-	// TODO: put entities and tock in a world class or something
-	private ArrayList<Entity> entities;
-	private ArrayList<Tick> tock;
+	private World world;
 
 	public Game() {
 		Dimension size = new Dimension(width, height);
@@ -49,9 +46,8 @@ public class Game extends Canvas implements Runnable {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
-		// initialize entities and tock
-		entities = new ArrayList<Entity>(2);
-		tock = new ArrayList<Tick>(2);
+		// initialize world
+		world = new testWorld();
 	}
 
 	/**
@@ -60,16 +56,6 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void start() {
 		running = true;
 		thread = new Thread(this);
-
-		Mover testMover = new Mover();
-		Mover testMover2 = new Mover();
-		addEntity(testMover);
-		addTick(testMover);
-		addEntity(testMover2);
-		addTick(testMover2);
-		testMover2.setX(30);
-		testMover2.setY(10);
-
 		thread.start();
 	}
 
@@ -96,7 +82,8 @@ public class Game extends Canvas implements Runnable {
 			lastTime = now;
 
 			while (delta >= 1) {
-				tick();
+				world.tick();
+				world.callTick();
 				delta--;
 				tickCount++;
 			}
@@ -118,12 +105,9 @@ public class Game extends Canvas implements Runnable {
 		stop();
 	}
 
-	public void tick() {
-		for (int i = 0; i < tock.size(); i++) {
-			tock.get(i).tick();
-		}
-	}
-
+	/**
+	 * Creates a BufferStrategy if there isn't one, calls render method of render, and displays the buffered image
+	 */
 	public void render() {
 		BufferStrategy strategy = getBufferStrategy();
 		if (strategy == null) {
@@ -132,7 +116,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		render.clear();
-		render.render(entities);
+		render.render(world.getEntities());
 
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = render.pixels[i];
@@ -143,14 +127,6 @@ public class Game extends Canvas implements Runnable {
 		g.dispose();
 
 		strategy.show();
-	}
-
-	private void addTick(Tick t) {
-		tock.add(t);
-	}
-
-	public void addEntity(Entity e) {
-		entities.add(e);
 	}
 
 	/**

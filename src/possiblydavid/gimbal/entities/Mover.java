@@ -1,6 +1,7 @@
 package possiblydavid.gimbal.entities;
 
 import possiblydavid.gimbal.Tick;
+import possiblydavid.gimbal.world.World;
 
 /**
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
@@ -11,10 +12,15 @@ public abstract class Mover extends Entity implements Tick {
 
 	protected double deltaX = 0, deltaY = 0;
 	protected double exactX = 0, exactY = 0;
+	protected World world;
 
 	public void move() {
 		exactX += deltaX;
 		exactY += deltaY;
+	}
+	
+	public void setWorld(World w) {
+		world = w;
 	}
 
 	public double getDeltaX() {
