@@ -3,29 +3,34 @@ package possiblydavid.gimbal.input;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import possiblydavid.gimbal.Tick;
-
 /**
  * KeyInput stores keyboard input and can be accessed by other objects that need to know whether a key is pressed or not.
  * 
- * TODO improve implementation
- * 
  * @since 10-23-12
  * @author David Aaron Suddjian
- *
  */
-public class KeyInput implements KeyListener, Tick{
+public class KeyInput implements KeyListener {
 	
 	// All possible keys (but not actually all the POSSIBLE keys because that would be an immense array)
 	private boolean[] keys = new boolean[120];
-	// The keys that are relevant to this program
-	public boolean up, down, left, right;
-	
-	public void tick() {
-		up = keys[KeyEvent.VK_W] || keys[KeyEvent.VK_UP];
-		down = keys[KeyEvent.VK_S] || keys[KeyEvent.VK_DOWN];
-		left = keys[KeyEvent.VK_A] || keys[KeyEvent.VK_DOWN];
-		right = keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT];
+	// The key codes that are relevant to this program (subject to change by other objects during execution, a preferences loader for example)
+	public static int[] up = new int[] {KeyEvent.VK_W, KeyEvent.VK_UP};
+	public static int[] down = new int[] {KeyEvent.VK_S, KeyEvent.VK_DOWN};
+	public static int[] left = new int[] {KeyEvent.VK_A, KeyEvent.VK_LEFT};
+	public static int[] right = new int[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT};
+
+	/**
+	 * Returns whether any key in an array of keys is pressed or not.
+	 * 
+	 * KeyInput's static key value arrays can be passed to easily check multiple keys that should all do the same thing.
+	 * 
+	 * @param keyCodes the array of codes to check
+	 */
+	public boolean pressed(int[] keyCodes) {
+		for (int keyCode : keyCodes) {
+			if (keys[keyCode]) return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -53,7 +58,6 @@ public class KeyInput implements KeyListener, Tick{
 	}
 
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 

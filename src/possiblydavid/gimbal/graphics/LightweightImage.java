@@ -85,11 +85,7 @@ public class LightweightImage {
 	 * @return a copy of this LightweightImage's pixel data
 	 */
 	public int[] getPixelCopy() {
-		int[] copy = new int[pixels.length];
-		for (int i = 0; i < pixels.length; i++) {
-			copy[i] = pixels[i];
-		}
-		return copy;
+		return pixels.clone();
 	}
 
 	public int getWidth() {
