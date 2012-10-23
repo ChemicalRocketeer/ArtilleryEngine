@@ -65,7 +65,7 @@ public class LightweightImage {
 		width = 20;
 		pixels = new int[width * width];
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0x99FFFFFF;
+			pixels[i] = 0xCCFFFFFF;
 		}
 	}
 

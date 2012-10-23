@@ -10,11 +10,7 @@ import possiblydavid.gimbal.graphics.LightweightImage;
 public abstract class Entity {
 
 	protected int x = 0, y = 0;
-	protected LightweightImage image;
-	
-	public Entity() {
-		image = new LightweightImage();
-	}
+	protected LightweightImage image = new LightweightImage();
 
 	public LightweightImage getImage() {
 		return image;
