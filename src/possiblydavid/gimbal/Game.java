@@ -10,13 +10,14 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import possiblydavid.gimbal.graphics.Render;
+import possiblydavid.gimbal.input.KeyInput;
 import possiblydavid.gimbal.world.World;
 import possiblydavid.gimbal.world.testWorld;
 
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.02
+ * @version Pre-Alpha.0.02_2
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
@@ -35,6 +36,8 @@ public class Game extends Canvas implements Runnable {
 	private int[] pixels;
 
 	private World world;
+	
+	private KeyInput key;
 
 	public Game() {
 		Dimension size = new Dimension(width, height);
@@ -48,6 +51,11 @@ public class Game extends Canvas implements Runnable {
 
 		// initialize world
 		world = new testWorld();
+		
+		// initialize keyboard input
+		key = new KeyInput();
+		addKeyListener(key);
+		world.addTicker(key);
 	}
 
 	/**
