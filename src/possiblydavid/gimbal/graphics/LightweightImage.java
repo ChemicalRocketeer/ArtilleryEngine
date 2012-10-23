@@ -13,6 +13,7 @@ import possiblydavid.gimbal.Err;
  * 
  * There is no height variable. Height is calculated using the width variable and the length of the pixel array.
  * 
+ * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class LightweightImage {

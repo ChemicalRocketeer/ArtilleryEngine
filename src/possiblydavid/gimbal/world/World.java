@@ -10,10 +10,11 @@ import possiblydavid.gimbal.entities.Entity;
 /**
  * A superclass to describe a world.
  * 
- * World keeps track of entities and anything else in the game. 
+ * World keeps track of entities and anything else in the game.
  * 
  * TODO initialize Lists with starting values for efficiency
  * 
+ * @since 10-23-12
  * @author David Aaron Suddjian
  */
 public abstract class World {
@@ -23,7 +24,7 @@ public abstract class World {
 	private List<Tick> tickers = new ArrayList<Tick>();
 
 	public void tick() {
-		
+
 	}
 
 	public void callTick() {
@@ -39,6 +40,7 @@ public abstract class World {
 
 	/**
 	 * Adds an Entity to the World, allowing it to be displayed.
+	 * 
 	 * @param e
 	 */
 	public void add(Entity e) {
@@ -49,7 +51,7 @@ public abstract class World {
 			entities.add(e);
 		}
 	}
-	
+
 	public void addTicker(Tick t) {
 		if (t != null) {
 			tickers.add(t);

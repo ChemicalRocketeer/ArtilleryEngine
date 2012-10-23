@@ -5,6 +5,7 @@ import possiblydavid.gimbal.graphics.LightweightImage;
 /**
  * An Entity contains a LightweightImage and x and y coordinates. Subclasses can be rendered.
  * 
+ * @since 10-16-12
  * @author David Aaron Suddjian
  */
 public abstract class Entity {
@@ -15,7 +16,7 @@ public abstract class Entity {
 	public LightweightImage getImage() {
 		return image;
 	}
-	
+
 	public void setImage(LightweightImage img) {
 		image = img;
 	}

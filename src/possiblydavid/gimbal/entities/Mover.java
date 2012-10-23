@@ -7,6 +7,9 @@ import possiblydavid.gimbal.world.World;
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
  * 
  * The delta variables store the change in movement and can be used to manipulate a Mover's position over a period of time.
+ * 
+ * @since 10-18-12
+ * @author David Aaron Suddjian
  */
 public abstract class Mover extends Entity implements Tick {
 
@@ -18,7 +21,7 @@ public abstract class Mover extends Entity implements Tick {
 		exactX += deltaX;
 		exactY += deltaY;
 	}
-	
+
 	public void setWorld(World w) {
 		world = w;
 	}

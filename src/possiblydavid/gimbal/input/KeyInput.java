@@ -5,6 +5,13 @@ import java.awt.event.KeyListener;
 
 import possiblydavid.gimbal.Tick;
 
+/**
+ * KeyInput stores keyboard input and can be accessed by other objects that need to know whether a key is pressed or not.
+ * 
+ * @since 10-23-12
+ * @author David Aaron Suddjian
+ *
+ */
 public class KeyInput implements KeyListener, Tick{
 	
 	private boolean[] keys = new boolean[120];

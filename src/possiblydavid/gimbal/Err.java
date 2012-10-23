@@ -5,6 +5,7 @@ package possiblydavid.gimbal;
  * 
  * TODO remove error messages throughout game
  * 
+ * @since 10-23-12
  * @author David Aaron Suddjian
  */
 public class Err {

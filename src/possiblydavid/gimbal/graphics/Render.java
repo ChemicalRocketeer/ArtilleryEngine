@@ -8,6 +8,7 @@ import possiblydavid.gimbal.entities.Entity;
 /**
  * Render handles computation of the pixels that go onto the screen.
  * 
+ * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class Render {
