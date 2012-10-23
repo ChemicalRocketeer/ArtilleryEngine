@@ -73,19 +73,10 @@ public class LightweightImage {
 	/**
 	 * Caution: this method allows the original pixels to be edited!
 	 * 
-	 * If you do not intend to change color values but are writing or using a method that may change them, try getPixelCopy instead.
-	 * 
-	 * @return this LightweightImage's original pixel data
+	 * @return this LightweightImage's pixel data
 	 */
 	public int[] getPixels() {
 		return pixels;
-	}
-
-	/**
-	 * @return a copy of this LightweightImage's pixel data
-	 */
-	public int[] getPixelCopy() {
-		return pixels.clone();
 	}
 
 	public int getWidth() {
