@@ -27,7 +27,7 @@ public abstract class World {
 
 	}
 
-	public void callTick() {
+	public final void callTick() {
 		// tick all the registered tickers
 		for (Tick tock : tickers) {
 			if (tock == null) {
