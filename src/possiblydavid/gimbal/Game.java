@@ -34,7 +34,6 @@ public class Game extends Canvas implements Runnable {
 
 	private Render render;
 	private BufferedImage image;
-	private int[] pixels;
 
 	private World world;
 	
@@ -48,7 +47,7 @@ public class Game extends Canvas implements Runnable {
 		frame = new JFrame();
 		render = new Render(width, height);
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 		// initialize world
 		world = new testWorld();
@@ -125,10 +124,6 @@ public class Game extends Canvas implements Runnable {
 
 		render.clear();
 		render.render(world.getEntities());
-
-		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = render.pixels[i];
-		}
 
 		Graphics g = strategy.getDrawGraphics();
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
