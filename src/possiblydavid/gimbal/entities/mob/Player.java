@@ -6,6 +6,7 @@ import possiblydavid.gimbal.world.World;
 
 /**
  * The Player class. This is the player. Yessiree Bob.
+ * Must be contructed with a World object, or it won't work.
  * 
  * @since 10-23-12
  * @author David Aaron Suddjian
@@ -36,14 +37,14 @@ public class Player extends Mover {
 		}
 		
 		// correct for out of bounds
-		if (exactX >= world.getWidth() - image.getWidth()) {
+		if (exactX >= world.getWidth() - image.getWidth()) { // right
 			setPos(world.getWidth() - image.getWidth(), exactY);
-		} else if (exactX < 0) {
+		} else if (exactX < 0) { // left
 			setPos(0, exactY);
 		}
-		if (exactY >= world.getHeight() - image.getHeight()) {
+		if (exactY >= world.getHeight() - image.getHeight()) { // bottom
 			setPos(exactX, world.getHeight() - image.getHeight());
-		} else if (exactY < 0) {
+		} else if (exactY < 0) { // top
 			setPos(exactX, 0);
 		}
 	}

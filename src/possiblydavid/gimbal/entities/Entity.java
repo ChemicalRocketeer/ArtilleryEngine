@@ -1,6 +1,7 @@
 package possiblydavid.gimbal.entities;
 
 import possiblydavid.gimbal.graphics.LightweightImage;
+import possiblydavid.gimbal.world.World;
 
 /**
  * An Entity contains a LightweightImage and x and y coordinates. Subclasses can be rendered.
@@ -10,8 +11,13 @@ import possiblydavid.gimbal.graphics.LightweightImage;
  */
 public abstract class Entity {
 
-	protected int x = 0, y = 0;
+	private int x = 0, y = 0;
 	protected LightweightImage image = new LightweightImage();
+	protected World world;
+
+	public void setWorld(World w) {
+		world = w;
+	}
 
 	public LightweightImage getImage() {
 		return image;
@@ -19,6 +25,10 @@ public abstract class Entity {
 
 	public void setImage(LightweightImage img) {
 		image = img;
+	}
+	
+	public void setImage(String path) {
+		image.setImage(path);
 	}
 
 	public int getX() {
