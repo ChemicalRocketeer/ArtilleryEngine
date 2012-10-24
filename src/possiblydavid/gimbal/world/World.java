@@ -47,16 +47,24 @@ public abstract class World {
 		if (e == null) {
 			Err.error(0);
 			return;
-		} else {
+		} else if (!entities.contains(e)) {
 			entities.add(e);
+			if (e instanceof Tick) {
+				addTicker((Tick) e);
+			}
 		}
 	}
 
+	/**
+	 * Adds an object implementing Tick to the World, thereby putting it in the tick cycle
+	 * 
+	 * @param t the object to add
+	 */
 	public void addTicker(Tick t) {
-		if (t != null) {
-			tickers.add(t);
-		} else {
+		if (t == null) {
 			Err.error(1);
+		} else if (!tickers.contains(t)) {
+			tickers.add(t);
 		}
 	}
 
