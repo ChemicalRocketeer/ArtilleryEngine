@@ -12,7 +12,7 @@ import java.awt.event.KeyListener;
 public class KeyInput implements KeyListener {
 	
 	// All possible keys (but not actually all the POSSIBLE keys because that would be an immense array)
-	private boolean[] keys = new boolean[256];
+	private static boolean[] keys = new boolean[256];
 	// The key codes that are relevant to this program (subject to change by other objects during execution, a preferences loader for example)
 	public static int[] up = new int[] {KeyEvent.VK_W, KeyEvent.VK_UP};
 	public static int[] down = new int[] {KeyEvent.VK_S, KeyEvent.VK_DOWN};
@@ -26,7 +26,7 @@ public class KeyInput implements KeyListener {
 	 * 
 	 * @param keyCodes the array of codes to check
 	 */
-	public boolean pressed(int[] keyCodes) {
+	public static boolean pressed(int[] keyCodes) {
 		for (int keyCode : keyCodes) {
 			if (keys[keyCode]) return true;
 		}
@@ -36,11 +36,11 @@ public class KeyInput implements KeyListener {
 	/**
 	 * Returns whether a key is pressed or not.
 	 * 
-	 * @param e the Key you want to know about
+	 * @param keyCode the id of the Key you want to know about
 	 * @return true if the key is pressed, else false
 	 */
-	public boolean pressed(KeyEvent e) {
-		return keys[e.getKeyCode()];
+	public static boolean pressed(int keyCode) {
+		return keys[keyCode];
 	}
 
 	/**
