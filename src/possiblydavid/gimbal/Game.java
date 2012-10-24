@@ -17,7 +17,7 @@ import possiblydavid.gimbal.world.testWorld;
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.02_2
+ * @version Pre-Alpha.0.03
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
