@@ -1,6 +1,6 @@
 package possiblydavid.gimbal.world;
 
-import possiblydavid.gimbal.entities.mob.TestMob;
+import possiblydavid.gimbal.entities.mob.Player;
 
 /**
  * testWorld is just a temporary class to test out World's functionality.
@@ -11,8 +11,6 @@ import possiblydavid.gimbal.entities.mob.TestMob;
 public class testWorld extends World {
 
 	public testWorld() {
-		TestMob mob = new TestMob(this);
-		add(mob);
-		addTicker(mob);
+		Player player = new Player(this);
 	}
 }
