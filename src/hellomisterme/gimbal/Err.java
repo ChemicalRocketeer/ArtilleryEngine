@@ -1,4 +1,4 @@
-package possiblydavid.gimbal;
+package hellomisterme.gimbal;
 
 /**
  * Err handles printing of error messages to the console

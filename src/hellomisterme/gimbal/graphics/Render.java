@@ -1,9 +1,10 @@
-package possiblydavid.gimbal.graphics;
+package hellomisterme.gimbal.graphics;
+
+import hellomisterme.gimbal.Err;
+import hellomisterme.gimbal.entities.Entity;
 
 import java.util.List;
 
-import possiblydavid.gimbal.Err;
-import possiblydavid.gimbal.entities.Entity;
 
 /**
  * Render handles computation of the pixels that go onto the screen.

@@ -1,6 +1,6 @@
-package possiblydavid.gimbal.entities;
+package hellomisterme.gimbal.entities;
 
-import possiblydavid.gimbal.Tick;
+import hellomisterme.gimbal.Tick;
 
 /**
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.

@@ -1,4 +1,6 @@
-package possiblydavid.gimbal.input;
+package hellomisterme.gimbal.input;
+
+import hellomisterme.gimbal.Err;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-import possiblydavid.gimbal.Err;
 
 /**
  * KeyInput stores keyboard input and can be accessed by other objects that need to know whether a key is pressed or not.
@@ -70,7 +71,7 @@ public class KeyInput implements KeyListener {
 	 * 
 	 * Spaces, tabs, and case do not matter, but line breaks do.
 	 */
-	public static void readsettingsFile() {
+	public static void readSettingsFile() {
 		String settings = "";
 		try {
 			// read settings.txt to settings

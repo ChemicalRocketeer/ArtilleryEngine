@@ -1,6 +1,6 @@
-package possiblydavid.gimbal.world;
+package hellomisterme.gimbal.world;
 
-import possiblydavid.gimbal.entities.mob.Player;
+import hellomisterme.gimbal.entities.mob.Player;
 
 /**
  * testWorld is just a temporary class to test out World's functionality.

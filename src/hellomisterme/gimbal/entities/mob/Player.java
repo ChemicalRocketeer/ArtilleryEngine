@@ -1,12 +1,11 @@
-package possiblydavid.gimbal.entities.mob;
+package hellomisterme.gimbal.entities.mob;
 
-import possiblydavid.gimbal.entities.Mover;
-import possiblydavid.gimbal.input.KeyInput;
-import possiblydavid.gimbal.world.World;
+import hellomisterme.gimbal.entities.Mover;
+import hellomisterme.gimbal.input.KeyInput;
+import hellomisterme.gimbal.world.World;
 
 /**
- * The Player class. This is the player. Yessiree Bob.
- * Must be contructed with a World object, or it won't work.
+ * The Player class. This is the player. Yessiree Bob. Must be contructed with a World object, or it won't work.
  * 
  * @since 10-23-12
  * @author David Aaron Suddjian
@@ -24,10 +23,10 @@ public class Player extends Mover {
 	public void tick() {
 		// Move if the right button(s) are held down
 		if (KeyInput.pressed(KeyInput.up)) {
-			setPos(getExactX(), getExactY() - speed * .5);
+			setPos(getExactX(), getExactY() - speed *.5);
 		}
 		if (KeyInput.pressed(KeyInput.down)) {
-			setPos(getExactX(), getExactY() + speed * .5);
+			setPos(getExactX(), getExactY() + speed *.5);
 		}
 		if (KeyInput.pressed(KeyInput.left)) {
 			setPos(getExactX() - speed, getExactY());
@@ -35,7 +34,7 @@ public class Player extends Mover {
 		if (KeyInput.pressed(KeyInput.right)) {
 			setPos(getExactX() + speed, getExactY());
 		}
-		
+
 		// correct for out of bounds
 		if (exactX >= world.getWidth() - image.getWidth()) { // right
 			setPos(world.getWidth() - image.getWidth(), exactY);

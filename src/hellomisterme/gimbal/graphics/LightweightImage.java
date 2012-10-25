@@ -1,4 +1,6 @@
-package possiblydavid.gimbal.graphics;
+package hellomisterme.gimbal.graphics;
+
+import hellomisterme.gimbal.Err;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,7 +8,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import possiblydavid.gimbal.Err;
 
 /**
  * A LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.

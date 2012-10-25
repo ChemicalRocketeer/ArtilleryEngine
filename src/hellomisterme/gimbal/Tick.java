@@ -1,4 +1,4 @@
-package possiblydavid.gimbal;
+package hellomisterme.gimbal;
 
 /**
  * The Tick interface is used to allow objects to tick, i.e. update with the Game's update cycle.

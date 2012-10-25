@@ -1,7 +1,7 @@
-package possiblydavid.gimbal.entities;
+package hellomisterme.gimbal.entities;
 
-import possiblydavid.gimbal.graphics.LightweightImage;
-import possiblydavid.gimbal.world.World;
+import hellomisterme.gimbal.graphics.LightweightImage;
+import hellomisterme.gimbal.world.World;
 
 /**
  * An Entity contains a LightweightImage and x and y coordinates. Subclasses can be rendered.

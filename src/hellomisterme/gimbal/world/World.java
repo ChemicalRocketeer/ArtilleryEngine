@@ -1,11 +1,12 @@
-package possiblydavid.gimbal.world;
+package hellomisterme.gimbal.world;
+
+import hellomisterme.gimbal.Err;
+import hellomisterme.gimbal.Tick;
+import hellomisterme.gimbal.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import possiblydavid.gimbal.Err;
-import possiblydavid.gimbal.Tick;
-import possiblydavid.gimbal.entities.Entity;
 
 /**
  * A superclass to describe a world.

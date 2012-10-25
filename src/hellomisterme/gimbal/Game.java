@@ -1,4 +1,9 @@
-package possiblydavid.gimbal;
+package hellomisterme.gimbal;
+
+import hellomisterme.gimbal.graphics.Render;
+import hellomisterme.gimbal.input.KeyInput;
+import hellomisterme.gimbal.world.World;
+import hellomisterme.gimbal.world.testWorld;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -9,10 +14,6 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-import possiblydavid.gimbal.graphics.Render;
-import possiblydavid.gimbal.input.KeyInput;
-import possiblydavid.gimbal.world.World;
-import possiblydavid.gimbal.world.testWorld;
 
 /**
  * The Game handles display and management of game objects.
@@ -55,7 +56,7 @@ public class Game extends Canvas implements Runnable {
 		// initialize keyboard input
 		key = new KeyInput();
 		addKeyListener(key);
-		KeyInput.readOptionsFile();
+		KeyInput.readSettingsFile();
 	}
 
 	/**
