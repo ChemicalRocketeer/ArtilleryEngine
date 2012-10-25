@@ -15,7 +15,8 @@ public class Err {
 		"Trying to add null Ticker to World!",
 		"LightweightImage can't read the file!",
 		"Can't render a null entity!",
-		"null call to tick method!"
+		"null call to tick method!",
+		"KeyInput can't read options.txt!"
 	};
 	
 	// TODO replace email
@@ -27,7 +28,7 @@ public class Err {
 	 */
 	public static void error(int id) {
 		if (id >= 0 && id < ERRORS.length) {
-			System.out.println("\nERROR: " + ERRORS[id] + APPEND);
+			System.out.println("\nERROR " + id + ": " + ERRORS[id] + APPEND);
 		} else {
 			System.out.println("\nUnknown error!" + APPEND);
 		}

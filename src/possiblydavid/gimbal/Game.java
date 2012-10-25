@@ -55,6 +55,7 @@ public class Game extends Canvas implements Runnable {
 		// initialize keyboard input
 		key = new KeyInput();
 		addKeyListener(key);
+		KeyInput.readOptionsFile();
 	}
 
 	/**

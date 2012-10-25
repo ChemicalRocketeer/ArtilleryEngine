@@ -1,0 +1,9 @@
+﻿This file contains game settings.
+Key codes are stored in java.awt.KeyEvent format.
+
+keybindings{
+up: 38, 87;
+down: 40, 83;
+left: 65, 37;
+right: 68, 39;
+}
