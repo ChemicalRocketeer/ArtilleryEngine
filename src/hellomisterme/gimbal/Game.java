@@ -14,7 +14,6 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-
 /**
  * The Game handles display and management of game objects.
  * 
@@ -28,6 +27,7 @@ public class Game extends Canvas implements Runnable {
 	public static int width = 800;
 	public static int height = width * 10 / 16;
 	public static String title = "Gimbal";
+	public static final int TICKS_PER_SECOND = 60;
 
 	private Thread thread;
 	private JFrame frame;
@@ -37,8 +37,8 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image;
 
 	private World world;
-	
-	private KeyInput key;
+
+	private boolean screenshotOrdered = false;
 
 	public Game() {
 		Dimension size = new Dimension(width, height);
@@ -52,10 +52,9 @@ public class Game extends Canvas implements Runnable {
 
 		// initialize world
 		world = new testWorld();
-		
+
 		// initialize keyboard input
-		key = new KeyInput();
-		addKeyListener(key);
+		addKeyListener(new KeyInput());
 		KeyInput.readSettingsFile();
 	}
 
@@ -81,7 +80,7 @@ public class Game extends Canvas implements Runnable {
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
 		// regulate tick frequency
-		double ns = 1000000000D / 59.9D; // target time between ticks, adjusted to best make up for accuracy errors
+		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
 		double delta = 0; // difference between now and the last tick
 		long lastTime = System.nanoTime();
 
@@ -91,8 +90,7 @@ public class Game extends Canvas implements Runnable {
 			lastTime = now;
 
 			while (delta >= 1) {
-				world.tick();
-				world.callTick();
+				tick();
 				delta--;
 				tickCount++;
 			}
@@ -104,7 +102,7 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				System.out.println("FPS: " + frameCount + ", TPS: " + tickCount + ", AVG: " + (totalFrames / totalSeconds) + ", SEC: " + totalSeconds);
+				System.out.println("FPS: " + frameCount + ", AVG: " + (totalFrames / totalSeconds) + ", TPS: " + tickCount + ", SEC: " + totalSeconds + "  " + ns);
 				frame.setTitle(title + "   -   FPS: " + frameCount + ", TPS: " + tickCount);
 				frameCount = 0;
 				tickCount = 0;
@@ -115,16 +113,33 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
+	 * Calls the world's tick() and callTick() methods, and checks for over-all game-related events, like screenshot key presses
+	 */
+	private void tick() {
+		// if the screenshot key is pressed
+		if (KeyInput.pressed(KeyInput.screenshot)) {
+			if (screenshotOrdered == false) { // if the screenshot key was up before
+				render.screenshot();
+				screenshotOrdered = true; // remember that screenshot was pressed
+			}
+		} else { // screenshot key not pressed
+			screenshotOrdered = false; 
+		}
+		
+		world.tick();
+		world.callTick();
+	}
+
+	/**
 	 * Creates a BufferStrategy if there isn't one, calls render method of render, and displays the buffered image
 	 */
-	public void render() {
+	private void render() {
 		BufferStrategy strategy = getBufferStrategy();
 		if (strategy == null) {
 			createBufferStrategy(3);
 			return;
 		}
 
-		render.clear();
 		render.render(world.getEntities());
 
 		Graphics g = strategy.getDrawGraphics();

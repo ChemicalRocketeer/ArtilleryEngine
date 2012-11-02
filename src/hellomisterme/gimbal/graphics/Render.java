@@ -1,30 +1,102 @@
 package hellomisterme.gimbal.graphics;
 
 import hellomisterme.gimbal.Err;
+import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.Entity;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 
 /**
- * Render handles computation of the pixels that go onto the screen.
+ * Render handles computation and combination of the pixels that go onto the screen.
+ * 
+ * Also handles methods to do with the visual contents of the entire screen, like screenshots.
  * 
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class Render {
 
-	private int width;
-	private int height;
-	public int[] pixels;
+	private int width = Game.width;
+	private int height = Game.height;
+	public int[] pixels = new int[width * height];
+
+	private int screenshotNumber = 0;
+	private String screenshotPrefix = "screen ";
 
 	public Render(int width, int height) {
 		this.width = width;
 		this.height = height;
 		pixels = new int[width * height];
+		readScreenshotNumber();
+	}
+
+	/**
+	 * Saves a picture of whatever's currently on the screen to screenshots/default-generated-filename in PNG format.
+	 */
+	public void screenshot() {
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		int[] shot = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		for (int i = 0; i < pixels.length; i++) {
+			shot[i] = pixels[i];
+		}
+		Calendar c = Calendar.getInstance();
+		screenshotNumber++;
+		String fileName = c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + ""; // date
+		fileName += " " + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + "_" + c.get(Calendar.SECOND) + ""; // time
+		fileName = "screenshots/" + screenshotPrefix + screenshotNumber + "  " + fileName + ".png"; // other file name stuff
+		try {
+			File outFile = new File(fileName);
+			outFile.mkdirs();
+			ImageIO.write(image, "png", outFile);
+		} catch (Exception e) {
+			System.out.print("\nscreenshotNumber: " + screenshotNumber);
+			Err.error(6);
+			e.printStackTrace();
+		}
+		System.out.println("Screenshot saved as " + fileName);
+	}
+
+	/**
+	 * Reads the number of the latest screenshot from the screenshots folder, and sets it as the number to start at when writing future screenshots.
+	 */
+	public void readScreenshotNumber() {
+		File[] shots = new File("screenshots").listFiles();
+		if (shots == null) {
+			screenshotNumber = 0;
+			return;
+		}
+		for (int i = 0; i < shots.length; i++) {
+			String name = shots[i].getName();
+			int index = name.indexOf(screenshotPrefix); // find the screenshotPrefix in file
+			index += screenshotPrefix.length();
+			if (index != -1) {
+				name = name.substring(index); // name now starts with its screenshot number
+				index = name.indexOf(' '); // now use index to find the end of the number
+				if (index != -1) {
+					name = name.substring(0, index);
+					BigInteger num = new BigInteger(name);
+					if (num.intValue() > screenshotNumber) {
+						screenshotNumber = num.intValue();
+					}
+				} else {
+					System.out.print("Render.readScreenshotNumber: illegal filename!"); // TODO remove/modify
+				}
+			} else {
+				System.out.print("Render.readScreenshotNumber: illegal filename!"); // TODO remove/modify
+			}
+
+		}
 	}
 
 	public void render(List<Entity> entities) {
+		clear();
 		for (int i = 0; i < entities.size(); i++) {
 			if (entities.get(i) != null) {
 				render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
@@ -98,9 +170,9 @@ public class Render {
 	 * make it closer to `rgb`.
 	 * 
 	 * @param rgb
-	 *            the rgb color to be blended (if there is a "bottom" color, it's probably this)
+	 *            the rgb color to be blended (the "bottom" color)
 	 * @param argb
-	 *            the rgb color with alpha to be blended (this is probably the "top" color, if there is one)
+	 *            the rgb color with alpha to be blended (the "top" color)
 	 * @return the two colors blended together
 	 */
 	public static int blendRGB(int rgb, int argb) {
