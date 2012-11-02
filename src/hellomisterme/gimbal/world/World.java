@@ -4,9 +4,8 @@ import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Tick;
 import hellomisterme.gimbal.entities.Entity;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
 
 /**
  * A superclass to describe a world.
@@ -21,8 +20,8 @@ import java.util.List;
 public abstract class World {
 
 	private int width = 256, height = 256;
-	private List<Entity> entities = new ArrayList<Entity>();
-	private List<Tick> tickers = new ArrayList<Tick>();
+	private List<Entity> entities = new LinkedList<Entity>();
+	private List<Tick> tickers = new LinkedList<Tick>();
 
 	public void tick() {
 
