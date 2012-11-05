@@ -56,8 +56,7 @@ public class Render {
 			outFile.mkdirs();
 			ImageIO.write(image, "png", outFile);
 		} catch (Exception e) {
-			System.out.print("\nscreenshotNumber: " + screenshotNumber);
-			Err.error(6);
+			System.out.println(Err.error("Can't write screenshot \"" + fileName + "\" to file!"));
 			e.printStackTrace();
 		}
 		System.out.println("Screenshot saved as " + fileName);
@@ -86,10 +85,10 @@ public class Render {
 						screenshotNumber = num.intValue();
 					}
 				} else {
-					System.out.print("Render.readScreenshotNumber: illegal filename!"); // TODO remove/modify
+					System.out.print("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
 				}
 			} else {
-				System.out.print("Render.readScreenshotNumber: illegal filename!"); // TODO remove/modify
+				System.out.print("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
 			}
 
 		}
@@ -102,7 +101,7 @@ public class Render {
 				render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
 			} else {
 				System.out.println("At entities[" + i + "]:");
-				Err.error(3);
+				System.out.println(Err.error("Cannot render null Entity at Render.render.entities[" + i + "]!"));
 			}
 		}
 	}

@@ -28,8 +28,6 @@ public class KeyInput implements KeyListener {
 	public static int[] left 			= new int[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
 	public static int[] right 			= new int[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
 	public static int[] screenshot 		= new int[] {KeyEvent.VK_F1};
-	
-	public static final int keyCount = 4;
 
 	/**
 	 * Parses through an settings String and assigns the keyCodes inside to KeyInput, using the format:
@@ -138,7 +136,7 @@ public class KeyInput implements KeyListener {
 			parsesettings(settings);
 			in.close();
 		} catch (Exception e) {
-			Err.error(5);
+			System.out.println(Err.error("KeyInput can't read settings.txt!"));
 			e.printStackTrace();
 		}
 	}

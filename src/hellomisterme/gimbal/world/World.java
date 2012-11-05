@@ -21,17 +21,17 @@ public abstract class World {
 
 	private int width = 256, height = 256;
 	private List<Entity> entities = new LinkedList<Entity>();
-	private List<Tick> tickers = new LinkedList<Tick>();
+	private List<Tick> tickables = new LinkedList<Tick>();
 
 	public void tick() {
 
 	}
 
 	public final void callTick() {
-		// tick all the registered tickers
-		for (Tick tock : tickers) {
+		// tick all the registered Tick objects
+		for (Tick tock : tickables) {
 			if (tock == null) {
-				Err.error(4);
+				System.out.println(Err.error("Can't call a null Tick!"));
 			} else {
 				tock.tick();
 			}
@@ -45,7 +45,7 @@ public abstract class World {
 	 */
 	public void add(Entity e) {
 		if (e == null) {
-			Err.error(0);
+			System.out.println(Err.error("Trying to add null Entity to World!"));
 			return;
 		} else if (!entities.contains(e)) {
 			entities.add(e);
@@ -62,9 +62,9 @@ public abstract class World {
 	 */
 	public void addTicker(Tick t) {
 		if (t == null) {
-			Err.error(1);
-		} else if (!tickers.contains(t)) {
-			tickers.add(t);
+			System.out.println(Err.error("Trying to add null Tick to World!"));
+		} else if (!tickables.contains(t)) {
+			tickables.add(t);
 		}
 	}
 

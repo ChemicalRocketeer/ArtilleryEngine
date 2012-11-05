@@ -10,27 +10,11 @@ package hellomisterme.gimbal;
  */
 public class Err {
 	
-	public static final String[] ERRORS = new String[] {
-		"0: Trying to add null Entity to World!",
-		"1: Trying to add null Ticker to World!",
-		"2: LightweightImage can't read the file!",
-		"3: Can't render a null entity!",
-		"4: null call to tick method!",
-		"5: KeyInput can't read options.txt!",
-		"6: Can't write screenshot to file!"
-	};
-	
 	// TODO replace email
 	public static final String APPEND = "\nPlease contact aasuddjian@gmail.com with this error message.\n";
+	public static final String PREPEND = "Error: ";
 	
-	/**
-	 * @param id the ID number of the error to print
-	 */
-	public static void error(int id) {
-		if (id >= 0 && id < ERRORS.length) {
-			System.out.println("\nERROR " + ERRORS[id] + APPEND);
-		} else {
-			System.out.println("\nUnknown error!" + APPEND);
-		}
+	public static String error(String message) {
+		return PREPEND + message + APPEND;
 	}
 }

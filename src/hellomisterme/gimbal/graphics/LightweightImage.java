@@ -45,7 +45,7 @@ public class LightweightImage {
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
 		} catch (IOException e) {
-			Err.error(2);
+			System.out.println(Err.error("LightweightImage can't read " + path + "!"));
 			e.printStackTrace();
 			useDefaultImage(); // can't get the correct image, so use default
 			return; // can't do the rest of this method, so exit
