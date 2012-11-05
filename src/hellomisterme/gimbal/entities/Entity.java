@@ -1,7 +1,6 @@
 package hellomisterme.gimbal.entities;
 
 import hellomisterme.gimbal.graphics.LightweightImage;
-import hellomisterme.gimbal.world.World;
 
 /**
  * An Entity contains a LightweightImage and x and y coordinates. Subclasses can be rendered.
@@ -13,10 +12,10 @@ public abstract class Entity {
 
 	private int x = 0, y = 0;
 	protected LightweightImage image = new LightweightImage();
-	protected World world;
+	protected EntityHolder holder;
 
-	public void setWorld(World w) {
-		world = w;
+	public void setWorld(EntityHolder h) {
+		holder = h;
 	}
 
 	public LightweightImage getImage() {

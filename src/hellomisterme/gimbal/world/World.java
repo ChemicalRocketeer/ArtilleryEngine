@@ -3,6 +3,7 @@ package hellomisterme.gimbal.world;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Tick;
 import hellomisterme.gimbal.entities.Entity;
+import hellomisterme.gimbal.entities.EntityHolder;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
  * @since 10-23-12
  * @author David Aaron Suddjian
  */
-public abstract class World {
+public abstract class World implements EntityHolder {
 
 	private int width = 256, height = 256;
 	private List<Entity> entities = new LinkedList<Entity>();
@@ -39,19 +40,20 @@ public abstract class World {
 	}
 
 	/**
-	 * Adds an Entity to the World, allowing it to be displayed.
+	 * Adds an Entity to the World, allowing it to be displayed. If the Entity implements Tick, also adds it to tickables
 	 * 
-	 * @param e
+	 * @param e the Entity to add
 	 */
 	public void add(Entity e) {
 		if (e == null) {
 			System.out.println(Err.error("Trying to add null Entity to World!"));
-			return;
 		} else if (!entities.contains(e)) {
 			entities.add(e);
 			if (e instanceof Tick) {
-				addTicker((Tick) e);
+				addTickable((Tick) e);
 			}
+		} else {
+			System.out.println("Trying to add an Entity that is already in World...");
 		}
 	}
 
@@ -60,11 +62,46 @@ public abstract class World {
 	 * 
 	 * @param t the object to add
 	 */
-	public void addTicker(Tick t) {
+	public void addTickable(Tick t) {
 		if (t == null) {
 			System.out.println(Err.error("Trying to add null Tick to World!"));
 		} else if (!tickables.contains(t)) {
 			tickables.add(t);
+		} else {
+			System.out.println("Trying to add a Tick that is already in World...");
+		}
+	}
+	
+	/**
+	 * Removes an Entity from the World. If the Entity implements Tick, also removes it from tickables
+	 * 
+	 * @param e the Entity to remove
+	 */
+	public void remove(Entity e) {
+		if (e == null) {
+			System.out.println(Err.error("Trying to remove null Entity from World!"));
+		} else if (entities.contains(e)) {
+			entities.remove(e);
+			if ( e instanceof Tick) {
+				removeTickable((Tick) e);
+			}
+		} else {
+			System.out.println("Trying to remove an Entity that isn't in World...");
+		}
+	}
+	
+	/**
+	 * Removes an object implementing Tick from the World, removing it from the tick cycle
+	 * 
+	 * @param t the object to remove
+	 */
+	public void removeTickable(Tick t) {
+		if (t == null) {
+			System.out.println(Err.error("Trying to remove null Tick from World!"));
+		} else if (tickables.contains(t)) {
+			tickables.add(t);
+		} else {
+			System.out.println("Trying to remove a Tick that isn't in World...");
 		}
 	}
 
