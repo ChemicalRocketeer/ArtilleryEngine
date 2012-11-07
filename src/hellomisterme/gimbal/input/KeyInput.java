@@ -20,14 +20,20 @@ import java.util.Scanner;
  */
 public class KeyInput implements KeyListener {
 
-	// All possible keys (but not actually all the POSSIBLE keys because that would be an immense array)
-	private static boolean[] keys = new boolean[256];
-	// The key codes that are relevant to this program (subject to change by other objects during execution, a preferences loader for example)
-	public static int[] up 				= new int[] {KeyEvent.VK_W, KeyEvent.VK_UP };
-	public static int[] down 			= new int[] {KeyEvent.VK_S, KeyEvent.VK_DOWN };
-	public static int[] left 			= new int[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
-	public static int[] right 			= new int[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
-	public static int[] screenshot 		= new int[] {KeyEvent.VK_F1};
+	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
+	private static boolean[] keys = new boolean[255];
+	
+	// The key codes that are relevant to this program (subject to change by other objects during execution, a settings file for example)
+	// TODO use unsigned bytes (chars?)
+	public static short[] up 			= new short[] {KeyEvent.VK_W, KeyEvent.VK_UP };
+	public static short[] down 			= new short[] {KeyEvent.VK_S, KeyEvent.VK_DOWN };
+	public static short[] left 			= new short[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
+	public static short[] right 		= new short[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
+	public static short[] screenshot 	= new short[] {KeyEvent.VK_F1};
+	public static short[] save	 		= new short[] {KeyEvent.VK_F5};
+	public static short[] load	 		= new short[] {KeyEvent.VK_F9};
+	
+	public static final String SETTINGS_FILE = "settings.txt";
 
 	/**
 	 * Parses through an settings String and assigns the keyCodes inside to KeyInput, using the format:
@@ -77,6 +83,20 @@ public class KeyInput implements KeyListener {
 			screenshot = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
 			settings = settings.substring(settings.indexOf(';') + 1);
 		}
+		// check for save
+		index = settings.indexOf("save:");
+		if (index != -1) {
+			index += "save:".length();
+			save = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
+			settings = settings.substring(settings.indexOf(';') + 1);
+		}
+		// check for load
+		index = settings.indexOf("load:");
+		if (index != -1) {
+			index += "load:".length();
+			load = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
+			settings = settings.substring(settings.indexOf(';') + 1);
+		}
 	}
 
 	/**
@@ -86,7 +106,7 @@ public class KeyInput implements KeyListener {
 	 *            the codes in the correct format
 	 * @return the codes extracted into an int[]
 	 */
-	public static int[] extractKeyCodes(String codes) {
+	public static short[] extractKeyCodes(String codes) {
 		// count the number of code values using the number of commas in 'codes'
 		int commas = 0;
 		for (int i = 0; i < codes.length(); i++) {
@@ -94,19 +114,19 @@ public class KeyInput implements KeyListener {
 				commas++;
 			}
 		}
-		int[] extracted = new int[commas + 1]; // there will always be 1 more code than there are commas
+		short[] extracted = new short[commas + 1]; // there will always be 1 more code than there are commas
 		Scanner scan = new Scanner(codes);
 		scan.useDelimiter(",");
 		for (int i = 0; scan.hasNextInt(); i++) {
-			extracted[i] = scan.nextInt();
+			extracted[i] = scan.nextShort();
 		}
 		return extracted;
 	}
 
 	/**
-	 * Reads settings.txt in the same directory and uses any keyCodes found instead of the defaults. If there are no keyCodes found, the default codes are used.
+	 * Reads SETTINGS_FILE in the same directory and uses any keyCodes found instead of the defaults. If there are no keyCodes found, the default codes are used.
 	 * 
-	 * settings.txt must follow the code block format:
+	 * SETTINGS_FILE must follow the code block format:
 	 * 
 	 * <code>
 	 * settings{
@@ -121,9 +141,9 @@ public class KeyInput implements KeyListener {
 	public static void readSettingsFile() {
 		String settings = "";
 		try {
-			// read settings.txt to settings
-			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("settings.txt"), "UTF8"));
-			// go to the start of the settings block, removing whitespace
+			// read SETTINGS_FILE to settings
+			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(SETTINGS_FILE), "UTF8"));
+			// go to the start of the settings block, removing whitespace (readLine removes the line breaks)
 			while (!in.readLine().replaceAll("\\s", "").replaceAll("\\t", "").toLowerCase().equals("keybindings{")) {
 			}
 			// read the settings block, removing whitespace
@@ -132,11 +152,10 @@ public class KeyInput implements KeyListener {
 				if (!line.equals(""))
 					settings += line;
 			}
-			//parse
 			parsesettings(settings);
 			in.close();
 		} catch (Exception e) {
-			System.out.println(Err.error("KeyInput can't read settings.txt!"));
+			Err.error("KeyInput can't read " + SETTINGS_FILE + "!");
 			e.printStackTrace();
 		}
 	}
@@ -149,7 +168,7 @@ public class KeyInput implements KeyListener {
 	 * @param keyCodes
 	 *            the array of codes to check
 	 */
-	public static boolean pressed(int[] keyCodes) {
+	public static boolean pressed(short[] keyCodes) {
 		for (int keyCode : keyCodes) {
 			if (keys[keyCode])
 				return true;
@@ -164,7 +183,7 @@ public class KeyInput implements KeyListener {
 	 *            the id of the Key you want to know about
 	 * @return true if the key is pressed, else false
 	 */
-	public static boolean pressed(int keyCode) {
+	public static boolean pressed(short keyCode) {
 		return keys[keyCode];
 	}
 
@@ -172,6 +191,10 @@ public class KeyInput implements KeyListener {
 	 * Called by JVM when a key is pressed. Do not call this method unless you are making a robot.
 	 */
 	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() >= keys.length) {
+			Err.error("Invalid key press!");
+			return;
+		}
 		keys[e.getKeyCode()] = true;
 	}
 
@@ -179,6 +202,10 @@ public class KeyInput implements KeyListener {
 	 * Called by JVM when a key is released. Do not call this method unless you are making a robot.
 	 */
 	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() >= keys.length) {
+			Err.error("Invalid key release!");
+			return;
+		}
 		keys[e.getKeyCode()] = false;
 	}
 

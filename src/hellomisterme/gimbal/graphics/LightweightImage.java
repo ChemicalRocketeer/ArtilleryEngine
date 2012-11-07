@@ -1,8 +1,11 @@
 package hellomisterme.gimbal.graphics;
 
 import hellomisterme.gimbal.Err;
+import hellomisterme.gimbal.io.Savable;
 
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,19 +20,38 @@ import javax.imageio.ImageIO;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class LightweightImage {
+public class LightweightImage implements Savable {
 	private int width;
 	private int[] pixels;
+	private String filePath;
 	
 	public LightweightImage(String path) {
 		setImage(path);
+		filePath = path;
 	}
 
 	/**
-	 * This has to be here so the LightwightImage can be initialized without a call by Entity's subclasses
+	 * Has to be here so the LightwightImage can be initialized without a call by Entity's subclasses
 	 */
 	public LightweightImage() {
 		
+	}
+	
+	public void save(DataOutputStream out) {
+		try {
+			out.writeUTF(filePath);
+		} catch (IOException e) {
+			Err.error("LightweightImage can't save data!");
+			e.printStackTrace();
+		}
+	}
+	
+	public void load(DataInputStream in) {
+		try {
+			setImage(in.readUTF());
+		} catch (IOException e) {
+			Err.error("LightweightImage can't read data!");
+		}
 	}
 
 	/**
@@ -44,8 +66,9 @@ public class LightweightImage {
 		BufferedImage src;
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
+			filePath = path;
 		} catch (IOException e) {
-			System.out.println(Err.error("LightweightImage can't read " + path + "!"));
+			Err.error("LightweightImage can't read " + path + "!");
 			e.printStackTrace();
 			useDefaultImage(); // can't get the correct image, so use default
 			return; // can't do the rest of this method, so exit
@@ -64,6 +87,7 @@ public class LightweightImage {
 	 * Sets this LightweightImage to the default 20x20 white square.
 	 */
 	public void useDefaultImage() {
+		filePath = "";
 		width = 20;
 		pixels = new int[width * width];
 		for (int i = 0; i < pixels.length; i++) {

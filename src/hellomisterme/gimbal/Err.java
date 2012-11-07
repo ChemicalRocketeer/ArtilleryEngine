@@ -12,9 +12,9 @@ public class Err {
 	
 	// TODO replace email
 	public static final String APPEND = "\nPlease contact aasuddjian@gmail.com with this error message.\n";
-	public static final String PREPEND = "Error: ";
+	public static final String PREPEND = "\nError: ";
 	
-	public static String error(String message) {
-		return PREPEND + message + APPEND;
+	public static void error(String message) {
+		System.out.println(PREPEND + message + APPEND);
 	}
 }

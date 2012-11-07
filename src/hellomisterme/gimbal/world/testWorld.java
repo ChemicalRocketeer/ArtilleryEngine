@@ -11,6 +11,6 @@ import hellomisterme.gimbal.entities.mob.Player;
 public class testWorld extends World {
 
 	public testWorld() {
-		Player player = new Player(this);
+		add(new Player());
 	}
 }

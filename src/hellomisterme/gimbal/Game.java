@@ -2,6 +2,7 @@ package hellomisterme.gimbal;
 
 import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.input.KeyInput;
+import hellomisterme.gimbal.io.Savegame;
 import hellomisterme.gimbal.world.World;
 import hellomisterme.gimbal.world.testWorld;
 
@@ -17,7 +18,7 @@ import javax.swing.JFrame;
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.03
+ * @version Pre-Alpha.0.04
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
@@ -39,6 +40,7 @@ public class Game extends Canvas implements Runnable {
 	private World world;
 
 	private boolean screenshotOrdered = false;
+	private boolean ioOrdered = false;
 
 	public Game() {
 		Dimension size = new Dimension(width, height);
@@ -102,7 +104,7 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				System.out.println("FPS: " + frameCount + ", AVG: " + (totalFrames / totalSeconds) + ", TPS: " + tickCount + ", SEC: " + totalSeconds + "  " + ns);
+				System.out.println("FPS: " + frameCount + ", AVG: " + (totalFrames / totalSeconds) + ", TPS: " + tickCount + ", SEC: " + totalSeconds);
 				frame.setTitle(title + "   -   FPS: " + frameCount + ", TPS: " + tickCount);
 				frameCount = 0;
 				tickCount = 0;
@@ -124,6 +126,21 @@ public class Game extends Canvas implements Runnable {
 			}
 		} else { // screenshot key not pressed
 			screenshotOrdered = false; 
+		}
+		
+		// if an io key is pressed
+		if (KeyInput.pressed(KeyInput.save)) {
+			if (ioOrdered == false) { // if an io key was up before
+				Savegame.saveData(world, world.getName());
+				ioOrdered = true; // remember that io was ordered
+			}
+		} else if (KeyInput.pressed(KeyInput.load)) {
+			if (ioOrdered == false) { // if the io key was up before
+				Savegame.loadData(world, world.getName());
+				ioOrdered = true; // remember that io was ordered
+			}
+		} else { // io keys not pressed
+			ioOrdered = false; 
 		}
 		
 		world.tick();

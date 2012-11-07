@@ -56,7 +56,7 @@ public class Render {
 			outFile.mkdirs();
 			ImageIO.write(image, "png", outFile);
 		} catch (Exception e) {
-			System.out.println(Err.error("Can't write screenshot \"" + fileName + "\" to file!"));
+			Err.error("Can't write screenshot \"" + fileName + "\" to file!");
 			e.printStackTrace();
 		}
 		System.out.println("Screenshot saved as " + fileName);
@@ -101,7 +101,7 @@ public class Render {
 				render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
 			} else {
 				System.out.println("At entities[" + i + "]:");
-				System.out.println(Err.error("Cannot render null Entity at Render.render.entities[" + i + "]!"));
+				Err.error("Cannot render null Entity at Render.render.entities[" + i + "]!");
 			}
 		}
 	}

@@ -1,6 +1,11 @@
 package hellomisterme.gimbal.entities;
 
+import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Tick;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
@@ -14,6 +19,28 @@ public abstract class Mover extends Entity implements Tick {
 
 	protected double exactX = 0, exactY = 0;
 
+	public void save(DataOutputStream out) {
+		super.save(out);
+		try {
+			out.writeDouble(exactX);
+			out.writeDouble(exactY);
+		} catch (IOException e) {
+			Err.error("Can't save Mover data!");
+			e.printStackTrace();
+		}
+	}
+	
+	public void load(DataInputStream in) {
+		super.load(in);
+		try {
+			exactX = in.readDouble();
+			exactY = in.readDouble();
+		} catch (IOException e) {
+			Err.error("Can't read Mover data!");
+			e.printStackTrace();
+		}
+	}
+	
 	public double getExactX() {
 		return exactX;
 	}
