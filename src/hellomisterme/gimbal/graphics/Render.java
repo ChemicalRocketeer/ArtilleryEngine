@@ -203,9 +203,9 @@ public class Render {
 	 * TODO: fill with black for final game instead of pink for testing
 	 */
 	public void clear() {
-		// fill all pixels with pink
+		// fill all pixels with black
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0xFF00FF;
+			pixels[i] = 0;
 		}
 	}
 }
