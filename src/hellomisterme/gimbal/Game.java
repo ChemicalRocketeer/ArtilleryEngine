@@ -131,12 +131,12 @@ public class Game extends Canvas implements Runnable {
 		// if an io key is pressed
 		if (KeyInput.pressed(KeyInput.save)) {
 			if (ioOrdered == false) { // if an io key was up before
-				Savegame.saveData(world, world.getName());
+				Savegame.saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else if (KeyInput.pressed(KeyInput.load)) {
 			if (ioOrdered == false) { // if the io key was up before
-				Savegame.loadData(world, world.getName());
+				Savegame.loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else { // io keys not pressed
