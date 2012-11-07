@@ -53,7 +53,7 @@ public class Game extends Canvas implements Runnable {
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 		// initialize world
-		world = new testWorld();
+		world = new testWorld(width, height);
 
 		// initialize keyboard input
 		addKeyListener(new KeyInput());

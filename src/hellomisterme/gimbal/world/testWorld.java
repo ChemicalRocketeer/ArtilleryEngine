@@ -10,7 +10,9 @@ import hellomisterme.gimbal.entities.mob.Player;
  */
 public class testWorld extends World {
 
-	public testWorld() {
+	public testWorld(int width, int height) {
+		setWidth(width);
+		setHeight(height);
 		add(new Player());
 	}
 }
