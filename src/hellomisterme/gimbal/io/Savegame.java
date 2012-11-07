@@ -31,6 +31,7 @@ public class Savegame {
 	 */
 	public static void saveData(Savable savable, String name) {
 		try {
+			new File("saves").mkdir(); // make the diectory
 			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("saves/" + name + ".gmbl"))));
 			out.writeInt(VERSION);
 			savable.save(out);
