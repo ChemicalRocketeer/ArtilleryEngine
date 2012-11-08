@@ -104,8 +104,7 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				System.out.println("FPS: " + frameCount + ", AVG: " + (totalFrames / totalSeconds) + ", TPS: " + tickCount + ", SEC: " + totalSeconds);
-				frame.setTitle(title + "   -   FPS: " + frameCount + ", TPS: " + tickCount);
+				frame.setTitle(title + "   -   FPS: " + frameCount + ",   AVG: " + (totalFrames / totalSeconds) + ",   TPS: " + tickCount + ",   SEC: " + totalSeconds);
 				frameCount = 0;
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
