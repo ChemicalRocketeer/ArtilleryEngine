@@ -64,6 +64,8 @@ public class Game extends Canvas implements Runnable {
 	 * Starts running this Game
 	 */
 	public synchronized void start() {
+		createBufferStrategy(3);
+		
 		running = true;
 		thread = new Thread(this);
 		thread.start();
@@ -75,6 +77,7 @@ public class Game extends Canvas implements Runnable {
 	 * Called by this Game's Thread thread.
 	 */
 	public void run() {
+		
 		int totalFrames = 0; // the total number of frames generated
 		int totalSeconds = 0; // the number of times totalFrames has been updated
 		int frameCount = 0; // FPS timer variable
@@ -85,7 +88,7 @@ public class Game extends Canvas implements Runnable {
 		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
 		double delta = 0; // difference between now and the last tick
 		long lastTime = System.nanoTime();
-
+		
 		while (running) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -147,14 +150,10 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Creates a BufferStrategy if there isn't one, calls render method of render, and displays the buffered image
+	 * Calls render method of render, and displays the buffered image
 	 */
 	private void render() {
 		BufferStrategy strategy = getBufferStrategy();
-		if (strategy == null) {
-			createBufferStrategy(3);
-			return;
-		}
 
 		render.render(world.getEntities());
 
@@ -185,6 +184,7 @@ public class Game extends Canvas implements Runnable {
 		game.frame.add(game);
 		game.frame.pack(); // automatically set size
 		game.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		game.requestFocus();
 		game.frame.setLocationRelativeTo(null); // center
 		game.frame.setVisible(true);
 

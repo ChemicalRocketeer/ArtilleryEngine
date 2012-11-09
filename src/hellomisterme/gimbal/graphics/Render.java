@@ -85,10 +85,10 @@ public class Render {
 						screenshotNumber = num.intValue();
 					}
 				} else {
-					System.out.print("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
+					System.out.println("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
 				}
 			} else {
-				System.out.print("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
+				System.out.println("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
 			}
 
 		}
