@@ -25,17 +25,17 @@ import javax.swing.JFrame;
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
+	public static String title = "Gimbal";
 	public static int width = 800;
 	public static int height = width * 10 / 16;
-	public static String title = "Gimbal";
 	public static final int TICKS_PER_SECOND = 60;
 
 	private Thread thread;
 	private JFrame frame;
 	boolean running = false;
 
-	private Render render;
 	private BufferedImage image;
+	private Render render;	
 
 	private World world;
 
@@ -43,13 +43,9 @@ public class Game extends Canvas implements Runnable {
 	private boolean ioOrdered = false;
 
 	public Game() {
-		Dimension size = new Dimension(width, height);
-		setPreferredSize(size);
-
 		// initialize visual elements
-		frame = new JFrame();
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
 		render = new Render(width, height);
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 		// initialize world
@@ -57,7 +53,6 @@ public class Game extends Canvas implements Runnable {
 
 		// initialize keyboard input
 		addKeyListener(new KeyInput());
-		KeyInput.readSettingsFile();
 	}
 
 	/**
@@ -65,7 +60,6 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public synchronized void start() {
 		createBufferStrategy(3);
-		
 		running = true;
 		thread = new Thread(this);
 		thread.start();
@@ -73,6 +67,8 @@ public class Game extends Canvas implements Runnable {
 
 	/**
 	 * This is it. The game loop. If something happens in the game, it begins here.
+	 * 
+	 * TODO make all the extra frames actually do something useful
 	 * 
 	 * Called by this Game's Thread thread.
 	 */
@@ -86,7 +82,7 @@ public class Game extends Canvas implements Runnable {
 
 		// regulate tick frequency
 		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
-		double delta = 0; // difference between now and the last tick
+		double delta = 1; // difference between now and the last tick
 		long lastTime = System.nanoTime();
 		
 		while (running) {
@@ -150,18 +146,16 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Calls render method of render, and displays the buffered image
+	 * Calls render method of render, and displays the image
 	 */
 	private void render() {
-		BufferStrategy strategy = getBufferStrategy();
-
 		render.render(world.getEntities());
-
-		Graphics g = strategy.getDrawGraphics();
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-		g.dispose();
-
-		strategy.show();
+		
+		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
+		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		g.dispose(); // let go of the Graphics object
+		strategy.show(); // have the strategy do its thing
 	}
 
 	/**
@@ -175,19 +169,23 @@ public class Game extends Canvas implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setupFrame() {
+		setPreferredSize(new Dimension(width, height)); // set canvas size
+		frame = new JFrame();
+		frame.setResizable(false);
+		frame.setTitle(title);
+		frame.add(this); // add Game to frame
+		frame.pack(); // automatically set window size
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		requestFocus(); // get focus if OS allows it
+		frame.setLocationRelativeTo(null); // center
+		frame.setVisible(true);
+	}
 
 	public static void main(String[] args) {
 		Game game = new Game();
-
-		game.frame.setResizable(false);
-		game.frame.setTitle(title);
-		game.frame.add(game);
-		game.frame.pack(); // automatically set size
-		game.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		game.requestFocus();
-		game.frame.setLocationRelativeTo(null); // center
-		game.frame.setVisible(true);
-
+		game.setupFrame();
 		game.start();
 	}
 

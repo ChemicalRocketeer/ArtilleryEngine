@@ -3,15 +3,9 @@ package hellomisterme.gimbal.graphics;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.Entity;
+import hellomisterme.gimbal.io.ScreenshotManager;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.io.File;
-import java.math.BigInteger;
-import java.util.Calendar;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 /**
  * Render handles computation and combination of the pixels that go onto the screen.
@@ -22,76 +16,18 @@ import javax.imageio.ImageIO;
  * @author David Aaron Suddjian
  */
 public class Render {
-
+	
 	private int width = Game.width;
 	private int height = Game.height;
-	public int[] pixels = new int[width * height];
-
-	private int screenshotNumber = 0;
-	private String screenshotPrefix = "screen ";
+	public int[] pixels = new int[getWidth() * getHeight()];
+	
+	private ScreenshotManager screenshot;
 
 	public Render(int width, int height) {
-		this.width = width;
-		this.height = height;
+		this.setWidth(width);
+		this.setHeight(height);
 		pixels = new int[width * height];
-		readScreenshotNumber();
-	}
-
-	/**
-	 * Saves a picture of whatever's currently on the screen to screenshots/default-generated-filename in PNG format.
-	 */
-	public void screenshot() {
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		int[] shot = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		for (int i = 0; i < pixels.length; i++) {
-			shot[i] = pixels[i];
-		}
-		Calendar c = Calendar.getInstance();
-		screenshotNumber++;
-		String fileName = c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + ""; // date
-		fileName += " " + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + "_" + c.get(Calendar.SECOND) + ""; // time
-		fileName = "screenshots/" + screenshotPrefix + screenshotNumber + "  " + fileName + ".png"; // other file name stuff
-		try {
-			File outFile = new File(fileName);
-			outFile.mkdirs();
-			ImageIO.write(image, "png", outFile);
-		} catch (Exception e) {
-			Err.error("Can't write screenshot \"" + fileName + "\" to file!");
-			e.printStackTrace();
-		}
-		System.out.println("Screenshot saved as " + fileName);
-	}
-
-	/**
-	 * Reads the number of the latest screenshot from the screenshots folder, and sets it as the number to start at when writing future screenshots.
-	 */
-	public void readScreenshotNumber() {
-		File[] shots = new File("screenshots").listFiles();
-		if (shots == null) {
-			screenshotNumber = 0;
-			return;
-		}
-		for (int i = 0; i < shots.length; i++) {
-			String name = shots[i].getName();
-			int index = name.indexOf(screenshotPrefix); // find the screenshotPrefix in file
-			index += screenshotPrefix.length();
-			if (index != -1) {
-				name = name.substring(index); // name now starts with its screenshot number
-				index = name.indexOf(' '); // now use index to find the end of the number
-				if (index != -1) {
-					name = name.substring(0, index);
-					BigInteger num = new BigInteger(name);
-					if (num.intValue() > screenshotNumber) {
-						screenshotNumber = num.intValue();
-					}
-				} else {
-					System.out.println("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
-				}
-			} else {
-				System.out.println("Render.readScreenshotNumber: " + name + " is an illegal filename!"); // TODO remove/modify
-			}
-
-		}
+		screenshot = new ScreenshotManager(this);
 	}
 
 	public void render(List<Entity> entities) {
@@ -118,7 +54,7 @@ public class Render {
 	 */
 	public void render(LightweightImage img, int xPos, int yPos) {
 		// check if img is completely off-screen
-		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
+		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
 			return;
 		}
 
@@ -128,8 +64,8 @@ public class Render {
 		int yIndex; // y value to start at when copying pixels from img
 		int yClip; // y value to stop at when copying pixels from img
 		// OOB right
-		if (xPos >= width - img.getWidth()) {
-			xClip = width - xPos;
+		if (xPos >= getWidth() - img.getWidth()) {
+			xClip = getWidth() - xPos;
 		} else {
 			xClip = img.getWidth();
 		}
@@ -146,18 +82,18 @@ public class Render {
 			yIndex = 0;
 		}
 		// OOB bottom
-		if (yPos > height - img.getHeight()) {
-			yClip = height - yPos;
+		if (yPos > getHeight() - img.getHeight()) {
+			yClip = getHeight() - yPos;
 		} else {
 			yClip = img.getHeight();
 		}
 
-		yPos *= width; // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
+		yPos *= getWidth(); // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
 
 		// actual img copy loop
 		for (int y = yIndex; y < yClip; y++) {
 			for (int x = xIndex; x < xClip; x++) {
-				int index = xPos + x + yPos + y * width; // the current location in pixels[]
+				int index = xPos + x + yPos + y * getWidth(); // the current location in pixels[]
 				// calculate the new pixel value and put into pixels[]
 				pixels[index] = blendRGB(pixels[index], img.getPixels()[x + y * img.getWidth()]);
 			}
@@ -207,5 +143,25 @@ public class Render {
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 0;
 		}
+	}
+	
+	public void screenshot() {
+		screenshot.screenshot();
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }

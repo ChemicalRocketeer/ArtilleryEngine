@@ -35,6 +35,10 @@ public class KeyInput implements KeyListener {
 	
 	public static final String SETTINGS_FILE = "settings.txt";
 
+	public KeyInput() {
+		readSettingsFile();
+	}
+	
 	/**
 	 * Parses through an settings String and assigns the keyCodes inside to KeyInput, using the format:
 	 * 
