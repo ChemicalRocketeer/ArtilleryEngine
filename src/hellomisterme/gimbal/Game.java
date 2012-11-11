@@ -30,12 +30,11 @@ public class Game extends Canvas implements Runnable {
 	public static int height = width * 10 / 16;
 	public static final int TICKS_PER_SECOND = 60;
 
-	private Thread thread;
 	private JFrame frame;
 	boolean running = false;
 
 	private BufferedImage image;
-	private Render render;	
+	private Render render;
 
 	private World world;
 
@@ -43,6 +42,8 @@ public class Game extends Canvas implements Runnable {
 	private boolean ioOrdered = false;
 
 	public Game() {
+		setPreferredSize(new Dimension(width, height));
+
 		// initialize visual elements
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
 		render = new Render(width, height);
@@ -56,16 +57,6 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Starts running this Game
-	 */
-	public synchronized void start() {
-		createBufferStrategy(3);
-		running = true;
-		thread = new Thread(this);
-		thread.start();
-	}
-
-	/**
 	 * This is it. The game loop. If something happens in the game, it begins here.
 	 * 
 	 * TODO make all the extra frames actually do something useful
@@ -73,7 +64,10 @@ public class Game extends Canvas implements Runnable {
 	 * Called by this Game's Thread thread.
 	 */
 	public void run() {
-		
+		createBufferStrategy(3);
+
+		running = true;
+
 		int totalFrames = 0; // the total number of frames generated
 		int totalSeconds = 0; // the number of times totalFrames has been updated
 		int frameCount = 0; // FPS timer variable
@@ -84,7 +78,7 @@ public class Game extends Canvas implements Runnable {
 		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
 		double delta = 1; // difference between now and the last tick
 		long lastTime = System.nanoTime();
-		
+
 		while (running) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -103,7 +97,9 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				frame.setTitle(title + "   -   FPS: " + frameCount + ",   AVG: " + (totalFrames / totalSeconds) + ",   TPS: " + tickCount + ",   SEC: " + totalSeconds);
+				if (frame != null) {
+					frame.setTitle(title + "   -   FPS: " + frameCount + ",   AVG: " + (totalFrames / totalSeconds) + ",   TPS: " + tickCount + ",   SEC: " + totalSeconds);
+				}
 				frameCount = 0;
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
@@ -123,9 +119,9 @@ public class Game extends Canvas implements Runnable {
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
 		} else { // screenshot key not pressed
-			screenshotOrdered = false; 
+			screenshotOrdered = false;
 		}
-		
+
 		// if an io key is pressed
 		if (KeyInput.pressed(KeyInput.save)) {
 			if (ioOrdered == false) { // if an io key was up before
@@ -138,9 +134,9 @@ public class Game extends Canvas implements Runnable {
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else { // io keys not pressed
-			ioOrdered = false; 
+			ioOrdered = false;
 		}
-		
+
 		world.tick();
 		world.callTick();
 	}
@@ -150,7 +146,7 @@ public class Game extends Canvas implements Runnable {
 	 */
 	private void render() {
 		render.render(world.getEntities());
-		
+
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
@@ -163,30 +159,16 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public synchronized void stop() {
 		running = false;
-		try {
-			thread.join(); // end thread, can't have that dangling there
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void setupFrame() {
-		setPreferredSize(new Dimension(width, height)); // set canvas size
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.setTitle(title);
-		frame.add(this); // add Game to frame
-		frame.pack(); // automatically set window size
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		requestFocus(); // get focus if OS allows it
-		frame.setLocationRelativeTo(null); // center
-		frame.setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		Game game = new Game();
-		game.setupFrame();
-		game.start();
+	/**
+	 * Sets this Game's frame variable to f. Does not add this Game to f. That must be done before calling this method.
+	 * 
+	 * @param f
+	 *            the frame this Game will be allowed to manipulate
+	 */
+	public void setFrame(JFrame f) {
+		frame = f;
 	}
 
 }
