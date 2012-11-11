@@ -1,7 +1,6 @@
 package hellomisterme.gimbal.io;
 
 import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.graphics.Render;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -20,27 +19,22 @@ public class ScreenshotManager {
 
 	private int screenshotNumber = 0;
 	private String screenshotPrefix = "screen ";
-	private Render render;
-	
-	private ScreenshotManager() {
-		
-	}
-	
-	public ScreenshotManager(Render r) {
+
+	public ScreenshotManager() {
 		readScreenshotNumber();
 	}
 
 	/**
 	 * Saves a picture of whatever's currently on the screen to screenshots/default-generated-filename in PNG format.
 	 */
-	public void screenshot() {
-		BufferedImage image = new BufferedImage(render.getWidth(), render.getHeight(), BufferedImage.TYPE_INT_RGB);
+	public void screenshot(int[] pixels, int width) {
+		BufferedImage image = new BufferedImage(width, pixels.length / width, BufferedImage.TYPE_INT_RGB);
 		int[] shot = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		for (int i = 0; i < render.pixels.length; i++) {
-			shot[i] = render.pixels[i];
+		for (int i = 0; i < pixels.length; i++) {
+			shot[i] = pixels[i];
 		}
-		Calendar c = Calendar.getInstance();
 		screenshotNumber++;
+		Calendar c = Calendar.getInstance();
 		String fileName = c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + ""; // date
 		fileName += " " + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + "_" + c.get(Calendar.SECOND) + ""; // time
 		fileName = "screenshots/" + screenshotPrefix + screenshotNumber + "  " + fileName + ".png"; // other file name stuff

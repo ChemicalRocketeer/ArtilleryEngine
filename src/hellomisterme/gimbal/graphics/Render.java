@@ -27,7 +27,7 @@ public class Render {
 		this.setWidth(width);
 		this.setHeight(height);
 		pixels = new int[width * height];
-		screenshot = new ScreenshotManager(this);
+		screenshot = new ScreenshotManager();
 	}
 
 	public void render(List<Entity> entities) {
@@ -146,7 +146,7 @@ public class Render {
 	}
 	
 	public void screenshot() {
-		screenshot.screenshot();
+		screenshot.screenshot(pixels, width);
 	}
 
 	public int getHeight() {
