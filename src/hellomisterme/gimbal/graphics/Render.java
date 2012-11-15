@@ -37,8 +37,6 @@ public class Render {
 			if (ent != null) {
 				if (ent.getImage() != null) {
 					render(ent.getImage(), ent.getX(), ent.getY());
-				} else {
-					Err.error("The GimbalImage of Entity number " + i + " doesn't exist!");
 				}
 			} else {
 				Err.error("Entity number " + i + " doesn't exist!");
