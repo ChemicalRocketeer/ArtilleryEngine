@@ -28,6 +28,7 @@ public abstract class Entity implements Savable {
 		try {
 			out.writeInt(x);
 			out.writeInt(y);
+			saveData(out);
 			if (image != null) {
 				out.writeBoolean(true);
 				image.save(out);
@@ -39,12 +40,21 @@ public abstract class Entity implements Savable {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Saves this Entity's data.
+	 */
+	public void saveData(DataOutputStream out) {
+		
+	}
 
 	/**
 	 * Calls loadData(), then if it reads a true, calls the loadImage().
 	 */
 	public void load(DataInputStream in) {
 		try {
+			x = in.readInt();
+			y = in.readInt();
 			loadData(in);
 			if (in.readBoolean()) {
 				loadImage(in);
@@ -58,9 +68,8 @@ public abstract class Entity implements Savable {
 	/**
 	 * Loads this Entity's saved data.
 	 */
-	public void loadData(DataInputStream in) throws IOException {
-		x = in.readInt();
-		y = in.readInt();
+	public void loadData(DataInputStream in) {
+		
 	}
 
 	/**

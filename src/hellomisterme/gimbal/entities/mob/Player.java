@@ -1,11 +1,13 @@
 package hellomisterme.gimbal.entities.mob;
 
+import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.entities.Mover;
 import hellomisterme.gimbal.graphics.GimbalImage;
 import hellomisterme.gimbal.graphics.LightweightAnimation;
 import hellomisterme.gimbal.input.KeyInput;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 /**
  * The Player class. This is the player. Yessiree Bob.
@@ -16,6 +18,9 @@ import java.io.DataInputStream;
 public class Player extends Mover {
 
 	private double speed = 2.0;
+
+	public static final int ANIMATION_SPEED = 6;
+	private int tickCount = 0;
 
 	public static final double MAX_HEALTH = 10;
 	private double health = MAX_HEALTH;
@@ -31,7 +36,13 @@ public class Player extends Mover {
 			die();
 		}
 
-		((LightweightAnimation) image).next();
+		if (tickCount == ANIMATION_SPEED) {
+			((LightweightAnimation) image).next();
+			tickCount = 0;
+		} else {
+			tickCount++;
+		}
+
 		// Move if the right button(s) are held down
 		if (KeyInput.pressed(KeyInput.up)) {
 			setPos(getExactX(), getExactY() - speed * .5);
@@ -85,6 +96,30 @@ public class Player extends Mover {
 			return super.getImage();
 		} else {
 			return null;
+		}
+	}
+	
+	@Override
+	public void saveData(DataOutputStream out) {
+		try {
+			out.writeInt(tickCount);
+			out.writeDouble(health);
+			out.writeInt(damageImmunityTimer);
+		} catch (Exception e) {
+			Err.error("Player can't save data!");
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void loadData(DataInputStream in) {
+		try {
+			tickCount = in.readInt();
+			health = in.readDouble();
+			damageImmunityTimer = in.readInt();
+		} catch (Exception e) {
+			Err.error("Player can't load data!");
+			e.printStackTrace();
 		}
 	}
 
