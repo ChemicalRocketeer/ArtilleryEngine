@@ -1,7 +1,6 @@
 package hellomisterme.gimbal.graphics;
 
 import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.io.Savable;
 
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
@@ -11,32 +10,34 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-
 /**
- * A LightweightImage efficiently stores image data. Currently creates a blank white 20x20 square.
+ * A LightweightImage efficiently stores image data. Creates a blank white 20x20 square by default.
  * 
  * There is no height variable. Height is calculated using the width variable and the length of the pixel array.
  * 
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class LightweightImage implements Savable {
-	private int width;
-	private int[] pixels;
-	private String filePath;
-	
+public class LightweightImage extends GimbalImage {
+	protected int width;
+	protected int[] pixels;
+	protected String filePath;
+
 	public LightweightImage(String path) {
 		setImage(path);
 		filePath = path;
 	}
 
 	/**
-	 * Has to be here so the LightwightImage can be initialized without a call by Entity's subclasses
+	 * Has to be here so the LightwightImage can be initialized and then manipulated without wasting system resources.
 	 */
 	public LightweightImage() {
-		
+		useDefaultImage();
 	}
-	
+
+	/**
+	 * Saves this LightweightImage's filepath (not the actual image data).
+	 */
 	public void save(DataOutputStream out) {
 		try {
 			out.writeUTF(filePath);
@@ -45,7 +46,10 @@ public class LightweightImage implements Savable {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Loads data from the image at whatever filepath is read.
+	 */
 	public void load(DataInputStream in) {
 		try {
 			setImage(in.readUTF());
@@ -55,7 +59,7 @@ public class LightweightImage implements Savable {
 	}
 
 	/**
-	 * Loads color data from an image file at the relative path 
+	 * Loads color data from an image file at the relative path
 	 * 
 	 * TODO check for efficiency
 	 * 
@@ -66,20 +70,12 @@ public class LightweightImage implements Savable {
 		BufferedImage src;
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
+			pixels = extractPixels(src);
+			width = src.getWidth();
 			filePath = path;
 		} catch (IOException e) {
 			Err.error("LightweightImage can't read " + path + "!");
 			e.printStackTrace();
-			useDefaultImage(); // can't get the correct image, so use default
-			return; // can't do the rest of this method, so exit
-		}
-		width = src.getWidth();
-		pixels = new int[src.getWidth() * src.getHeight()]; // set pixels length
-		// copy colors from src to pixels
-		for (int y = 0; y < getHeight(); y++) {
-			for (int x = 0; x < getWidth(); x++) {
-				pixels[x + y * width] = src.getRGB(x, y);
-			}
 		}
 	}
 
@@ -98,6 +94,8 @@ public class LightweightImage implements Savable {
 	/**
 	 * Caution: this method allows the original pixels to be edited!
 	 * 
+	 * Can return null
+	 * 
 	 * @return this LightweightImage's pixel data
 	 */
 	public int[] getPixels() {
@@ -106,6 +104,10 @@ public class LightweightImage implements Savable {
 
 	public int getWidth() {
 		return width;
+	}
+
+	protected void setWidth(int w) {
+		width = w;
 	}
 
 	public int getHeight() {

@@ -33,11 +33,15 @@ public class Render {
 	public void render(List<Entity> entities) {
 		clear();
 		for (int i = 0; i < entities.size(); i++) {
-			if (entities.get(i) != null) {
-				render(entities.get(i).getImage(), entities.get(i).getX(), entities.get(i).getY());
+			Entity ent = entities.get(i);
+			if (ent != null) {
+				if (ent.getImage() != null) {
+					render(ent.getImage(), ent.getX(), ent.getY());
+				} else {
+					Err.error("The GimbalImage of Entity number " + i + " doesn't exist!");
+				}
 			} else {
-				System.out.println("At entities[" + i + "]:");
-				Err.error("Cannot render null Entity at Render.render.entities[" + i + "]!");
+				Err.error("Entity number " + i + " doesn't exist!");
 			}
 		}
 	}
@@ -45,16 +49,16 @@ public class Render {
 	/**
 	 * Draws LightweightImage data at the indicated point on screen
 	 * 
-	 * @param img
-	 *            the LightweightImage to be drawn
+	 * @param image
+	 *            the GimbalImage to be drawn
 	 * @param xPos
 	 *            the x coordinate of the top-left corner of the LightweightImage
 	 * @param yPos
 	 *            the y coordinate of the top-left corner of the LightweightImage
 	 */
-	public void render(LightweightImage img, int xPos, int yPos) {
+	public void render(GimbalImage image, int xPos, int yPos) {
 		// check if img is completely off-screen
-		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
+		if (xPos + image.getWidth() < 0 || yPos + image.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
 			return;
 		}
 
@@ -64,10 +68,10 @@ public class Render {
 		int yIndex; // y value to start at when copying pixels from img
 		int yClip; // y value to stop at when copying pixels from img
 		// OOB right
-		if (xPos >= getWidth() - img.getWidth()) {
+		if (xPos >= getWidth() - image.getWidth()) {
 			xClip = getWidth() - xPos;
 		} else {
-			xClip = img.getWidth();
+			xClip = image.getWidth();
 		}
 		// OOB left
 		if (xPos < 0) {
@@ -82,10 +86,10 @@ public class Render {
 			yIndex = 0;
 		}
 		// OOB bottom
-		if (yPos > getHeight() - img.getHeight()) {
+		if (yPos > getHeight() - image.getHeight()) {
 			yClip = getHeight() - yPos;
 		} else {
-			yClip = img.getHeight();
+			yClip = image.getHeight();
 		}
 
 		yPos *= getWidth(); // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
@@ -95,7 +99,7 @@ public class Render {
 			for (int x = xIndex; x < xClip; x++) {
 				int index = xPos + x + yPos + y * getWidth(); // the current location in pixels[]
 				// calculate the new pixel value and put into pixels[]
-				pixels[index] = blendRGB(pixels[index], img.getPixels()[x + y * img.getWidth()]);
+				pixels[index] = blendRGB(pixels[index], image.getPixels()[x + y * image.getWidth()]);
 			}
 		}
 	}
@@ -136,12 +140,11 @@ public class Render {
 	/**
 	 * Clears pixels so they can be filled later
 	 * 
-	 * TODO: fill with black for final game instead of pink for testing
 	 */
 	public void clear() {
 		// fill all pixels with black
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0;
+			pixels[i] = 0xFFFFFF;
 		}
 	}
 	
