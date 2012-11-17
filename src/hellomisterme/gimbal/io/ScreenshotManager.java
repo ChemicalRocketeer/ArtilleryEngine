@@ -40,13 +40,13 @@ public class ScreenshotManager {
 		fileName = "screenshots/" + prefix + number + "  " + fileName + ".png"; // other file name stuff
 		try {
 			File outFile = new File(fileName);
-			outFile.mkdirs();
-			ImageIO.write(image, "png", outFile);
+			outFile.mkdirs(); // make any necessary directories
+			ImageIO.write(image, "png", outFile); // write the pixel data
 		} catch (Exception e) {
 			Err.error("Can't write screenshot \"" + fileName + "\" to file!");
 			e.printStackTrace();
 		}
-		System.out.println("Screenshot saved as " + fileName);
+		System.out.println("Screenshot saved as " + fileName); // TODO put text on screen instead
 	}
 
 	/**

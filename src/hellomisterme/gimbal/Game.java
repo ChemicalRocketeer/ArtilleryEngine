@@ -18,7 +18,7 @@ import javax.swing.JFrame;
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.04
+ * @version Pre-Alpha.0.05
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
@@ -70,8 +70,8 @@ public class Game extends Canvas implements Runnable {
 
 		int totalFrames = 0; // the total number of frames generated
 		int totalSeconds = 0; // the number of times totalFrames has been updated
-		int frameCount = 0; // FPS timer variable
-		int tickCount = 0; // TPS timer variable
+		int frameCount = 0; // FPS counter variable
+		int tickCount = 0; // TPS counter variable
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
 		// regulate tick frequency
@@ -93,7 +93,7 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 
-			// count and print the FPS, TPS, AVG, and SEC to console and titlebar
+			// count and print the FPS, TPS, AVG, and SEC to titlebar
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
@@ -122,6 +122,7 @@ public class Game extends Canvas implements Runnable {
 			screenshotOrdered = false;
 		}
 
+		// these if statements are organized the way they are to prevent save/load operations in the same tick
 		// if an io key is pressed
 		if (KeyInput.pressed(KeyInput.save)) {
 			if (ioOrdered == false) { // if an io key was up before
@@ -129,7 +130,7 @@ public class Game extends Canvas implements Runnable {
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else if (KeyInput.pressed(KeyInput.load)) {
-			if (ioOrdered == false) { // if the io key was up before
+			if (ioOrdered == false) { // if an io key was up before
 				Savegame.loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}

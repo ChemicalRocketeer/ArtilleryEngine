@@ -2,7 +2,6 @@ package hellomisterme.gimbal.entities;
 
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.graphics.GimbalImage;
-import hellomisterme.gimbal.graphics.LightweightImage;
 import hellomisterme.gimbal.io.Savable;
 
 import java.io.DataInputStream;
@@ -17,7 +16,6 @@ import java.io.IOException;
  */
 public abstract class Entity implements Savable {
 
-	private int x = 0, y = 0;
 	protected GimbalImage image;
 	protected EntityBucket bucket;
 
@@ -26,8 +24,8 @@ public abstract class Entity implements Savable {
 	 */
 	public void save(DataOutputStream out) {
 		try {
-			out.writeInt(x);
-			out.writeInt(y);
+			out.writeInt(getX());
+			out.writeInt(getY());
 			saveData(out);
 			if (image != null) {
 				out.writeBoolean(true);
@@ -49,12 +47,11 @@ public abstract class Entity implements Savable {
 	}
 
 	/**
-	 * Calls loadData(), then if it reads a true, calls the loadImage().
+	 * Calls loadData(), then if it reads a true, calls loadImage().
 	 */
 	public void load(DataInputStream in) {
 		try {
-			x = in.readInt();
-			y = in.readInt();
+			setPos(in.readInt(), in.readInt());
 			loadData(in);
 			if (in.readBoolean()) {
 				loadImage(in);
@@ -76,7 +73,6 @@ public abstract class Entity implements Savable {
 	 * Loads saved image data. Can be overridden to load other types of images.
 	 */
 	public void loadImage(DataInputStream in) {
-		image = new LightweightImage();
 		image.load(in);
 	}
 
@@ -100,20 +96,13 @@ public abstract class Entity implements Savable {
 		image = img;
 	}
 
-	protected void setImage(String path) {
-		image = new LightweightImage(path);
+	public void setImage(String path) {
+		image.setImage(path);
 	}
 
-	public int getX() {
-		return x;
-	}
+	public abstract int getX();
 
-	public int getY() {
-		return y;
-	}
+	public abstract int getY();
 
-	public void setPos(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
+	public abstract void setPos(int x, int y);
 }

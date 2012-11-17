@@ -19,12 +19,12 @@ public class Player extends Mover {
 
 	private double speed = 2.0;
 
-	public static final int ANIMATION_SPEED = 6;
-	private int tickCount = 0;
+	public static final int ANIMATION_SPEED = 5; // how many ticks between animation frames
+	private int animationTimer = 0; // how many ticks since the last frame update
 
-	public static final double MAX_HEALTH = 10;
+	public static final double MAX_HEALTH = 10.0;
 	private double health = MAX_HEALTH;
-	private int DAMAGE_IMMUNITY_TIME = 30;
+	private int DAMAGE_IMMUNITY_TIME = 30; // how long player will be immune after being damaged
 	private int damageImmunityTimer = 0;
 
 	public Player() {
@@ -36,11 +36,11 @@ public class Player extends Mover {
 			die();
 		}
 
-		if (tickCount == ANIMATION_SPEED) {
+		if (animationTimer == ANIMATION_SPEED) {
 			((LightweightAnimation) image).next();
-			tickCount = 0;
+			animationTimer = 0;
 		} else {
-			tickCount++;
+			animationTimer++;
 		}
 
 		// Move if the right button(s) are held down
@@ -59,18 +59,18 @@ public class Player extends Mover {
 
 		// correct for out of bounds
 		boolean damage = false;
-		if (exactX >= bucket.getWidth() - image.getWidth()) { // right
-			setPos(bucket.getWidth() - image.getWidth(), exactY);
+		if (x >= bucket.getWidth() - image.getWidth()) { // right
+			setPos(bucket.getWidth() - image.getWidth(), y);
 			damage = true;
-		} else if (exactX < 0) { // left
-			setPos(0, exactY);
+		} else if (x < 0) { // left
+			setPos(0, y);
 			damage = true;
 		}
-		if (exactY >= bucket.getHeight() - image.getHeight()) { // bottom
-			setPos(exactX, bucket.getHeight() - image.getHeight());
+		if (y >= bucket.getHeight() - image.getHeight()) { // bottom
+			setPos(x, bucket.getHeight() - image.getHeight());
 			damage = true;
-		} else if (exactY < 0) { // top
-			setPos(exactX, 0);
+		} else if (y < 0) { // top
+			setPos(x, 0);
 			damage = true;
 		}
 
@@ -92,17 +92,26 @@ public class Player extends Mover {
 
 	@Override
 	public GimbalImage getImage() {
-		if (damageImmunityTimer % 5 >= 0 && damageImmunityTimer % 5 < 3) {
+		if (damageImmunityTimer % 10 >= 0 && damageImmunityTimer % 10 < 5) {
 			return super.getImage();
 		} else {
 			return null;
 		}
 	}
 	
+	/**
+	 * Writes this Player's data in order:
+	 * 
+	 * <ul>
+	 * <li>animationTimer int</li>
+	 * <li>health double</li>
+	 * <li>damageImmunityTimer int</li>
+	 * </ul>
+	 */
 	@Override
 	public void saveData(DataOutputStream out) {
 		try {
-			out.writeInt(tickCount);
+			out.writeInt(animationTimer);
 			out.writeDouble(health);
 			out.writeInt(damageImmunityTimer);
 		} catch (Exception e) {
@@ -111,10 +120,13 @@ public class Player extends Mover {
 		}
 	}
 	
+	/**
+	 * Loads a Player's saved data. See saveData().
+	 */
 	@Override
 	public void loadData(DataInputStream in) {
 		try {
-			tickCount = in.readInt();
+			animationTimer = in.readInt();
 			health = in.readDouble();
 			damageImmunityTimer = in.readInt();
 		} catch (Exception e) {

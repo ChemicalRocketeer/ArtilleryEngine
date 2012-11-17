@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class LightweightImage extends GimbalImage {
+public class LightweightImage implements GimbalImage {
 	protected int width;
 	protected int[] pixels;
 	protected String filePath;
@@ -70,7 +70,7 @@ public class LightweightImage extends GimbalImage {
 		BufferedImage src;
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
-			pixels = extractPixels(src);
+			src.getRGB(0, 0, src.getWidth(), src.getHeight(), pixels, 0, src.getWidth()); // copy colors from src to pixels
 			width = src.getWidth();
 			filePath = path;
 		} catch (IOException e) {

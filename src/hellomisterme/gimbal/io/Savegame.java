@@ -36,7 +36,7 @@ public class Savegame {
 			out.writeInt(VERSION);
 			savable.save(out);
 			out.close();
-			System.out.println("Saved " + name + ".gmbl!");
+			System.out.println("Saved " + name + ".gmbl!"); // TODO put text on the screen instead
 		} catch (IOException e) {
 			Err.error("Savegame can't save saves/" + name + ".gmbl");
 			e.printStackTrace();

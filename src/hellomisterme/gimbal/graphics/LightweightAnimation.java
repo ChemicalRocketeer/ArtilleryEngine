@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  * @since 11-11-12
  * @author David Aaron Suddjian
  */
-public class LightweightAnimation extends GimbalImage {
+public class LightweightAnimation implements GimbalImage {
 
 	protected int frame = 0; // the current frame
 	private int width;
@@ -81,29 +81,23 @@ public class LightweightAnimation extends GimbalImage {
 				fileCount++;
 			}
 			frames = new int[fileCount][];
-			
-			for (int i = 0; i < fileCount; i++) {
+
+			BufferedImage src = null;
+			for (int i = 0; i < frames.length; i++) {
 				File file = new File(path + "/" + i + ".png");
+				filePath = path;
 				try {
-					BufferedImage src = ImageIO.read(file); // read image file from disk
-					if (src == null) {
-						Err.error("File format of frame " + i + " not recognized in LightweightAnimation!");
-						useDefaultImage();
-						return;
-					}
-					filePath = path;
-					frames[i] = extractPixels(src);
-					setWidth(src.getWidth());
+					src = ImageIO.read(file); // read image file from disk - if this returns null, it's because the image is unreadable
+					frames[i] = new int[src.getWidth() * src.getHeight()];
+					src.getRGB(0, 0, src.getWidth(), src.getHeight(), frames[i], 0, src.getWidth()); // copy colors from src to pixels
 				} catch (Exception e) {
-					Err.error("GimbalImage can't read " + file.getAbsolutePath() + "!");
-					useDefaultImage();
+					Err.error("GimbalImage can't read " + file.getAbsolutePath() + "! Make sure all the game files are correctly named!");
 					e.printStackTrace();
-				};
+				}
 			}
-			
+			width = src.getWidth(); // set width to the width of the last image
 		} else {
-			Err.error("LightweightAnimation cannot read data from " + path);
-			useDefaultImage();
+			Err.error(path + "Does not exist! Make sure your game files are all in the right place!");
 		}
 	}
 

@@ -17,13 +17,13 @@ import java.io.IOException;
  */
 public abstract class Mover extends Entity implements Tick {
 
-	protected double exactX = 0, exactY = 0;
+	protected double x = 0, y = 0;
 
 	public void save(DataOutputStream out) {
 		super.save(out);
 		try {
-			out.writeDouble(exactX);
-			out.writeDouble(exactY);
+			out.writeDouble(x);
+			out.writeDouble(y);
 		} catch (IOException e) {
 			Err.error("Can't save Mover data!");
 			e.printStackTrace();
@@ -33,8 +33,8 @@ public abstract class Mover extends Entity implements Tick {
 	public void load(DataInputStream in) {
 		super.load(in);
 		try {
-			exactX = in.readDouble();
-			exactY = in.readDouble();
+			x = in.readDouble();
+			y = in.readDouble();
 		} catch (IOException e) {
 			Err.error("Can't read Mover data!");
 			e.printStackTrace();
@@ -42,21 +42,27 @@ public abstract class Mover extends Entity implements Tick {
 	}
 	
 	public double getExactX() {
-		return exactX;
+		return x;
 	}
 
 	public double getExactY() {
-		return exactY;
+		return y;
+	}
+	
+	public int getX() {
+		return (int) x;
+	}
+	
+	public int getY() {
+		return (int) y;
 	}
 
 	public void setPos(double x, double y) {
-		super.setPos((int) x, (int) y);
-		exactX = x;
-		exactY = y;
+		this.x = x;
+		this.y = y;
 	}
-	
+
 	public void setPos(int x, int y) {
-		super.setPos(x, y);
-		setPos((double) x, (double) y); // have to cast or you get stack-overflow  >_<
+		setPos((double) x, (double) y);
 	}
 }

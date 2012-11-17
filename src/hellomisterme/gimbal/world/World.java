@@ -163,7 +163,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 			entities.add(e);
 			e.setEntityBucket(this);
 		} else {
-			System.out.println("Trying to add an Entity that is already in World...");
+			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
 		}
 	}
 
@@ -179,7 +179,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		} else if (entities.contains(e)) {
 			entities.remove(e);
 		} else {
-			System.out.println("Trying to remove an Entity that isn't in World...");
+			System.out.println("Trying to remove an Entity that isn't in World..."); // TODO use in debug mode
 		}
 	}
 
@@ -195,7 +195,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		} else if (!tickables.contains(t)) {
 			tickables.add(t);
 		} else {
-			System.out.println("Trying to add a Tick that is already in World...");
+			System.out.println("Trying to add a Tick that is already in World..."); // TODO use in debug mode
 		}
 	}
 
@@ -211,7 +211,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		} else if (tickables.contains(t)) {
 			tickables.add(t);
 		} else {
-			System.out.println("Trying to remove a Tick that isn't in World...");
+			System.out.println("Trying to remove a Tick that isn't in World..."); // TODO use in debug mode
 		}
 	}
 
@@ -227,7 +227,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		} else if (!savables.contains(s)) {
 			savables.add(s);
 		} else {
-			System.out.println("Trying to add a Savable already in World...");
+			System.out.println("Trying to add a Savable already in World..."); // TODO use in debug mode
 		}
 	}
 
@@ -243,7 +243,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		} else if (savables.contains(s)) {
 			savables.remove(s);
 		} else {
-			System.out.println("Trying to remove a Savable that isn't in World...");
+			System.out.println("Trying to remove a Savable that isn't in World..."); // TODO use in debug mode
 		}
 	}
 

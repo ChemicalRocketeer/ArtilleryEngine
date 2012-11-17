@@ -9,10 +9,14 @@ import hellomisterme.gimbal.entities.mob.Player;
  * @author David Aaron Suddjian
  */
 public class testWorld extends World {
+	
+	private Player player;
 
 	public testWorld(int width, int height) {
 		setWidth(width);
 		setHeight(height);
-		add(new Player());
+		
+		player = new Player();
+		add(player);
 	}
 }
