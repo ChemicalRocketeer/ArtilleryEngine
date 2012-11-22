@@ -20,7 +20,7 @@ public class testWorld extends World {
 		player = new Player();
 		add(player);
 		
-		add(new Baddie());
-		add(new Baddie());
+		add(new Baddie((double) width / 2, (double) height / 2));
+		add(new Baddie((double) width / 2, (double) height / 2));
 	}
 }

@@ -17,6 +17,12 @@ public class Baddie extends Mob {
 	public double width, height;
 
 	public Baddie() {
+		this(0, 0);
+	}
+	
+	public Baddie(double x, double y) {
+		this.x = x;
+		this.y = y;
 		image = new LightweightAnimation("graphics/sprites/baddie");
 		hitbox = new Rectangle(3, 3, 20, 20);
 	}
