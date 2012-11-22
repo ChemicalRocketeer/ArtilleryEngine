@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.06
+ * @version Pre-Alpha.0.06.1
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
@@ -50,6 +50,7 @@ public class Game extends Canvas implements Runnable {
 		// initialize visual elements
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
 		render = new Render(width, height);
+		
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 		// initialize world

@@ -15,12 +15,11 @@ import java.util.List;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class Render {
+public class Render{
 	
 	private int width = Game.width;
 	private int height = Game.height;
-	public int[] pixels = new int[getWidth() * getHeight()];
-	
+	public int[] pixels;
 	private ScreenshotManager screenshot;
 
 	public Render(int width, int height) {
@@ -30,6 +29,11 @@ public class Render {
 		screenshot = new ScreenshotManager();
 	}
 
+	/**
+	 * Renders every Entity in a List of Entities at their locations on the screen
+	 * 
+	 * @param entities the List of Entities to draw
+	 */
 	public void render(List<Entity> entities) {
 		clear();
 		for (int i = 0; i < entities.size(); i++) {
@@ -137,7 +141,6 @@ public class Render {
 
 	/**
 	 * Clears pixels so they can be filled later
-	 * 
 	 */
 	public void clear() {
 		// fill all pixels with black
@@ -146,8 +149,15 @@ public class Render {
 		}
 	}
 	
+	public int[] getPixels() {
+		return pixels;
+	}
+	
+	/**
+	 * Starts a new Thread that saves a copy of the current set of pixels.
+	 */
 	public void screenshot() {
-		screenshot.screenshot(pixels, width);
+		new Screenshot().start();
 	}
 
 	public int getHeight() {
@@ -164,5 +174,18 @@ public class Render {
 
 	public void setWidth(int width) {
 		this.width = width;
+	}
+	
+	/**
+	 * Takes a screenshot using parallel processing so that the screenshot doesn't interrupt the action.
+	 * 
+	 * @since 11-22-12
+	 * @author David Aaron Suddjian
+	 */
+	private class Screenshot extends Thread {
+		
+		public void run() {
+			screenshot.screenshot(pixels.clone(), width);
+		}
 	}
 }
