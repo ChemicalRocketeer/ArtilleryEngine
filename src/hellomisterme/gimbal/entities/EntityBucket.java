@@ -1,5 +1,7 @@
 package hellomisterme.gimbal.entities;
 
+import java.util.List;
+
 /**
  * Entities need an outside object they can get data from. An object implementing EntityBucket fulfills this role.
  * 
@@ -12,4 +14,5 @@ public interface EntityBucket {
 	public void removeEntity(Entity e);
 	public int getWidth();
 	public int getHeight();
+	public List<Entity> getEntities();
 }

@@ -1,4 +1,4 @@
-package hellomisterme.gimbal.input;
+package hellomisterme.gimbal.io;
 
 import hellomisterme.gimbal.Err;
 

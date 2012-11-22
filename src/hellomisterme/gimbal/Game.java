@@ -1,7 +1,7 @@
 package hellomisterme.gimbal;
 
 import hellomisterme.gimbal.graphics.Render;
-import hellomisterme.gimbal.input.KeyInput;
+import hellomisterme.gimbal.io.KeyInput;
 import hellomisterme.gimbal.io.Savegame;
 import hellomisterme.gimbal.world.World;
 import hellomisterme.gimbal.world.testWorld;
@@ -12,19 +12,22 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.05
+ * @version Pre-Alpha.0.06
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
+	public static final double ISOMETRIC_RATIO = .5; // height to width, used in movement and distance calculations
+	public static final Random GLOBAL_RAND = new Random(System.currentTimeMillis());
 	public static String title = "Gimbal";
 	public static int width = 800;
 	public static int height = width * 10 / 16;

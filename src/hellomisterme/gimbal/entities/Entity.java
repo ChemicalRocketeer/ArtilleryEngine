@@ -96,10 +96,6 @@ public abstract class Entity implements Savable {
 		image = img;
 	}
 
-	public void setImage(String path) {
-		image.setImage(path);
-	}
-
 	public abstract int getX();
 
 	public abstract int getY();

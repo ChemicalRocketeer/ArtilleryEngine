@@ -1,11 +1,13 @@
 package hellomisterme.gimbal.entities.mob;
 
 import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.entities.Mover;
+import hellomisterme.gimbal.Game;
+import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.GimbalImage;
 import hellomisterme.gimbal.graphics.LightweightAnimation;
-import hellomisterme.gimbal.input.KeyInput;
+import hellomisterme.gimbal.io.KeyInput;
 
+import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
@@ -15,71 +17,83 @@ import java.io.DataOutputStream;
  * @since 10-23-12
  * @author David Aaron Suddjian
  */
-public class Player extends Mover {
+public class Player extends Mob {
 
-	private double speed = 2.0;
-
-	public static final int ANIMATION_SPEED = 5; // how many ticks between animation frames
-	private int animationTimer = 0; // how many ticks since the last frame update
+	private double movementSpeed = 2.0;
 
 	public static final double MAX_HEALTH = 10.0;
 	private double health = MAX_HEALTH;
-	private int DAMAGE_IMMUNITY_TIME = 30; // how long player will be immune after being damaged
+	private static final int DAMAGE_IMMUNITY_TIME = 30; // how long player will be immune after being damaged
 	private int damageImmunityTimer = 0;
+
+	private boolean dead = false;
 
 	public Player() {
 		image = new LightweightAnimation("graphics/sprites/player");
+		hitbox = new Rectangle(10, 60, 50, 20);
 	}
 
 	public void tick() {
+		boolean damage = false; // can be changed to tell if the player is damaged or not
+
 		if (health <= 0) {
 			die();
 		}
+		
+		animate();
 
-		if (animationTimer == ANIMATION_SPEED) {
-			((LightweightAnimation) image).next();
-			animationTimer = 0;
-		} else {
-			animationTimer++;
-		}
+		handleMovement();
 
-		// Move if the right button(s) are held down
-		if (KeyInput.pressed(KeyInput.up)) {
-			setPos(getExactX(), getExactY() - speed * .5);
-		}
-		if (KeyInput.pressed(KeyInput.down)) {
-			setPos(getExactX(), getExactY() + speed * .5);
-		}
-		if (KeyInput.pressed(KeyInput.left)) {
-			setPos(getExactX() - speed, getExactY());
-		}
-		if (KeyInput.pressed(KeyInput.right)) {
-			setPos(getExactX() + speed, getExactY());
-		}
+		correctOOB();
 
-		// correct for out of bounds
-		boolean damage = false;
-		if (x >= bucket.getWidth() - image.getWidth()) { // right
-			setPos(bucket.getWidth() - image.getWidth(), y);
-			damage = true;
-		} else if (x < 0) { // left
-			setPos(0, y);
-			damage = true;
-		}
-		if (y >= bucket.getHeight() - image.getHeight()) { // bottom
-			setPos(x, bucket.getHeight() - image.getHeight());
-			damage = true;
-		} else if (y < 0) { // top
-			setPos(x, 0);
+		if (collides()) {
 			damage = true;
 		}
 
-		// take damage
+		// take damage if elegible
 		if (damageImmunityTimer > 0) {
 			damageImmunityTimer--;
 		} else if (damage) {
 			takeDamage(1.0);
 		}
+	}
+
+	private void handleMovement() {
+		int xMotion = 0, yMotion = 0;
+		// Otherwise, must use more system resources to calculate.
+		if (KeyInput.pressed(KeyInput.up)) {
+			yMotion -= 1;
+		}
+		if (KeyInput.pressed(KeyInput.down)) {
+			yMotion += 1;
+		}
+		if (KeyInput.pressed(KeyInput.left)) {
+			xMotion -= 1;
+		}
+		if (KeyInput.pressed(KeyInput.right)) {
+			xMotion += 1;
+		}
+		// Keep player from going faster when moving diagonally
+		double diagAdjust = Math.sqrt(2);
+		if (xMotion != 0 && yMotion != 0) { // moving diagonally
+			setPos(x + (xMotion / diagAdjust) * movementSpeed, y + (yMotion / diagAdjust) * movementSpeed * Game.ISOMETRIC_RATIO);
+		} else {
+			setPos(x + xMotion * movementSpeed, y + yMotion * movementSpeed * Game.ISOMETRIC_RATIO);
+		}
+	}
+
+	/**
+	 * Checks if the Player collides with any physical Entity in its bucket
+	 * 
+	 * @return true if there is a collision, else false
+	 */
+	private boolean collides() {
+		for (Entity e : bucket.getEntities()) {
+			if (e != this && e instanceof Physical && ((Physical) e).getBounds().intersects(getBounds())) { // TODO change implementation so it doesn't use instanceof
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void takeDamage(double damage) {
@@ -88,6 +102,11 @@ public class Player extends Mover {
 	}
 
 	public void die() {
+		dead = true;
+	}
+
+	public boolean dead() {
+		return dead;
 	}
 
 	@Override
@@ -98,7 +117,7 @@ public class Player extends Mover {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Writes this Player's data in order:
 	 * 
@@ -119,7 +138,7 @@ public class Player extends Mover {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Loads a Player's saved data. See saveData().
 	 */

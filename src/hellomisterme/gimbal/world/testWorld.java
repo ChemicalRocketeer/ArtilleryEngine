@@ -1,5 +1,6 @@
 package hellomisterme.gimbal.world;
 
+import hellomisterme.gimbal.entities.mob.Baddie;
 import hellomisterme.gimbal.entities.mob.Player;
 
 /**
@@ -18,5 +19,8 @@ public class testWorld extends World {
 		
 		player = new Player();
 		add(player);
+		
+		add(new Baddie());
+		add(new Baddie());
 	}
 }
