@@ -33,7 +33,7 @@ public class Baddie extends Mob {
 	}
 
 	public void moveRandom() {
-		double angle = Game.GLOBAL_RAND.nextDouble(); // between 0.0 and 1.0
+		double angle = Game.RAND.nextDouble(); // between 0.0 and 1.0
 		angle *= Math.PI * 2; // direction is now between 0.0 and 2 pi. Gonna do some trig here
 		setPos(x + Math.cos(angle), y + Math.sin(angle) * Game.ISOMETRIC_RATIO);
 

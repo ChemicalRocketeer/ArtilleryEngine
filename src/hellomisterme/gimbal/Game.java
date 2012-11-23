@@ -27,7 +27,7 @@ public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static final double ISOMETRIC_RATIO = .5; // height to width, used in movement and distance calculations
-	public static final Random GLOBAL_RAND = new Random(System.currentTimeMillis());
+	public static final Random RAND = new Random(System.currentTimeMillis());
 	public static String title = "Gimbal";
 	public static int width = 800;
 	public static int height = width * 10 / 16;
