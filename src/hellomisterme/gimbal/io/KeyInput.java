@@ -23,108 +23,76 @@ public class KeyInput implements KeyListener {
 	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
 	private static boolean[] keys = new boolean[255];
 	
-	// The key codes that are relevant to this program (subject to change by other objects during execution, a settings file for example)
+	// The keys that are relevant to this program (subject to change by other objects during execution, a settings file for example)
 	// TODO use unsigned bytes (chars?)
 	public static short[] up 			= new short[] {KeyEvent.VK_W, KeyEvent.VK_UP };
 	public static short[] down 			= new short[] {KeyEvent.VK_S, KeyEvent.VK_DOWN };
 	public static short[] left 			= new short[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
 	public static short[] right 		= new short[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
+	public static short[] addbaddie		= new short[] {KeyEvent.VK_G};
 	public static short[] screenshot 	= new short[] {KeyEvent.VK_F1};
 	public static short[] save	 		= new short[] {KeyEvent.VK_F5};
 	public static short[] load	 		= new short[] {KeyEvent.VK_F9};
-	
+
 	public static final String SETTINGS_FILE = "settings.txt";
 
 	public KeyInput() {
 		readSettingsFile();
 	}
-	
+
 	/**
-	 * Parses through an settings String and assigns the keyCodes inside to KeyInput, using the format:
-	 * 
-	 * TODO refactor
+	 * Parses through a settings String and assigns the keyCodes inside to KeyInput, using the format:
 	 * 
 	 * <code>
 	 * up:int,int,int;down:int,int;left:int;right:int,int,int,int;
 	 * </code>
 	 * 
-	 * The number of 'int' values is unlimited. No whitespace. Lowercase.
+	 * The number of values is unlimited. No whitespace. Lowercase.
 	 * 
 	 * @param settings
 	 *            the collective settings to apply to KeyInput
 	 */
 	public static void parsesettings(String settings) {
-		// check for up
-		int index = settings.indexOf("up:");
-		if (index != -1) {
-			index += "up:".length();
-			up = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-		}
-		// check for down
-		index = settings.indexOf("down:");
-	 	if (index != -1) {
-			index += "down:".length();
-			down = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-		}
-		// check for left
-		index = settings.indexOf("left:");
-		if (index != -1) {
-			index += "left:".length();
-			left = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-			settings = settings.substring(settings.indexOf(';') + 1);
-		}
-		// check for right
-		index = settings.indexOf("right:");
-		if (index != -1) {
-			index += "right:".length();
-			right = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-			settings = settings.substring(settings.indexOf(';') + 1);
-		}
-		// check for screenshot
-		index = settings.indexOf("screenshot:");
-		if (index != -1) {
-			index += "screenshot:".length();
-			screenshot = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-			settings = settings.substring(settings.indexOf(';') + 1);
-		}
-		// check for save
-		index = settings.indexOf("save:");
-		if (index != -1) {
-			index += "save:".length();
-			save = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-			settings = settings.substring(settings.indexOf(';') + 1);
-		}
-		// check for load
-		index = settings.indexOf("load:");
-		if (index != -1) {
-			index += "load:".length();
-			load = extractKeyCodes(settings.substring(index, settings.indexOf(';', index)));
-			settings = settings.substring(settings.indexOf(';') + 1);
-		}
+		up = extractKeyCodes(settings, "up:", up);
+		down = extractKeyCodes(settings, "down:", down);
+		left = extractKeyCodes(settings, "left:", left);
+		right = extractKeyCodes(settings, "right:", right);
+		screenshot = extractKeyCodes(settings, "screenshot:", screenshot);
+		addbaddie = extractKeyCodes(settings, "addbaddie:", addbaddie);
+		save = extractKeyCodes(settings, "save:", save);
+		load = extractKeyCodes(settings, "load:", load);
 	}
 
 	/**
-	 * Generates an int[] using an unlimited-length String of format num,num,num,num
+	 * Searches through the given string for the query, then extracts any keycodes following the query into a short[]. Returns a short[] of key codes using an unlimited-length String of format
+	 * num,num,num,num
 	 * 
-	 * @param codes
+	 * @param settings
 	 *            the codes in the correct format
-	 * @return the codes extracted into an int[]
+	 * @param query
+	 *            the string to search for in settings
+	 * @param key
+	 *            the array to use as the default if the search doesn't find anything
+	 * @return the codes extracted into a short[]
 	 */
-	public static short[] extractKeyCodes(String codes) {
-		// count the number of code values using the number of commas in 'codes'
-		int commas = 0;
-		for (int i = 0; i < codes.length(); i++) {
-			if (codes.charAt(i) == ',') {
-				commas++;
+	public static short[] extractKeyCodes(String settings, String query, short[] key) {
+		int index = settings.indexOf(query);
+		if (index != -1) { // if the query is found in the settings string
+			settings = settings.substring(index + query.length(), settings.indexOf(';', index)); // trim settings so it only contains the comma-delimited codes
+			int commas = 0; // count the number of code values using the number of commas in settings
+			for (int i = 0; i < settings.length(); i++) { // count how many codes there are by counting the commas
+				if (settings.charAt(i) == ',') {
+					commas++;
+				}
+			}
+			key = new short[commas + 1]; // there will always be 1 more code than there are commas
+			Scanner scan = new Scanner(settings);
+			scan.useDelimiter(","); // because the codes are comma-delimited
+			for (int i = 0; scan.hasNextInt(); i++) { 
+				key[i] = scan.nextShort();
 			}
 		}
-		short[] extracted = new short[commas + 1]; // there will always be 1 more code than there are commas
-		Scanner scan = new Scanner(codes);
-		scan.useDelimiter(",");
-		for (int i = 0; scan.hasNextInt(); i++) {
-			extracted[i] = scan.nextShort();
-		}
-		return extracted;
+		return key;
 	}
 
 	/**
@@ -163,7 +131,7 @@ public class KeyInput implements KeyListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Returns whether any key in an array of keys is pressed or not.
 	 * 
