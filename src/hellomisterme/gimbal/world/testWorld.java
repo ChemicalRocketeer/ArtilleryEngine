@@ -1,7 +1,9 @@
 package hellomisterme.gimbal.world;
 
+import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.mob.Baddie;
 import hellomisterme.gimbal.entities.mob.Player;
+import hellomisterme.gimbal.io.KeyInput;
 
 /**
  * testWorld is just a temporary class to test out World's functionality.
@@ -10,17 +12,34 @@ import hellomisterme.gimbal.entities.mob.Player;
  * @author David Aaron Suddjian
  */
 public class testWorld extends World {
-	
+
 	private Player player;
+	private boolean baddieOrdered = false;
 
 	public testWorld(int width, int height) {
 		setWidth(width);
 		setHeight(height);
-		
+
 		player = new Player();
 		add(player);
-		
-		add(new Baddie((double) width / 2, (double) height / 2));
-		add(new Baddie((double) width / 2, (double) height / 2));
+
+		generateBaddie();
+		generateBaddie();
+	}
+
+	public void tick() {
+		// if the addbaddie key is pressed
+		if (KeyInput.pressed(KeyInput.addbaddie)) {
+			if (baddieOrdered == false) { // if the key was up before
+				generateBaddie();
+				baddieOrdered = true; // remember that the key was pressed
+			}
+		} else { // key not pressed
+			baddieOrdered = false;
+		}
+	}
+	
+	public void generateBaddie() {
+		add(new Baddie((double) Game.RAND.nextInt(getWidth()), (double) Game.RAND.nextInt(getHeight())));
 	}
 }
