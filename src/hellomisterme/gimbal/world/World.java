@@ -3,9 +3,9 @@ package hellomisterme.gimbal.world;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Tick;
 import hellomisterme.gimbal.entities.Entity;
-import hellomisterme.gimbal.entities.EntityBucket;
 import hellomisterme.gimbal.io.Savable;
 
+import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,10 +18,10 @@ import java.util.List;
  * @since 10-23-12
  * @author David Aaron Suddjian
  */
-public abstract class World implements EntityBucket, Tick, Savable {
+public abstract class World implements Tick, Savable {
 
 	private String name = "New Game";
-	private int width = 256, height = 256;
+	private Rectangle bounds = new Rectangle(256, 256);
 	// If any of these lists is changed, remember to change instantiations in constructors and other methods like load!
 	// TODO initialize Lists with starting values for efficiency
 	private List<Entity> entities = new LinkedList<Entity>();
@@ -39,8 +39,8 @@ public abstract class World implements EntityBucket, Tick, Savable {
 	public void save(DataOutputStream out) {
 		try {
 			// the first int saved is width, second is height
-			out.writeInt(width);
-			out.writeInt(height);
+			out.writeInt(bounds.width);
+			out.writeInt(bounds.height);
 			// save each Savable's data
 			for (Savable s : savables) {
 				//write a boolean so we can tell there is another object when reading
@@ -68,8 +68,8 @@ public abstract class World implements EntityBucket, Tick, Savable {
 			tickables = new LinkedList<Tick>();
 			savables = new LinkedList<Savable>();
 			// the first int read is width, second is height
-			width = in.readInt();
-			height = in.readInt();
+			bounds.width = in.readInt();
+			bounds.height = in.readInt();
 			// while there are true booleans there is another object to read data from
 			while (in.readBoolean()) {
 				// whatever we're reading must be savable because it saved this data
@@ -93,7 +93,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 		tick();
 		for (Tick tock : tickables) {
 			if (tock == null) {
-				Err.error("Can't call a null Tick!");
+				Err.error("Can't call a null Tick!"); // TODO remove
 			} else {
 				tock.tick();
 			}
@@ -161,7 +161,7 @@ public abstract class World implements EntityBucket, Tick, Savable {
 			Err.error("Trying to add null Entity to World!");
 		} else if (!entities.contains(e)) {
 			entities.add(e);
-			e.setEntityBucket(this);
+			e.bounds = bounds;
 		} else {
 			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
 		}
@@ -248,19 +248,19 @@ public abstract class World implements EntityBucket, Tick, Savable {
 	}
 
 	public int getWidth() {
-		return width;
+		return bounds.width;
 	}
 
 	public void setWidth(int width) {
-		this.width = width;
+		bounds.width = width;
 	}
 
 	public int getHeight() {
-		return height;
+		return bounds.height;
 	}
 
 	public void setHeight(int height) {
-		this.height = height;
+		bounds.height = height;
 	}
 
 	public String getName() {

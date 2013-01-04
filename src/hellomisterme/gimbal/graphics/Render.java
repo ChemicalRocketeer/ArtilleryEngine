@@ -35,13 +35,10 @@ public class Render{
 	 * @param entities the List of Entities to draw
 	 */
 	public void render(List<Entity> entities) {
-		clear();
 		for (int i = 0; i < entities.size(); i++) {
-			Entity ent = entities.get(i);
-			if (ent != null) {
-				if (ent.getImage() != null) {
-					render(ent.getImage(), ent.getX(), ent.getY());
-				}
+			Entity e = entities.get(i);
+			if (e != null) {
+				e.render(this);
 			} else {
 				Err.error("Entity number " + i + " doesn't exist!");
 			}

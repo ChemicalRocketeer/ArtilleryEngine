@@ -33,6 +33,7 @@ public class KeyInput implements KeyListener {
 	public static short[] screenshot 	= new short[] {KeyEvent.VK_F1};
 	public static short[] save	 		= new short[] {KeyEvent.VK_F5};
 	public static short[] load	 		= new short[] {KeyEvent.VK_F9};
+	public static short[] devmode	 	= new short[] {KeyEvent.VK_F3};
 
 	public static final String SETTINGS_FILE = "settings.txt";
 
@@ -61,6 +62,7 @@ public class KeyInput implements KeyListener {
 		addbaddie = extractKeyCodes(settings, "addbaddie:", addbaddie);
 		save = extractKeyCodes(settings, "save:", save);
 		load = extractKeyCodes(settings, "load:", load);
+		devmode = extractKeyCodes(settings, "devmode:", devmode);
 	}
 
 	/**

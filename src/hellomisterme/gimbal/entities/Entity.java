@@ -2,14 +2,17 @@ package hellomisterme.gimbal.entities;
 
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.graphics.GimbalImage;
+import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.io.Savable;
+import hellomisterme.gimbal.world.World;
 
+import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * An Entity contains a LightweightImage and x and y coordinates. Subclasses can be rendered.
+ * An Entity is something that can render itself.
  * 
  * @since 10-16-12
  * @author David Aaron Suddjian
@@ -17,7 +20,17 @@ import java.io.IOException;
 public abstract class Entity implements Savable {
 
 	protected GimbalImage image;
-	protected EntityBucket bucket;
+	public Rectangle bounds;
+
+	/**
+	 * This method will be called when the entity is added to a World object. By default it does nothing but it can be overridden.
+	 * 
+	 * @param w
+	 *            the World that this Entity has been added to
+	 */
+	public void addedToWorld(World w) {
+
+	}
 
 	/**
 	 * Saves this Entity's x and y coordinates, then if the LightweightImage isn't null, writes a true and calls the LightweightImage's save() method. Else writes a false.
@@ -38,12 +51,12 @@ public abstract class Entity implements Savable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Saves this Entity's data.
 	 */
 	public void saveData(DataOutputStream out) {
-		
+
 	}
 
 	/**
@@ -61,12 +74,12 @@ public abstract class Entity implements Savable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Loads this Entity's saved data.
 	 */
 	public void loadData(DataInputStream in) {
-		
+
 	}
 
 	/**
@@ -76,8 +89,9 @@ public abstract class Entity implements Savable {
 		image.load(in);
 	}
 
-	public void setEntityBucket(EntityBucket h) {
-		bucket = h;
+	public void render(Render render) {
+		if (getImage() != null)
+			render.render(getImage(), getX(), getY());
 	}
 
 	/**
@@ -96,8 +110,14 @@ public abstract class Entity implements Savable {
 		image = img;
 	}
 
+	/**
+	 * @return the X coordinate of this Entity, increasing from left to right
+	 */
 	public abstract int getX();
 
+	/**
+	 * @return the Y coordinate of this Entity, increasing from top to bottom
+	 */
 	public abstract int getY();
 
 	public abstract void setPos(int x, int y);

@@ -6,6 +6,7 @@ import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.GimbalImage;
 import hellomisterme.gimbal.graphics.LightweightAnimation;
 import hellomisterme.gimbal.io.KeyInput;
+import hellomisterme.gimbal.world.World;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
@@ -18,6 +19,8 @@ import java.io.DataOutputStream;
  * @author David Aaron Suddjian
  */
 public class Player extends Mob {
+	
+	public World world;
 
 	private double movementSpeed = 2.0;
 
@@ -39,7 +42,7 @@ public class Player extends Mob {
 		if (health <= 0) {
 			die();
 		}
-		
+
 		animate();
 
 		handleMovement();
@@ -83,12 +86,12 @@ public class Player extends Mob {
 	}
 
 	/**
-	 * Checks if the Player collides with any physical Entity in its bucket
+	 * Checks if the Player collides with any physical Entity in its world
 	 * 
 	 * @return true if there is a collision, else false
 	 */
 	private boolean collides() {
-		for (Entity e : bucket.getEntities()) {
+		for (Entity e : world.getEntities()) {
 			if (e != this && e instanceof Physical && ((Physical) e).getBounds().intersects(getBounds())) { // TODO change implementation so it doesn't use instanceof
 				return true;
 			}

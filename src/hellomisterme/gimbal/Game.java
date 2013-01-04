@@ -1,5 +1,6 @@
 package hellomisterme.gimbal;
 
+import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.io.KeyInput;
 import hellomisterme.gimbal.io.Savegame;
@@ -28,6 +29,7 @@ public class Game extends Canvas implements Runnable {
 
 	public static final double ISOMETRIC_RATIO = .5; // height to width, used in movement and distance calculations
 	public static final Random RAND = new Random(System.currentTimeMillis());
+	
 	public static String title = "Gimbal";
 	public static int width = 800;
 	public static int height = width * 10 / 16;
@@ -41,6 +43,8 @@ public class Game extends Canvas implements Runnable {
 
 	private World world;
 
+	private boolean devMode = false;
+	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
 
@@ -72,8 +76,8 @@ public class Game extends Canvas implements Runnable {
 
 		running = true;
 
-		int totalFrames = 0; // the total number of frames generated
-		int totalSeconds = 0; // the number of times totalFrames has been updated
+		long totalFrames = 0; // the total number of frames generated (never gets decremented, so it's a long)
+		long totalSeconds = 0; // the number of times totalFrames has been updated (never gets decremented, so it's a long)
 		int frameCount = 0; // FPS counter variable
 		int tickCount = 0; // TPS counter variable
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
@@ -97,11 +101,11 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 
-			// count and print the FPS, TPS, AVG, and SEC to titlebar
+			// count and print the FPS, TPS, AVG, and SEC to titlebar every second
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				if (frame != null) {
+				if (devMode) {
 					frame.setTitle(title + "   -   FPS: " + frameCount + ",   AVG: " + (totalFrames / totalSeconds) + ",   TPS: " + tickCount + ",   SEC: " + totalSeconds);
 				}
 				frameCount = 0;
@@ -113,12 +117,21 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Calls the world's tick() and callTick() methods, and checks for over-all game-related events, like screenshot key presses
+	 * Calls everybody's tick() methods, and checks for over-all game-related events, like screenshot key presses
 	 */
 	private void tick() {
+		checkStatus();
+		world.tick();
+		world.callTick();
+	}
+	
+	/**
+	 * Checks certain large-scale state conditions like screenshots and devmode
+	 */
+	private void checkStatus() {
 		// if the screenshot key is pressed
 		if (KeyInput.pressed(KeyInput.screenshot)) {
-			if (screenshotOrdered == false) { // if the screenshot key was up before
+			if (!screenshotOrdered) { // if the screenshot key was up before
 				render.screenshot();
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
@@ -126,15 +139,15 @@ public class Game extends Canvas implements Runnable {
 			screenshotOrdered = false;
 		}
 
-		// these if statements are organized the way they are to prevent save/load operations in the same tick
+		// these if statements are organized to prevent save/load operations in the same tick
 		// if an io key is pressed
 		if (KeyInput.pressed(KeyInput.save)) {
-			if (ioOrdered == false) { // if an io key was up before
+			if (!ioOrdered) { // if an io key was up before
 				Savegame.saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else if (KeyInput.pressed(KeyInput.load)) {
-			if (ioOrdered == false) { // if an io key was up before
+			if (!ioOrdered) { // if an io key was up before
 				Savegame.loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
@@ -142,15 +155,27 @@ public class Game extends Canvas implements Runnable {
 			ioOrdered = false;
 		}
 
-		world.tick();
-		world.callTick();
+		// if devmode is being activated/deactivated
+		if (KeyInput.pressed(KeyInput.devmode)) {
+			if (!devModeOrdered) {
+				devMode = !devMode; // toggle
+				if (devMode) frame.setTitle(title + "   -   FPS: ...   AVG: ...   TPS: ...   SEC: ..."); // TODO change to on-screen text
+				else frame.setTitle(title);
+				devModeOrdered = true;
+			}
+		} else {
+			devModeOrdered = false;
+		}
 	}
 
 	/**
-	 * Calls render method of render, and displays the image
+	 * Draws the game's current frame
 	 */
 	private void render() {
-		render.render(world.getEntities());
+		render.clear();
+		for (Entity e : world.getEntities()) {
+			e.render(render);
+		}
 
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
@@ -167,13 +192,14 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Sets this Game's frame variable to f. Does not add this Game to f. That must be done before calling this method.
+	 * Sets this Game's frame variable to frame. Does not add this Game to frame. That must be done before calling this method.
 	 * 
-	 * @param f
+	 * If this is not called, devmode will not work
+	 * 
+	 * @param frame
 	 *            the frame this Game will be allowed to manipulate
 	 */
-	public void setFrame(JFrame f) {
-		frame = f;
+	public void setFrame(JFrame frame) {
+		this.frame = frame;
 	}
-
 }

@@ -22,6 +22,7 @@ public class testWorld extends World {
 
 		player = new Player();
 		add(player);
+		player.world = this;
 
 		generateBaddie();
 		generateBaddie();
