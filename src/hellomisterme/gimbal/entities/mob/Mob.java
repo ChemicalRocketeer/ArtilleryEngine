@@ -21,7 +21,7 @@ public abstract class Mob extends Mover implements Physical {
 	public Rectangle hitbox;
 
 	/**
-	 * If it's time to change frames, do it
+	 * If it's time to change frames, do it. Will not work if the image is not an animation.
 	 */
 	public void animate() {
 		if (animationTimer % animationSpeed == 0) {

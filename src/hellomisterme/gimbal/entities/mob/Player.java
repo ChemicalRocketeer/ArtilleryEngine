@@ -5,7 +5,7 @@ import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.GimbalImage;
 import hellomisterme.gimbal.graphics.LightweightAnimation;
-import hellomisterme.gimbal.io.KeyInput;
+import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.world.World;
 
 import java.awt.Rectangle;
@@ -22,7 +22,7 @@ public class Player extends Mob {
 	
 	public World world;
 
-	private double movementSpeed = 2.0;
+	private double movementSpeed = 8.0;
 
 	public static final double MAX_HEALTH = 10.0;
 	private double health = MAX_HEALTH;
@@ -64,16 +64,16 @@ public class Player extends Mob {
 	private void handleMovement() {
 		int xMotion = 0, yMotion = 0;
 		// Otherwise, must use more system resources to calculate.
-		if (KeyInput.pressed(KeyInput.up)) {
+		if (Keyboard.pressed(Keyboard.up)) {
 			yMotion -= 1;
 		}
-		if (KeyInput.pressed(KeyInput.down)) {
+		if (Keyboard.pressed(Keyboard.down)) {
 			yMotion += 1;
 		}
-		if (KeyInput.pressed(KeyInput.left)) {
+		if (Keyboard.pressed(Keyboard.left)) {
 			xMotion -= 1;
 		}
-		if (KeyInput.pressed(KeyInput.right)) {
+		if (Keyboard.pressed(Keyboard.right)) {
 			xMotion += 1;
 		}
 		// Keep player from going faster when moving diagonally

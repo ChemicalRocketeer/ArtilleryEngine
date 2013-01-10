@@ -21,8 +21,8 @@ public class Start {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null); // center
 		frame.setVisible(true);
-		game.setFrame(frame);
 		game.requestFocus(); // get focus if OS allows it
+		game.setup();
 
 		Thread thread = new Thread(game);
 		thread.start(); // calls game's run() method

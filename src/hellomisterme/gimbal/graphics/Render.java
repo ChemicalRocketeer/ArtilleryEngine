@@ -1,11 +1,7 @@
 package hellomisterme.gimbal.graphics;
 
-import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.io.ScreenshotManager;
-
-import java.util.List;
 
 /**
  * Render handles computation and combination of the pixels that go onto the screen.
@@ -16,7 +12,7 @@ import java.util.List;
  * @author David Aaron Suddjian
  */
 public class Render{
-	
+
 	private int width = Game.width;
 	private int height = Game.height;
 	public int[] pixels;
@@ -27,22 +23,6 @@ public class Render{
 		this.setHeight(height);
 		pixels = new int[width * height];
 		screenshot = new ScreenshotManager();
-	}
-
-	/**
-	 * Renders every Entity in a List of Entities at their locations on the screen
-	 * 
-	 * @param entities the List of Entities to draw
-	 */
-	public void render(List<Entity> entities) {
-		for (int i = 0; i < entities.size(); i++) {
-			Entity e = entities.get(i);
-			if (e != null) {
-				e.render(this);
-			} else {
-				Err.error("Entity number " + i + " doesn't exist!");
-			}
-		}
 	}
 
 	/**
@@ -145,11 +125,11 @@ public class Render{
 			pixels[i] = 0xFFFFFF;
 		}
 	}
-	
+
 	public int[] getPixels() {
 		return pixels;
 	}
-	
+
 	/**
 	 * Starts a new Thread that saves a copy of the current set of pixels.
 	 */
@@ -172,7 +152,7 @@ public class Render{
 	public void setWidth(int width) {
 		this.width = width;
 	}
-	
+
 	/**
 	 * Takes a screenshot using parallel processing so that the screenshot doesn't interrupt the action.
 	 * 
@@ -180,7 +160,7 @@ public class Render{
 	 * @author David Aaron Suddjian
 	 */
 	private class Screenshot extends Thread {
-		
+
 		public void run() {
 			screenshot.screenshot(pixels.clone(), width);
 		}

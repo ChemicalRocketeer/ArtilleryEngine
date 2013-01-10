@@ -11,14 +11,14 @@ import java.util.Scanner;
 
 
 /**
- * KeyInput stores keyboard input and can be accessed by other objects that need to know whether a key is pressed or not.
+ * Keyboard stores keyboard input and can be accessed by other objects that need to know whether a key is pressed or not.
  * 
- * KeyInput can read data from settings.txt
+ * Keyboard can read data from settings.txt
  * 
  * @since 10-23-12
  * @author David Aaron Suddjian
  */
-public class KeyInput implements KeyListener {
+public class Keyboard implements KeyListener {
 
 	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
 	private static boolean[] keys = new boolean[255];
@@ -37,12 +37,12 @@ public class KeyInput implements KeyListener {
 
 	public static final String SETTINGS_FILE = "settings.txt";
 
-	public KeyInput() {
+	public Keyboard() {
 		readSettingsFile();
 	}
 
 	/**
-	 * Parses through a settings String and assigns the keyCodes inside to KeyInput, using the format:
+	 * Parses through a settings String and assigns the keyCodes inside to Keyboard, using the format:
 	 * 
 	 * <code>
 	 * up:int,int,int;down:int,int;left:int;right:int,int,int,int;
@@ -51,7 +51,7 @@ public class KeyInput implements KeyListener {
 	 * The number of values is unlimited. No whitespace. Lowercase.
 	 * 
 	 * @param settings
-	 *            the collective settings to apply to KeyInput
+	 *            the collective settings to apply to Keyboard
 	 */
 	public static void parsesettings(String settings) {
 		up = extractKeyCodes(settings, "up:", up);
@@ -129,7 +129,7 @@ public class KeyInput implements KeyListener {
 			parsesettings(settings);
 			in.close();
 		} catch (Exception e) {
-			Err.error("KeyInput can't read " + SETTINGS_FILE + "!");
+			Err.error("Keyboard can't read " + SETTINGS_FILE + "!");
 			e.printStackTrace();
 		}
 	}
@@ -137,7 +137,7 @@ public class KeyInput implements KeyListener {
 	/**
 	 * Returns whether any key in an array of keys is pressed or not.
 	 * 
-	 * KeyInput's static key value arrays can be passed to easily check multiple keys that should all do the same thing.
+	 * Keyboard's static key value arrays can be passed to easily check multiple keys that should all do the same thing.
 	 * 
 	 * @param keyCodes
 	 *            the array of codes to check

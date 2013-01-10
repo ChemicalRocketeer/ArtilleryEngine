@@ -1,8 +1,9 @@
 package hellomisterme.gimbal;
 
 import hellomisterme.gimbal.entities.Entity;
+import hellomisterme.gimbal.graphics.DevInfo;
 import hellomisterme.gimbal.graphics.Render;
-import hellomisterme.gimbal.io.KeyInput;
+import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.io.Savegame;
 import hellomisterme.gimbal.world.World;
 import hellomisterme.gimbal.world.testWorld;
@@ -15,34 +16,55 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Random;
 
-import javax.swing.JFrame;
-
 /**
  * The Game handles display and management of game objects.
  * 
- * @version Pre-Alpha.0.06.1
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
+@SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
-	private static final long serialVersionUID = 1L;
-
-	public static final double ISOMETRIC_RATIO = .5; // height to width, used in movement and distance calculations
-	public static final Random RAND = new Random(System.currentTimeMillis());
 	
-	public static String title = "Gimbal";
+	/**
+	 * This game's title. Can be displayed in the window title bar.
+	 */
+	public static String title = "Gimbal Pre-Alpha.0.06.2";
+	
+	/**
+	 * A height to width ratio that objects can use for image transformations or for movement speed
+	 */
+	public static final double ISOMETRIC_RATIO = .5;
+	
+	/**
+	 * A random number that can be used by objects in the game, preventing multiple objects from doing the same thing
+	 */
+	public static final Random RAND = new Random(System.currentTimeMillis());
+
+	/**
+	 * The width of this game window
+	 */
 	public static int width = 800;
+	
+	/**
+	 * The height of this game window
+	 */
 	public static int height = width * 10 / 16;
+	
+	/**
+	 * The game's tick frequency, determining how quickly ingame actions happen
+	 */
 	public static final int TICKS_PER_SECOND = 60;
 
-	private JFrame frame;
-	boolean running = false;
+	private boolean running = false;
 
 	private BufferedImage image;
 	private Render render;
-
+	
 	private World world;
-
+	
+	private DevInfo devInfo;
+	
+	// control booleans TODO put these in a different class or something, they don't really belong here...
 	private boolean devMode = false;
 	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
@@ -50,18 +72,6 @@ public class Game extends Canvas implements Runnable {
 
 	public Game() {
 		setPreferredSize(new Dimension(width, height));
-
-		// initialize visual elements
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
-		render = new Render(width, height);
-		
-		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-
-		// initialize world
-		world = new testWorld(width, height);
-
-		// initialize keyboard input
-		addKeyListener(new KeyInput());
 	}
 
 	/**
@@ -72,17 +82,15 @@ public class Game extends Canvas implements Runnable {
 	 * Called by this Game's Thread thread.
 	 */
 	public void run() {
-		createBufferStrategy(3);
-
 		running = true;
 
 		long totalFrames = 0; // the total number of frames generated (never gets decremented, so it's a long)
-		long totalSeconds = 0; // the number of times totalFrames has been updated (never gets decremented, so it's a long)
+		int totalSeconds = 0; // the number of times totalFrames has been updated (never gets decremented, so it's a long)
 		int frameCount = 0; // FPS counter variable
 		int tickCount = 0; // TPS counter variable
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
-		// regulate tick frequency
+		// variables to regulate tick frequency
 		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
 		double delta = 1; // difference between now and the last tick
 		long lastTime = System.nanoTime();
@@ -92,6 +100,7 @@ public class Game extends Canvas implements Runnable {
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 
+			// run the tick cycle on time
 			while (delta >= 1) {
 				tick();
 				delta--;
@@ -101,19 +110,25 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 
-			// count and print the FPS, TPS, AVG, and SEC to titlebar every second
+			// keep track of stats every second and send to titlebar if devmode is on
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				if (devMode) {
-					frame.setTitle(title + "   -   FPS: " + frameCount + ",   AVG: " + (totalFrames / totalSeconds) + ",   TPS: " + tickCount + ",   SEC: " + totalSeconds);
-				}
+				
+				// keep dev info updated
+				devInfo.totalMem = Runtime.getRuntime().totalMemory();
+				devInfo.usedMem = devInfo.totalMem - Runtime.getRuntime().freeMemory();
+				devInfo.fps = frameCount;
+				devInfo.avg = (int) (totalFrames / totalSeconds);
+				devInfo.tps = tickCount;
+				devInfo.sec = totalSeconds;
+				
+				// reset variables
 				frameCount = 0;
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
 			}
 		}
-		stop();
 	}
 
 	/**
@@ -130,7 +145,7 @@ public class Game extends Canvas implements Runnable {
 	 */
 	private void checkStatus() {
 		// if the screenshot key is pressed
-		if (KeyInput.pressed(KeyInput.screenshot)) {
+		if (Keyboard.pressed(Keyboard.screenshot)) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
 				render.screenshot();
 				screenshotOrdered = true; // remember that screenshot was pressed
@@ -141,12 +156,12 @@ public class Game extends Canvas implements Runnable {
 
 		// these if statements are organized to prevent save/load operations in the same tick
 		// if an io key is pressed
-		if (KeyInput.pressed(KeyInput.save)) {
+		if (Keyboard.pressed(Keyboard.save)) {
 			if (!ioOrdered) { // if an io key was up before
 				Savegame.saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
-		} else if (KeyInput.pressed(KeyInput.load)) {
+		} else if (Keyboard.pressed(Keyboard.load)) {
 			if (!ioOrdered) { // if an io key was up before
 				Savegame.loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
@@ -156,11 +171,9 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		// if devmode is being activated/deactivated
-		if (KeyInput.pressed(KeyInput.devmode)) {
+		if (Keyboard.pressed(Keyboard.devmode)) {
 			if (!devModeOrdered) {
 				devMode = !devMode; // toggle
-				if (devMode) frame.setTitle(title + "   -   FPS: ...   AVG: ...   TPS: ...   SEC: ..."); // TODO change to on-screen text
-				else frame.setTitle(title);
 				devModeOrdered = true;
 			}
 		} else {
@@ -172,16 +185,45 @@ public class Game extends Canvas implements Runnable {
 	 * Draws the game's current frame
 	 */
 	private void render() {
-		render.clear();
-		for (Entity e : world.getEntities()) {
-			e.render(render);
-		}
-
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
+		
+		render.clear();
+		for (Entity e : world.getEntities()) { // render the game objects
+			e.render(g, render);
+		}
+		
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		
+		if (devMode) {
+			devInfo.render(g, render); // render the dev info if applicable
+		}
+		
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
+	}
+	
+	/**
+	 * Prepares game assets before it actuallly starts to run.
+	 * 
+	 * TODO add loading bar and/or do this in a different thread and stuff
+	 */
+	public void setup() {
+		createBufferStrategy(3); // set up the buffer strategy for rendering
+
+		// initialize visual elements
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
+		render = new Render(width, height);
+		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
+
+		// initialize world
+		world = new testWorld(width, height);
+
+		// initialize keyboard input
+		addKeyListener(new Keyboard());
+		
+		// initialize devInfo
+		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
 	}
 
 	/**
@@ -189,17 +231,5 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public synchronized void stop() {
 		running = false;
-	}
-
-	/**
-	 * Sets this Game's frame variable to frame. Does not add this Game to frame. That must be done before calling this method.
-	 * 
-	 * If this is not called, devmode will not work
-	 * 
-	 * @param frame
-	 *            the frame this Game will be allowed to manipulate
-	 */
-	public void setFrame(JFrame frame) {
-		this.frame = frame;
 	}
 }

@@ -3,21 +3,23 @@ package hellomisterme.gimbal.entities;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.graphics.GimbalImage;
 import hellomisterme.gimbal.graphics.Render;
+import hellomisterme.gimbal.graphics.Renderable;
 import hellomisterme.gimbal.io.Savable;
 import hellomisterme.gimbal.world.World;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * An Entity is something that can render itself.
+ * An Entity is an object in the game.
  * 
  * @since 10-16-12
  * @author David Aaron Suddjian
  */
-public abstract class Entity implements Savable {
+public abstract class Entity implements Savable, Renderable {
 
 	protected GimbalImage image;
 	public Rectangle bounds;
@@ -89,7 +91,7 @@ public abstract class Entity implements Savable {
 		image.load(in);
 	}
 
-	public void render(Render render) {
+	public void render(Graphics g, Render render) {
 		if (getImage() != null)
 			render.render(getImage(), getX(), getY());
 	}

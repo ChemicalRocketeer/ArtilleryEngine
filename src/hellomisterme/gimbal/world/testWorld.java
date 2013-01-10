@@ -3,7 +3,7 @@ package hellomisterme.gimbal.world;
 import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.mob.Baddie;
 import hellomisterme.gimbal.entities.mob.Player;
-import hellomisterme.gimbal.io.KeyInput;
+import hellomisterme.gimbal.io.Keyboard;
 
 /**
  * testWorld is just a temporary class to test out World's functionality.
@@ -30,7 +30,7 @@ public class testWorld extends World {
 
 	public void tick() {
 		// if the addbaddie key is pressed
-		if (KeyInput.pressed(KeyInput.addbaddie)) {
+		if (Keyboard.pressed(Keyboard.addbaddie)) {
 			if (baddieOrdered == false) { // if the key was up before
 				generateBaddie();
 				baddieOrdered = true; // remember that the key was pressed
