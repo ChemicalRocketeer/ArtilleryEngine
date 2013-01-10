@@ -188,7 +188,10 @@ public class Game extends Canvas implements Runnable {
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		
-		render.clear();
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
+		
+		
 		for (Entity e : world.getEntities()) { // render the game objects
 			e.render(g, render);
 		}
@@ -212,9 +215,10 @@ public class Game extends Canvas implements Runnable {
 		createBufferStrategy(3); // set up the buffer strategy for rendering
 
 		// initialize visual elements
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // used to send data to the BufferStrategy
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
 		render = new Render(width, height);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
+		
 
 		// initialize world
 		world = new testWorld(width, height);

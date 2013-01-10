@@ -11,7 +11,7 @@ import hellomisterme.gimbal.io.ScreenshotManager;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class Render{
+public class Render {
 
 	private int width = Game.width;
 	private int height = Game.height;
@@ -19,9 +19,8 @@ public class Render{
 	private ScreenshotManager screenshot;
 
 	public Render(int width, int height) {
-		this.setWidth(width);
-		this.setHeight(height);
-		pixels = new int[width * height];
+		setWidth(width);
+		setHeight(height);
 		screenshot = new ScreenshotManager();
 	}
 
@@ -120,7 +119,6 @@ public class Render{
 	 * Clears pixels so they can be filled later
 	 */
 	public void clear() {
-		// fill all pixels with black
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 0xFFFFFF;
 		}

@@ -23,6 +23,9 @@ public class Start {
 		frame.setVisible(true);
 		game.requestFocus(); // get focus if OS allows it
 		game.setup();
+		
+		//TODO figure fullscreen out
+		//GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
 
 		Thread thread = new Thread(game);
 		thread.start(); // calls game's run() method
