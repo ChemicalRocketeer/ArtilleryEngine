@@ -12,6 +12,6 @@ import java.io.DataOutputStream;
 public interface Savable {
 	
 	public void save(DataOutputStream out);
-	public void load(DataInputStream in);
+	public void load(DataInputStream in, int version);
 	
 }

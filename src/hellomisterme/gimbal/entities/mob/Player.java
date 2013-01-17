@@ -3,8 +3,8 @@ package hellomisterme.gimbal.entities.mob;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.Entity;
+import hellomisterme.gimbal.graphics.AnimatedSprite;
 import hellomisterme.gimbal.graphics.GimbalImage;
-import hellomisterme.gimbal.graphics.LightweightAnimation;
 import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.world.World;
 
@@ -19,9 +19,9 @@ import java.io.DataOutputStream;
  * @author David Aaron Suddjian
  */
 public class Player extends Mob {
-	
-	public World world;
 
+	public World world;
+	
 	private double movementSpeed = 8.0;
 
 	public static final double MAX_HEALTH = 10.0;
@@ -32,10 +32,13 @@ public class Player extends Mob {
 	private boolean dead = false;
 
 	public Player() {
-		image = new LightweightAnimation("graphics/sprites/player");
+		animation = new AnimatedSprite("graphics/sprites/player");
+		image = animation;
 		hitbox = new Rectangle(10, 60, 50, 20);
+		world = getWorld();
 	}
 
+	@Override
 	public void tick() {
 		boolean damage = false; // can be changed to tell if the player is damaged or not
 
@@ -128,12 +131,13 @@ public class Player extends Mob {
 	 * <li>animationTimer int</li>
 	 * <li>health double</li>
 	 * <li>damageImmunityTimer int</li>
+	 * <li>animation.frame int</li>
 	 * </ul>
 	 */
 	@Override
-	public void saveData(DataOutputStream out) {
+	public void save(DataOutputStream out) {
+		super.save(out);
 		try {
-			out.writeInt(animationTimer);
 			out.writeDouble(health);
 			out.writeInt(damageImmunityTimer);
 		} catch (Exception e) {
@@ -146,23 +150,14 @@ public class Player extends Mob {
 	 * Loads a Player's saved data. See saveData().
 	 */
 	@Override
-	public void loadData(DataInputStream in) {
+	public void load(DataInputStream in, int version) {
+		super.load(in, version);
 		try {
-			animationTimer = in.readInt();
 			health = in.readDouble();
 			damageImmunityTimer = in.readInt();
 		} catch (Exception e) {
 			Err.error("Player can't load data!");
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Loads saved image data. Can be overridden to load other types of images.
-	 */
-	@Override
-	public void loadImage(DataInputStream in) {
-		image = new LightweightAnimation();
-		image.load(in);
 	}
 }

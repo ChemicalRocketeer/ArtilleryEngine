@@ -1,6 +1,5 @@
 package hellomisterme.gimbal.graphics;
 
-import java.awt.Graphics;
 
 /**
  * Renderable objects can render themselves onto a Graphics object.
@@ -10,5 +9,5 @@ import java.awt.Graphics;
  */
 public interface Renderable {
 
-	public void render(Graphics g, Render r);
+	public void render(Render r);
 }

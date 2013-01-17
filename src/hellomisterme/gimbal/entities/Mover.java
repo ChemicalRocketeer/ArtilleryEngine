@@ -20,7 +20,6 @@ public abstract class Mover extends Entity implements Tick {
 	protected double x = 0, y = 0;
 
 	public void save(DataOutputStream out) {
-		super.save(out);
 		try {
 			out.writeDouble(x);
 			out.writeDouble(y);
@@ -30,11 +29,9 @@ public abstract class Mover extends Entity implements Tick {
 		}
 	}
 	
-	public void load(DataInputStream in) {
-		super.load(in);
+	public void load(DataInputStream in, int version) {
 		try {
-			x = in.readDouble();
-			y = in.readDouble();
+			setPos(in.readDouble(), in.readDouble());
 		} catch (IOException e) {
 			Err.error("Can't read Mover data!");
 			e.printStackTrace();
@@ -49,10 +46,12 @@ public abstract class Mover extends Entity implements Tick {
 		return y;
 	}
 	
+	@Override
 	public int getX() {
 		return (int) x;
 	}
-	
+
+	@Override
 	public int getY() {
 		return (int) y;
 	}
@@ -62,6 +61,7 @@ public abstract class Mover extends Entity implements Tick {
 		this.y = y;
 	}
 
+	@Override
 	public void setPos(int x, int y) {
 		setPos((double) x, (double) y);
 	}

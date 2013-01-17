@@ -19,6 +19,9 @@ import java.io.IOException;
  */
 public class Savegame {
 
+	/**
+	 * The current numerical version of the save system.
+	 */
 	public static final int VERSION = 0;
 
 	/**
@@ -48,7 +51,7 @@ public class Savegame {
 			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(new File("saves/" + name + ".gmbl"))));
 			int version = in.readInt();
 			if (version == 0) {
-				savable.load(in);
+				savable.load(in, version);
 			} else {
 				Err.error("Trying to load a save with an invalid version number!");
 			}

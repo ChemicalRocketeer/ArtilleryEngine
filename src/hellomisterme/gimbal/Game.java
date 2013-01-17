@@ -1,7 +1,6 @@
 package hellomisterme.gimbal;
 
 import hellomisterme.gimbal.entities.Entity;
-import hellomisterme.gimbal.graphics.DevInfo;
 import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.io.Savegame;
@@ -26,7 +25,7 @@ import java.util.Random;
 public class Game extends Canvas implements Runnable {
 	
 	/**
-	 * This game's title. Can be displayed in the window title bar.
+	 * This game's title
 	 */
 	public static String title = "Gimbal Pre-Alpha.0.06.2";
 	
@@ -36,17 +35,17 @@ public class Game extends Canvas implements Runnable {
 	public static final double ISOMETRIC_RATIO = .5;
 	
 	/**
-	 * A random number that can be used by objects in the game, preventing multiple objects from doing the same thing
+	 * A random number that can be used by objects in the game
 	 */
 	public static final Random RAND = new Random(System.currentTimeMillis());
 
 	/**
-	 * The width of this game window
+	 * The width of the game window
 	 */
 	public static int width = 800;
 	
 	/**
-	 * The height of this game window
+	 * The height of the game window
 	 */
 	public static int height = width * 10 / 16;
 	
@@ -60,11 +59,11 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image;
 	private Render render;
 	
-	private World world;
+	private static World world;
 	
 	private DevInfo devInfo;
 	
-	// control booleans TODO put these in a different class or something, they don't really belong here...
+	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devMode = false;
 	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
@@ -116,8 +115,8 @@ public class Game extends Canvas implements Runnable {
 				totalSeconds++;
 				
 				// keep dev info updated
-				devInfo.totalMem = Runtime.getRuntime().totalMemory();
-				devInfo.usedMem = devInfo.totalMem - Runtime.getRuntime().freeMemory();
+				devInfo.maxMem = Runtime.getRuntime().maxMemory();
+				devInfo.usedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 				devInfo.fps = frameCount;
 				devInfo.avg = (int) (totalFrames / totalSeconds);
 				devInfo.tps = tickCount;
@@ -188,18 +187,16 @@ public class Game extends Canvas implements Runnable {
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
-		
+		render.clear();		
 		
 		for (Entity e : world.getEntities()) { // render the game objects
-			e.render(g, render);
+			e.render(render);
 		}
 		
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		
 		if (devMode) {
-			devInfo.render(g, render); // render the dev info if applicable
+			devInfo.render(g); // render the dev info if applicable
 		}
 		
 		g.dispose(); // let go of the Graphics object
@@ -219,7 +216,6 @@ public class Game extends Canvas implements Runnable {
 		render = new Render(width, height);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
 		
-
 		// initialize world
 		world = new testWorld(width, height);
 
@@ -227,7 +223,7 @@ public class Game extends Canvas implements Runnable {
 		addKeyListener(new Keyboard());
 		
 		// initialize devInfo
-		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
+		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics(), world.player);
 	}
 
 	/**
@@ -235,5 +231,9 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public synchronized void stop() {
 		running = false;
+	}
+	
+	public static World getWorld() {
+		return world;
 	}
 }

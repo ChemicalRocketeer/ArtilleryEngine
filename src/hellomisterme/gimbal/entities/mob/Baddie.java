@@ -1,7 +1,7 @@
 package hellomisterme.gimbal.entities.mob;
 
 import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.graphics.LightweightAnimation;
+import hellomisterme.gimbal.graphics.AnimatedSprite;
 
 import java.awt.Rectangle;
 
@@ -13,7 +13,6 @@ import java.awt.Rectangle;
  */
 public class Baddie extends Mob {
 
-	public Player player;
 	public double width, height;
 
 	public Baddie() {
@@ -23,7 +22,8 @@ public class Baddie extends Mob {
 	public Baddie(double x, double y) {
 		this.x = x;
 		this.y = y;
-		image = new LightweightAnimation("graphics/sprites/baddie");
+		animation = new AnimatedSprite("graphics/sprites/baddie");
+		image = animation;
 		hitbox = new Rectangle(3, 3, 20, 20);
 	}
 

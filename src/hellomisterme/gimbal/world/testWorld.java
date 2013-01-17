@@ -2,7 +2,6 @@ package hellomisterme.gimbal.world;
 
 import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.mob.Baddie;
-import hellomisterme.gimbal.entities.mob.Player;
 import hellomisterme.gimbal.io.Keyboard;
 
 /**
@@ -12,18 +11,14 @@ import hellomisterme.gimbal.io.Keyboard;
  * @author David Aaron Suddjian
  */
 public class testWorld extends World {
-
-	private Player player;
+	
 	private boolean baddieOrdered = false;
 
 	public testWorld(int width, int height) {
 		setWidth(width);
 		setHeight(height);
 
-		player = new Player();
-		add(player);
-		player.world = this;
-
+		makePlayer();
 		generateBaddie();
 		generateBaddie();
 	}

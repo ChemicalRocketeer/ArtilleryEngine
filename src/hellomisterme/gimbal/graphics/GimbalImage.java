@@ -1,6 +1,5 @@
 package hellomisterme.gimbal.graphics;
 
-import hellomisterme.gimbal.io.Savable;
 
 /**
  * A basic class to describe an image.
@@ -8,10 +7,9 @@ import hellomisterme.gimbal.io.Savable;
  * @since 11-12-12
  * @author David Aaron Suddjian
  */
-public interface GimbalImage extends Savable {
+public interface GimbalImage {
 	
 	public int[] getPixels();
-	public void setImage(String path);
 	public int getWidth();
 	public int getHeight();
 }

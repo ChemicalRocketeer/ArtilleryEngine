@@ -15,7 +15,12 @@ public class Render {
 
 	private int width = Game.width;
 	private int height = Game.height;
+	
+	/**
+	 * The array of pixels that will be manipulated through rendering
+	 */
 	public int[] pixels;
+	
 	private ScreenshotManager screenshot;
 
 	public Render(int width, int height) {
@@ -25,14 +30,14 @@ public class Render {
 	}
 
 	/**
-	 * Draws LightweightImage data at the indicated point on screen
+	 * Draws Sprite data at the indicated point on screen
 	 * 
 	 * @param image
 	 *            the GimbalImage to be drawn
 	 * @param xPos
-	 *            the x coordinate of the top-left corner of the LightweightImage
+	 *            the xLocation coordinate of the top-left corner of the Sprite
 	 * @param yPos
-	 *            the y coordinate of the top-left corner of the LightweightImage
+	 *            the yLocation coordinate of the top-left corner of the Sprite
 	 */
 	public void render(GimbalImage image, int xPos, int yPos) {
 		// check if img is completely off-screen
@@ -41,10 +46,10 @@ public class Render {
 		}
 
 		// vars used to avoid printing unnecessary pixels or going out of bounds
-		int xIndex; // x value to start at when copying pixels from img
-		int xClip; // x value to stop at when copying pixels from img
-		int yIndex; // y value to start at when copying pixels from img
-		int yClip; // y value to stop at when copying pixels from img
+		int xIndex; // xLocation value to start at when copying pixels from img
+		int xClip; // xLocation value to stop at when copying pixels from img
+		int yIndex; // yLocation value to start at when copying pixels from img
+		int yClip; // yLocation value to stop at when copying pixels from img
 		// OOB right
 		if (xPos >= getWidth() - image.getWidth()) {
 			xClip = getWidth() - xPos;
@@ -72,7 +77,7 @@ public class Render {
 
 		yPos *= getWidth(); // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
 
-		// actual img copy loop
+		// actual img render loop
 		for (int y = yIndex; y < yClip; y++) {
 			for (int x = xIndex; x < xClip; x++) {
 				int index = xPos + x + yPos + y * getWidth(); // the current location in pixels[]
@@ -83,7 +88,7 @@ public class Render {
 	}
 
 	/**
-	 * Blends two colors (provided only one has an alpha channel) using the alpha value. Alpha values closer to 255 will make the returned color closer to `argb`, while alpha values closer to 0 will
+	 * Blends two rgb colors (provided one has an alpha channel) using the alpha value. Alpha values closer to 255 will make the returned color closer to `argb`, while alpha values closer to 0 will
 	 * make it closer to `rgb`.
 	 * 
 	 * @param rgb
@@ -111,7 +116,7 @@ public class Render {
 		int g = (rgb >> 8) & 0xFF;
 		int b = rgb & 0xFF;
 		// (argb >> number & 0xFF) is the sub-pixel value of argb.
-		// return hex color made of the calculated RGB values: R << 16 or G << 8 or B
+		// return hex color made of the calculated RGB values: R << 16 OR G << 8 OR B
 		return ((int) (((argb >> 16 & 0xFF) - r) * alpha + r) << 16) | ((int) (((argb >> 8 & 0xFF) - g) * alpha + g) << 8) | (int) (((argb & 0xFF) - b) * alpha + b);
 	}
 
@@ -120,7 +125,7 @@ public class Render {
 	 */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0xFFFFFF;
+			pixels[i] = 0xFFFFFFFF;
 		}
 	}
 
@@ -152,7 +157,7 @@ public class Render {
 	}
 
 	/**
-	 * Takes a screenshot using parallel processing so that the screenshot doesn't interrupt the action.
+	 * Takes a screenshot using a new Thread so that the screenshot doesn't interrupt the rest of the program.
 	 * 
 	 * @since 11-22-12
 	 * @author David Aaron Suddjian

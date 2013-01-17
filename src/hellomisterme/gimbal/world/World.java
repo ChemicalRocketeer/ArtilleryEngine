@@ -3,13 +3,16 @@ package hellomisterme.gimbal.world;
 import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Tick;
 import hellomisterme.gimbal.entities.Entity;
+import hellomisterme.gimbal.entities.mob.Player;
+import hellomisterme.gimbal.graphics.Render;
+import hellomisterme.gimbal.graphics.Renderable;
 import hellomisterme.gimbal.io.Savable;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,15 +21,28 @@ import java.util.List;
  * @since 10-23-12
  * @author David Aaron Suddjian
  */
-public abstract class World implements Tick, Savable {
+public abstract class World implements Tick, Savable, Renderable {
 
 	private String name = "New Game";
 	private Rectangle bounds = new Rectangle(256, 256);
-	// If any of these lists is changed, remember to change instantiations in constructors and other methods like load!
-	// TODO initialize Lists with starting values for efficiency
-	private List<Entity> entities = new LinkedList<Entity>();
-	private List<Tick> tickables = new LinkedList<Tick>();
-	private List<Savable> savables = new LinkedList<Savable>();
+
+	private List<Entity> entities = new ArrayList<Entity>();
+	private List<Tick> tickables = new ArrayList<Tick>();
+	private List<Savable> savables = new ArrayList<Savable>();
+
+	/**
+	 * The ultimate controlling dude. The overarching overlord. The final cheese. The player.
+	 */
+	public Player player;
+
+	/**
+	 * Renders the world
+	 */
+	public void render(Render render) {
+		for (Entity e : entities) {
+			e.render(render);
+		}
+	}
 
 	/**
 	 * Writes this World's data to wherever the DataOutputStream goes. This World's data includes the data of all its registered savables.
@@ -41,17 +57,21 @@ public abstract class World implements Tick, Savable {
 			// the first int saved is width, second is height
 			out.writeInt(bounds.width);
 			out.writeInt(bounds.height);
-			// save each Savable's data
-			for (Savable s : savables) {
-				//write a boolean so we can tell there is another object when reading
-				out.writeBoolean(true);
-				out.writeUTF(s.getClass().getName());
-				s.save(out);
-			}
-			// write false so we know when to stop when reading
-			out.writeBoolean(false);
+
+			out.writeInt(savables.size()); // write how many savables there are
 		} catch (IOException e) {
 			Err.error("World can't write data!");
+		}
+
+		// save all the savable data
+		for (Savable s : savables) {
+			try {
+				out.writeUTF(s.getClass().getName()); // save the class name so we'll know what class it is later TODO: use switch statements or something, I dunno
+			} catch (IOException e) {
+				Err.error("Can't save class name " + s.getClass().getName() + "!");
+				e.printStackTrace();
+			}
+			s.save(out);
 		}
 	}
 
@@ -61,24 +81,22 @@ public abstract class World implements Tick, Savable {
 	 * @param in
 	 *            the DataInputStream to use to load data from
 	 */
-	public void load(DataInputStream in) {
+	public void load(DataInputStream in, int version) {
+		// clear all lists. We're starting this world over from scratch.
+		entities.clear();
+		tickables.clear();
+		savables.clear();
 		try {
-			// reset all lists. We're starting this world over from scratch.
-			entities = new LinkedList<Entity>();
-			tickables = new LinkedList<Tick>();
-			savables = new LinkedList<Savable>();
 			// the first int read is width, second is height
 			bounds.width = in.readInt();
 			bounds.height = in.readInt();
-			// while there are true booleans there is another object to read data from
-			while (in.readBoolean()) {
-				// whatever we're reading must be savable because it saved this data
-				String name = in.readUTF();
-				Savable thing = (Savable) Class.forName(name).newInstance();
-				thing.load(in);
-				add(thing);
+
+			for (int i = in.readInt(); i > 0; i--) {
+				// whatever we're reading must be savable because it saved its data
+				Savable s = (Savable) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
+				add(s);
+				s.load(in, version);
 			}
-			// when the false boolean is reached, we are at the end of this World's data
 		} catch (Exception e) {
 			Err.error("World can't load saved data! Please send the world save in a bug report.");
 			e.printStackTrace();
@@ -92,16 +110,12 @@ public abstract class World implements Tick, Savable {
 		// tick all the registered Tick objects
 		tick();
 		for (Tick tock : tickables) {
-			if (tock == null) {
-				Err.error("Can't call a null Tick!"); // TODO remove
-			} else {
-				tock.tick();
-			}
+			tock.tick();
 		}
 	}
-	
+
 	public void tick() {
-		
+
 	}
 
 	/**
@@ -114,7 +128,7 @@ public abstract class World implements Tick, Savable {
 	 */
 	public void add(Object o) {
 		if (o == null) {
-			Err.error("Trying to add null Object to World!");
+			Err.error("Trying to add null Object to World!"); // TODO remove
 		} else {
 			if (o instanceof Entity) {
 				addEntity((Entity) o);
@@ -136,7 +150,7 @@ public abstract class World implements Tick, Savable {
 	 */
 	public void remove(Object o) {
 		if (o == null) {
-			Err.error("Trying to remove null Object from World!");
+			Err.error("Trying to remove null Object from World!"); // TODO remove
 		} else {
 			if (o instanceof Entity) {
 				removeEntity((Entity) o);
@@ -151,17 +165,17 @@ public abstract class World implements Tick, Savable {
 	}
 
 	/**
-	 * Adds an Entity to the World's Entity list, allowing it to be displayed
+	 * Adds an Entity to the World's Entity list, allowing it to be displayed. Also sets the Entity's world variable to this.
 	 * 
 	 * @param e
 	 *            the Entity to add
 	 */
 	public void addEntity(Entity e) {
 		if (e == null) {
-			Err.error("Trying to add null Entity to World!");
+			Err.error("Trying to add null Entity to World!"); // TODO remove
 		} else if (!entities.contains(e)) {
 			entities.add(e);
-			e.bounds = bounds;
+			e.addedToWorld(this);
 		} else {
 			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
 		}
@@ -247,30 +261,60 @@ public abstract class World implements Tick, Savable {
 		}
 	}
 
+	/**
+	 * Makes a player
+	 */
+	public void makePlayer() {
+		player = new Player();
+		add(player);
+		player.world = this;
+	}
+
+	/**
+	 * @return the width of the world
+	 */
 	public int getWidth() {
 		return bounds.width;
 	}
 
+	/**
+	 * @param width the width to set
+	 */
 	public void setWidth(int width) {
 		bounds.width = width;
 	}
 
+	/**
+	 * @return the height of the world
+	 */
 	public int getHeight() {
 		return bounds.height;
 	}
 
+	/**
+	 * @param height the height to set
+	 */
 	public void setHeight(int height) {
 		bounds.height = height;
 	}
 
+	/**
+	 * @return this world's name, can be used for whatever a name is useful for
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name the string that will be considered this world's name from now on
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return all known Enitities
+	 */
 	public List<Entity> getEntities() {
 		return entities;
 	}
