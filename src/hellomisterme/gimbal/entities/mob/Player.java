@@ -4,7 +4,7 @@ import hellomisterme.gimbal.Err;
 import hellomisterme.gimbal.Game;
 import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.AnimatedSprite;
-import hellomisterme.gimbal.graphics.GimbalImage;
+import hellomisterme.gimbal.graphics.BasicImage;
 import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.world.World;
 
@@ -116,7 +116,7 @@ public class Player extends Mob {
 	}
 
 	@Override
-	public GimbalImage getImage() {
+	public BasicImage getImage() {
 		if (damageImmunityTimer % 10 >= 0 && damageImmunityTimer % 10 < 5) {
 			return super.getImage();
 		} else {

@@ -31,16 +31,16 @@ public abstract class World implements Tick, Savable, Renderable {
 	private List<Savable> savables = new ArrayList<Savable>();
 
 	/**
-	 * The ultimate controlling dude. The overarching overlord. The final cheese. The player.
+	 * The ultimate ontrolling dude. The overarching overlord. The final cheese. The player.
 	 */
 	public Player player;
 
 	/**
 	 * Renders the world
 	 */
-	public void render(Render render) {
+	public void render(Render r) {
 		for (Entity e : entities) {
-			e.render(render);
+			e.render(r);
 		}
 	}
 
@@ -104,11 +104,10 @@ public abstract class World implements Tick, Savable, Renderable {
 	}
 
 	/**
-	 * Calls this World's tick() method, and the tick() methods of all registered Tick objects
+	 * Calls the tick methods of all registered Tick objects
 	 */
 	public final void callTick() {
 		// tick all the registered Tick objects
-		tick();
 		for (Tick tock : tickables) {
 			tock.tick();
 		}
@@ -121,7 +120,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	/**
 	 * Adds an Object to this World as appropriate
 	 * 
-	 * TODO replace all add/remove calls with specific calls (for speed). add() and remove() are for ease of development purposes. In final versions their use should be avoided.
+	 * TODO replace all add/remove calls with specific calls. add() and remove() are for ease of development purposes. In final versions their use should be avoided.
 	 * 
 	 * @param o
 	 *            the Object to add

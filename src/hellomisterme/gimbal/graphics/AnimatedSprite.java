@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  * @since 11-11-12
  * @author David Aaron Suddjian
  */
-public class AnimatedSprite implements GimbalImage {
+public class AnimatedSprite implements BasicImage {
 
 	protected int frame = 0; // the current frame
 	private int width;
@@ -64,7 +64,7 @@ public class AnimatedSprite implements GimbalImage {
 					frames[i] = new int[src.getWidth() * src.getHeight()];
 					src.getRGB(0, 0, src.getWidth(), src.getHeight(), frames[i], 0, src.getWidth()); // copy colors from src to pixels
 				} catch (Exception e) {
-					Err.error("GimbalImage can't read " + file.getAbsolutePath() + "! Make sure all the game files are correctly named!");
+					Err.error("BasicImage can't read " + file.getAbsolutePath() + "! Make sure all the game files are correctly named!");
 					e.printStackTrace();
 				}
 			}

@@ -11,7 +11,7 @@ import hellomisterme.gimbal.io.Keyboard;
  * @author David Aaron Suddjian
  */
 public class testWorld extends World {
-	
+
 	private boolean baddieOrdered = false;
 
 	public testWorld(int width, int height) {

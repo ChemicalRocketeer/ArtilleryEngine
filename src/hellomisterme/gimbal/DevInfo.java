@@ -1,6 +1,6 @@
 package hellomisterme.gimbal;
 
-import hellomisterme.gimbal.entities.mob.Player;
+import hellomisterme.gimbal.world.World;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -24,7 +24,7 @@ public class DevInfo {
 	/**
 	 * The font size that will be used when rendering
 	 */
-	public int fontSize = 18;
+	public int fontSize = 22;
 
 	/**
 	 * Total memory available
@@ -40,49 +40,43 @@ public class DevInfo {
 	 * Game status variable
 	 */
 	public int fps = 0, avg = 0, tps = 0, sec = 0;
-	
-	/**
-	 * The player that this DevInfo is watching
-	 */
-	public Player player;
 
 	private static final int MB = 1048576; // bytes in a megabyte
 
-	public DevInfo(Graphics g, Player p) {
+	public DevInfo(Graphics g) {
 		setup(g);
-		player = p;
 	}
 
 	/**
-	 * Renders the dev info onto the Graphics object by first rendering a light background text, then a darker shadow and then the default text color on top of that.
+	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
 	 */
-	public void render(Graphics g) {
-		g.setFont(new Font("Courier New", Font.PLAIN, fontSize));
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g.setColor(new Color(0xFF, 0xFF, 0xFF, 0xAA)); // render the light part
-		render(g, 1, 1);
-		g.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
-		render(g, 0, 1);
-		g.setColor(new Color(0, 0xBB, 0)); // render the primary color
-		render(g, 0, 0);
+	public void render(Graphics2D g2) {
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON); // antialiasing
+		g2.setFont(new Font("Courier New", Font.BOLD, fontSize));
+		g2.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
+		render(g2, 0, 1);
+		g2.setColor(new Color(0, 0xBB, 0)); // render the primary color
+		render(g2, 0, 0);
 	}
 
 	private void render(Graphics g, int xOff, int yOff) {
-		// turn on antialiasing
+		World world = Game.getWorld();
 		int currentLine = 0; // used to tell how far down each info line should render
 		g.drawString("memory usage: " + usedMem / MB + " MB used of " + maxMem / MB + " total", xLocation + xOff, yLocation + yOff + currentLine); // render the memory info
 		currentLine += fontSize * 2;
-		g.drawString("    FPS: " + fps, xLocation + xOff, yLocation + currentLine + yOff); // render fps
+		g.drawString("    FPS: " + fps, xLocation + xOff, yLocation + currentLine + yOff); // fps
 		currentLine += fontSize;
-		g.drawString("average: " + avg, xLocation + xOff, yLocation + currentLine + yOff); // render avg
+		g.drawString("average: " + avg, xLocation + xOff, yLocation + currentLine + yOff); // average fps
 		currentLine += fontSize;
-		g.drawString("    TPS: " + tps, xLocation + xOff, yLocation + currentLine + yOff); // render tps
+		g.drawString("    TPS: " + tps, xLocation + xOff, yLocation + currentLine + yOff); // ticks per second
 		currentLine += fontSize;
-		g.drawString("seconds: " + sec, xLocation + xOff, yLocation + currentLine + yOff); // render sec
+		g.drawString("   time: " + sec + " seconds", xLocation + xOff, yLocation + currentLine + yOff); // seconds
 		currentLine += fontSize * 2;
-		g.drawString("x: " + player.getExactX(), xLocation + xOff, yLocation + currentLine + yOff); // render player's x coordinate
+		g.drawString("x: " + world.player.getExactX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize;
-		g.drawString("y: " + player.getExactY(), xLocation + xOff, yLocation + currentLine + yOff); // render player's x coordinate
+		g.drawString("y: " + world.player.getExactY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+		currentLine += fontSize * 2;
+		g.drawString("e: " + world.getEntities().size(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
 	}
 
 	/**

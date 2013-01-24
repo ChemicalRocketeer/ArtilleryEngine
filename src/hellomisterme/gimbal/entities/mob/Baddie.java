@@ -18,7 +18,7 @@ public class Baddie extends Mob {
 	public Baddie() {
 		this(0, 0);
 	}
-	
+
 	public Baddie(double x, double y) {
 		this.x = x;
 		this.y = y;

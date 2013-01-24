@@ -16,22 +16,26 @@ import javax.imageio.ImageIO;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class Sprite implements GimbalImage {
+public class Sprite implements BasicImage {
 	protected int width;
 	protected int[] pixels;
 
-	
-	public Sprite(String path) {
-		setImage(path);
-	}
-
 	/**
-	 * Creates a Sprite by calling useDefaultImage
+	 * Creates a default Sprite by calling useDefaultImage
 	 * 
 	 * @see #useDefaultImage()
 	 */
 	public Sprite() { // has to be here so the LightwightImage can be initialized and then manipulated without wasting system resources.
 		useDefaultImage();
+	}
+	
+	/**
+	 * Creates a new Sprite from the specified path
+	 * 
+	 * @param path the path to load the image from
+	 */
+	public Sprite(String path) {
+		loadImage(path);
 	}
 
 	/**
@@ -42,10 +46,11 @@ public class Sprite implements GimbalImage {
 	 * @param path
 	 *            the path to the image file
 	 */
-	public void setImage(String path) {
+	public void loadImage(String path) {
 		BufferedImage src;
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk
+			pixels = new int[src.getWidth() * src.getHeight()];
 			src.getRGB(0, 0, src.getWidth(), src.getHeight(), pixels, 0, src.getWidth()); // copy colors from src to pixels
 			width = src.getWidth();
 		} catch (IOException e) {

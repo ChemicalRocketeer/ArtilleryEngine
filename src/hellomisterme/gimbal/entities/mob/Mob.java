@@ -31,7 +31,7 @@ public abstract class Mob extends Mover implements Physical {
 	 */
 	public void animate() {
 		if (animationTimer % animationSpeed == 0) {
-			((AnimatedSprite) image).next();
+			animation.next();
 		}
 		animationTimer++;
 	}

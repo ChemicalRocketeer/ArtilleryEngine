@@ -1,7 +1,6 @@
 package hellomisterme.gimbal.graphics;
 
 import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.io.ScreenshotManager;
 
 /**
  * Render handles computation and combination of the pixels that go onto the screen.
@@ -15,31 +14,25 @@ public class Render {
 
 	private int width = Game.width;
 	private int height = Game.height;
-	
+
 	/**
 	 * The array of pixels that will be manipulated through rendering
 	 */
 	public int[] pixels;
-	
-	private ScreenshotManager screenshot;
 
 	public Render(int width, int height) {
-		setWidth(width);
-		setHeight(height);
-		screenshot = new ScreenshotManager();
+		this.width = width;
+		this.height = height;
 	}
 
 	/**
 	 * Draws Sprite data at the indicated point on screen
 	 * 
-	 * @param image
-	 *            the GimbalImage to be drawn
-	 * @param xPos
-	 *            the xLocation coordinate of the top-left corner of the Sprite
-	 * @param yPos
-	 *            the yLocation coordinate of the top-left corner of the Sprite
+	 * @param image the BasicImage to be drawn
+	 * @param xPos the xLocation coordinate of the top-left corner of the Sprite
+	 * @param yPos the yLocation coordinate of the top-left corner of the Sprite
 	 */
-	public void render(GimbalImage image, int xPos, int yPos) {
+	public void render(BasicImage image, int xPos, int yPos) {
 		// check if img is completely off-screen
 		if (xPos + image.getWidth() < 0 || yPos + image.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
 			return;
@@ -75,9 +68,12 @@ public class Render {
 			yClip = image.getHeight();
 		}
 
+		/* ----- 
+		
+		//old pixel render loop, not as efficient but included becuase it does the same thing (or at least it should!) and is more readable
+		
 		yPos *= getWidth(); // yPos can now be used to shift the image down in the later equation without having to multiply by width every time
-
-		// actual img render loop
+		
 		for (int y = yIndex; y < yClip; y++) {
 			for (int x = xIndex; x < xClip; x++) {
 				int index = xPos + x + yPos + y * getWidth(); // the current location in pixels[]
@@ -85,16 +81,34 @@ public class Render {
 				pixels[index] = blendRGB(pixels[index], image.getPixels()[x + y * image.getWidth()]);
 			}
 		}
+
+		/* ----- */
+
+		// variables to decrease computation time during the loop
+		int[] imgPix = image.getPixels();
+		int w = getWidth();
+		int imgW = image.getWidth();
+		int imgYpix = 0;
+		int xPixel = xPos; 
+		yPos *= getWidth();
+
+		// actual pixel render loop
+		for (int y = yIndex; y < yClip; y++, yPos += w, imgYpix += imgW, xPixel = xPos) {
+			int index = 0;
+			for (int x = xIndex; x < xClip; x++, xPixel++) {
+				index = xPixel + yPos; // the current location in pixels[]
+				// calculate the new pixel value and put into pixels[]
+				this.pixels[index] = blendRGB(this.pixels[index], imgPix[x + imgYpix]);
+			}
+		}
 	}
 
 	/**
-	 * Blends two rgb colors (provided one has an alpha channel) using the alpha value. Alpha values closer to 255 will make the returned color closer to `argb`, while alpha values closer to 0 will
-	 * make it closer to `rgb`.
+	 * Blends two rgb colors (provided one has an alpha channel) using the alpha value. Alpha values closer to 255 will make the returned color closer to argb, while alpha values closer to 0 will make
+	 * it closer to rgb.
 	 * 
-	 * @param rgb
-	 *            the rgb color to be blended (the "bottom" color)
-	 * @param argb
-	 *            the rgb color with alpha to be blended (the "top" color)
+	 * @param rgb the rgb color to be blended (the "bottom" color)
+	 * @param argb the rgb color with alpha to be blended (the "top" color)
 	 * @return the two colors blended together
 	 */
 	public static int blendRGB(int rgb, int argb) {
@@ -125,47 +139,27 @@ public class Render {
 	 */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0xFFFFFFFF;
+			pixels[i] = 0xFFFFFF;
 		}
-	}
-
-	public int[] getPixels() {
-		return pixels;
-	}
-
-	/**
-	 * Starts a new Thread that saves a copy of the current set of pixels.
-	 */
-	public void screenshot() {
-		new Screenshot().start();
 	}
 
 	public int getHeight() {
 		return height;
 	}
 
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
 	public int getWidth() {
 		return width;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
 	/**
-	 * Takes a screenshot using a new Thread so that the screenshot doesn't interrupt the rest of the program.
+	 * Resets the width and height of this Render. If pixels[] is shared another object, calling this will break the link.
 	 * 
-	 * @since 11-22-12
-	 * @author David Aaron Suddjian
+	 * @param w the new width
+	 * @param h the new height
 	 */
-	private class Screenshot extends Thread {
-
-		public void run() {
-			screenshot.screenshot(pixels.clone(), width);
-		}
+	public void setSize(int w, int h) {
+		width = w;
+		height = h;
+		pixels = new int[width * height];
 	}
 }

@@ -1,9 +1,9 @@
 package hellomisterme.gimbal;
 
-import hellomisterme.gimbal.entities.Entity;
 import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.io.Keyboard;
 import hellomisterme.gimbal.io.Savegame;
+import hellomisterme.gimbal.io.Screenshot;
 import hellomisterme.gimbal.world.World;
 import hellomisterme.gimbal.world.testWorld;
 
@@ -16,24 +16,24 @@ import java.awt.image.DataBufferInt;
 import java.util.Random;
 
 /**
- * The Game handles display and management of game objects.
+ * The Game handles display and management of the game loop.
  * 
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
-	
+
 	/**
 	 * This game's title
 	 */
-	public static String title = "Gimbal Pre-Alpha.0.06.2";
-	
+	public static String title = "Artillery Engine Pre-Alpha.0.06.2";
+
 	/**
 	 * A height to width ratio that objects can use for image transformations or for movement speed
 	 */
 	public static final double ISOMETRIC_RATIO = .5;
-	
+
 	/**
 	 * A random number that can be used by objects in the game
 	 */
@@ -43,12 +43,12 @@ public class Game extends Canvas implements Runnable {
 	 * The width of the game window
 	 */
 	public static int width = 800;
-	
+
 	/**
 	 * The height of the game window
 	 */
 	public static int height = width * 10 / 16;
-	
+
 	/**
 	 * The game's tick frequency, determining how quickly ingame actions happen
 	 */
@@ -58,11 +58,11 @@ public class Game extends Canvas implements Runnable {
 
 	private BufferedImage image;
 	private Render render;
-	
+
 	private static World world;
-	
+
 	private DevInfo devInfo;
-	
+
 	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devMode = false;
 	private boolean devModeOrdered = false;
@@ -76,7 +76,7 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This is it. The game loop. If something happens in the game, it begins here.
 	 * 
-	 * TODO make all the extra frames actually do something useful
+	 * TODO make all the extra frames actually do something useful (so, tweening)
 	 * 
 	 * Called by this Game's Thread thread.
 	 */
@@ -113,20 +113,22 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				
+
 				// keep dev info updated
 				devInfo.maxMem = Runtime.getRuntime().maxMemory();
 				devInfo.usedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 				devInfo.fps = frameCount;
+				System.out.println(devInfo.fps);
 				devInfo.avg = (int) (totalFrames / totalSeconds);
 				devInfo.tps = tickCount;
 				devInfo.sec = totalSeconds;
-				
+
 				// reset variables
 				frameCount = 0;
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
 			}
+
 		}
 	}
 
@@ -138,7 +140,7 @@ public class Game extends Canvas implements Runnable {
 		world.tick();
 		world.callTick();
 	}
-	
+
 	/**
 	 * Checks certain large-scale state conditions like screenshots and devmode
 	 */
@@ -146,7 +148,7 @@ public class Game extends Canvas implements Runnable {
 		// if the screenshot key is pressed
 		if (Keyboard.pressed(Keyboard.screenshot)) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
-				render.screenshot();
+				new Screenshot(image);
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
 		} else { // screenshot key not pressed
@@ -181,32 +183,27 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Draws the game's current frame
+	 * Draws the current frame
 	 */
 	private void render() {
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		
-		render.clear();		
-		
-		for (Entity e : world.getEntities()) { // render the game objects
-			e.render(render);
-		}
+		render.clear();
+
+		world.render(render);
+
+		if (devMode) devInfo.render(image.createGraphics());
 		
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
-		
-		if (devMode) {
-			devInfo.render(g); // render the dev info if applicable
-		}
-		
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
-	
+
 	/**
-	 * Prepares game assets before it actuallly starts to run.
+	 * Prepares game assets
 	 * 
-	 * TODO add loading bar and/or do this in a different thread and stuff
+	 * TODO add loading bar and/or do some of this in a different thread and stuff
 	 */
 	public void setup() {
 		createBufferStrategy(3); // set up the buffer strategy for rendering
@@ -215,15 +212,11 @@ public class Game extends Canvas implements Runnable {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
 		render = new Render(width, height);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
-		
-		// initialize world
-		world = new testWorld(width, height);
 
-		// initialize keyboard input
+		world = new testWorld(width, height);
 		addKeyListener(new Keyboard());
-		
-		// initialize devInfo
-		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics(), world.player);
+		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
+		Screenshot.readScreenshotNumber();
 	}
 
 	/**
@@ -232,7 +225,7 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void stop() {
 		running = false;
 	}
-	
+
 	public static World getWorld() {
 		return world;
 	}

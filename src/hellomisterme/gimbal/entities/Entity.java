@@ -1,7 +1,7 @@
 package hellomisterme.gimbal.entities;
 
 import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.graphics.GimbalImage;
+import hellomisterme.gimbal.graphics.BasicImage;
 import hellomisterme.gimbal.graphics.Render;
 import hellomisterme.gimbal.graphics.Renderable;
 import hellomisterme.gimbal.io.Savable;
@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public abstract class Entity implements Savable, Renderable {
 
-	protected GimbalImage image;
+	protected BasicImage image;
 
 	/**
 	 * This method will be called when the entity is added to a World object. By default it does nothing but it can be overridden.
@@ -67,14 +67,11 @@ public abstract class Entity implements Savable, Renderable {
 	 * 
 	 * @return the Sprite associated with this Entity
 	 */
-	public GimbalImage getImage() {
-		if (image == null) {
-			System.out.println("Returning null Sprite from Entity"); // TODO remove/change
-		}
+	public BasicImage getImage() {
 		return image;
 	}
 
-	protected void setImage(GimbalImage img) {
+	protected void setImage(BasicImage img) {
 		image = img;
 	}
 
