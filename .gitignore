@@ -1,10 +1,10 @@
 #################
-## Gimbal
+## Artillery Engine
 #################
 
 *.jar
--gimbal*
-*.gmbl
+_*
+*.arte
 screenshots/
 
 

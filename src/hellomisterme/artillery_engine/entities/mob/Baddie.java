@@ -1,7 +1,7 @@
-package hellomisterme.gimbal.entities.mob;
+package hellomisterme.artillery_engine.entities.mob;
 
-import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.graphics.AnimatedSprite;
+import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.graphics.AnimatedSprite;
 
 import java.awt.Rectangle;
 

@@ -1,8 +1,8 @@
-package hellomisterme.gimbal.world;
+package hellomisterme.artillery_engine.world;
 
-import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.entities.mob.Baddie;
-import hellomisterme.gimbal.io.Keyboard;
+import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.entities.mob.Baddie;
+import hellomisterme.artillery_engine.io.Keyboard;
 
 /**
  * testWorld is just a temporary class to test out World's functionality.

@@ -1,7 +1,7 @@
-package hellomisterme.gimbal.entities;
+package hellomisterme.artillery_engine.entities;
 
-import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.Tick;
+import hellomisterme.artillery_engine.Err;
+import hellomisterme.artillery_engine.Tick;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -29,7 +29,7 @@ public abstract class Mover extends Entity implements Tick {
 		}
 	}
 	
-	public void load(DataInputStream in, int version) {
+	public void load(DataInputStream in, String version) {
 		try {
 			setPos(in.readDouble(), in.readDouble());
 		} catch (IOException e) {

@@ -1,4 +1,4 @@
-package hellomisterme.gimbal;
+package hellomisterme.artillery_engine;
 
 import javax.swing.JFrame;
 

@@ -1,11 +1,11 @@
-package hellomisterme.gimbal.entities;
+package hellomisterme.artillery_engine.entities;
 
-import hellomisterme.gimbal.Game;
-import hellomisterme.gimbal.graphics.BasicImage;
-import hellomisterme.gimbal.graphics.Render;
-import hellomisterme.gimbal.graphics.Renderable;
-import hellomisterme.gimbal.io.Savable;
-import hellomisterme.gimbal.world.World;
+import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.graphics.BasicImage;
+import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.graphics.Renderable;
+import hellomisterme.artillery_engine.io.Savable;
+import hellomisterme.artillery_engine.world.World;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -46,7 +46,7 @@ public abstract class Entity implements Savable, Renderable {
 	/**
 	 * Loads this Entity's personal data.
 	 */
-	public void load(DataInputStream in, int version) {
+	public void load(DataInputStream in, String version) {
 		try {
 			setPos(in.readInt(), in.readInt());
 		} catch (IOException e) {

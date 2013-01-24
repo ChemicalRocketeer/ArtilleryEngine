@@ -1,6 +1,6 @@
-package hellomisterme.gimbal.graphics;
+package hellomisterme.artillery_engine.graphics;
 
-import hellomisterme.gimbal.Game;
+import hellomisterme.artillery_engine.Game;
 
 /**
  * Render handles computation and combination of the pixels that go onto the screen.

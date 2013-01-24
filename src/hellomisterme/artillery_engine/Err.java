@@ -1,4 +1,4 @@
-package hellomisterme.gimbal;
+package hellomisterme.artillery_engine;
 
 /**
  * Err handles printing of error messages to the console

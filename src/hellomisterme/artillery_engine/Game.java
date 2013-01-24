@@ -1,11 +1,11 @@
-package hellomisterme.gimbal;
+package hellomisterme.artillery_engine;
 
-import hellomisterme.gimbal.graphics.Render;
-import hellomisterme.gimbal.io.Keyboard;
-import hellomisterme.gimbal.io.Savegame;
-import hellomisterme.gimbal.io.Screenshot;
-import hellomisterme.gimbal.world.World;
-import hellomisterme.gimbal.world.testWorld;
+import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.io.Keyboard;
+import hellomisterme.artillery_engine.io.Savegame;
+import hellomisterme.artillery_engine.io.Screenshot;
+import hellomisterme.artillery_engine.world.World;
+import hellomisterme.artillery_engine.world.testWorld;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -159,12 +159,12 @@ public class Game extends Canvas implements Runnable {
 		// if an io key is pressed
 		if (Keyboard.pressed(Keyboard.save)) {
 			if (!ioOrdered) { // if an io key was up before
-				Savegame.saveData(world, "quicksave");
+				new Savegame().saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else if (Keyboard.pressed(Keyboard.load)) {
 			if (!ioOrdered) { // if an io key was up before
-				Savegame.loadData(world, "quicksave");
+				new Savegame().loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else { // io keys not pressed

@@ -1,12 +1,12 @@
-package hellomisterme.gimbal.world;
+package hellomisterme.artillery_engine.world;
 
-import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.Tick;
-import hellomisterme.gimbal.entities.Entity;
-import hellomisterme.gimbal.entities.mob.Player;
-import hellomisterme.gimbal.graphics.Render;
-import hellomisterme.gimbal.graphics.Renderable;
-import hellomisterme.gimbal.io.Savable;
+import hellomisterme.artillery_engine.Err;
+import hellomisterme.artillery_engine.Tick;
+import hellomisterme.artillery_engine.entities.Entity;
+import hellomisterme.artillery_engine.entities.mob.Player;
+import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.graphics.Renderable;
+import hellomisterme.artillery_engine.io.Savable;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
@@ -81,7 +81,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * @param in
 	 *            the DataInputStream to use to load data from
 	 */
-	public void load(DataInputStream in, int version) {
+	public void load(DataInputStream in, String version) {
 		// clear all lists. We're starting this world over from scratch.
 		entities.clear();
 		tickables.clear();

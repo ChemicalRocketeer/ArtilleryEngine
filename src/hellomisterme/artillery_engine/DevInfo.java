@@ -1,6 +1,6 @@
-package hellomisterme.gimbal;
+package hellomisterme.artillery_engine;
 
-import hellomisterme.gimbal.world.World;
+import hellomisterme.artillery_engine.world.World;
 
 import java.awt.Color;
 import java.awt.Font;

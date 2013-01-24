@@ -1,4 +1,4 @@
-package hellomisterme.gimbal.io;
+package hellomisterme.artillery_engine.io;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,6 +12,6 @@ import java.io.DataOutputStream;
 public interface Savable {
 	
 	public void save(DataOutputStream out);
-	public void load(DataInputStream in, int version);
+	public void load(DataInputStream in, String version);
 	
 }

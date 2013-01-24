@@ -1,6 +1,6 @@
-package hellomisterme.gimbal.io;
+package hellomisterme.artillery_engine.io;
 
-import hellomisterme.gimbal.Err;
+import hellomisterme.artillery_engine.Err;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;

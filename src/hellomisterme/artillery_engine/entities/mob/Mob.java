@@ -1,9 +1,9 @@
-package hellomisterme.gimbal.entities.mob;
+package hellomisterme.artillery_engine.entities.mob;
 
-import hellomisterme.gimbal.Err;
-import hellomisterme.gimbal.entities.Mover;
-import hellomisterme.gimbal.graphics.AnimatedSprite;
-import hellomisterme.gimbal.world.World;
+import hellomisterme.artillery_engine.Err;
+import hellomisterme.artillery_engine.entities.Mover;
+import hellomisterme.artillery_engine.graphics.AnimatedSprite;
+import hellomisterme.artillery_engine.world.World;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
@@ -79,7 +79,7 @@ public abstract class Mob extends Mover implements Physical {
 	 * @see #save(DataOutputStream)
 	 */
 	@Override
-	public void load(DataInputStream in, int version) {
+	public void load(DataInputStream in, String version) {
 		super.load(in, version);
 		try {
 			animationTimer = in.readInt();

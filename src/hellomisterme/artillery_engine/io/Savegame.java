@@ -1,6 +1,6 @@
-package hellomisterme.gimbal.io;
+package hellomisterme.artillery_engine.io;
 
-import hellomisterme.gimbal.Err;
+import hellomisterme.artillery_engine.Err;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -22,42 +22,44 @@ public class Savegame {
 	/**
 	 * The current numerical version of the save system.
 	 */
-	public static final int VERSION = 0;
+	public String version = "0";
+	
+	public static final String extension = ".arte";
 
 	/**
-	 * Saves the data of the given Savable as saves/name.gmbl
+	 * Saves the data of the given Savable in the saves folder
 	 * 
 	 * @param savable
 	 *            the Savable to save data from
 	 * @param name
 	 *            used to name the save file
 	 */
-	public static void saveData(Savable savable, String name) {
+	public void saveData(Savable savable, String name) {
 		try {
 			new File("saves").mkdir(); // make the diectory
-			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("saves/" + name + ".gmbl"))));
-			out.writeInt(VERSION);
+			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("saves/" + name + extension))));
+			out.writeUTF(version);
 			savable.save(out);
 			out.close();
-			System.out.println("Saved " + name + ".gmbl!"); // TODO put text on the screen instead
+			System.out.println("Saved " + name + ".arte!"); // TODO put text on the screen instead
 		} catch (IOException e) {
-			Err.error("Savegame can't save saves/" + name + ".gmbl");
+			Err.error("Savegame can't save saves/" + name + extension + "!");
 			e.printStackTrace();
 		}
 	}
 
-	public static void loadData(Savable savable, String name) {
+	public void loadData(Savable savable, String name) {
 		try {
-			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(new File("saves/" + name + ".gmbl"))));
-			int version = in.readInt();
-			if (version == 0) {
+			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(new File("saves/" + name + extension))));
+			version = in.readUTF();
+			if (version.equals("0")) {
 				savable.load(in, version);
 			} else {
 				Err.error("Trying to load a save with an invalid version number!");
 			}
 			in.close();
 		} catch (IOException e) {
-			Err.error("Savegame can't load saves/" + name + ".gmbl");
+			Err.error("Savegame can't load saves/" + name + extension);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package hellomisterme.gimbal.entities.mob;
+package hellomisterme.artillery_engine.entities.mob;
 
 import java.awt.Rectangle;
 

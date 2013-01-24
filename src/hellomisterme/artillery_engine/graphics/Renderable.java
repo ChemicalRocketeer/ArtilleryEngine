@@ -1,4 +1,4 @@
-package hellomisterme.gimbal.graphics;
+package hellomisterme.artillery_engine.graphics;
 
 
 /**
