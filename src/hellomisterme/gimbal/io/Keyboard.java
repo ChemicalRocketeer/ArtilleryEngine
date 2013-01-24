@@ -21,19 +21,19 @@ import java.util.Scanner;
 public class Keyboard implements KeyListener {
 
 	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
-	private static boolean[] keys = new boolean[255];
+	private static boolean[] keys = new boolean[256];
 	
-	// The keys that are relevant to this program (subject to change by other objects during execution, a settings file for example)
-	// TODO use unsigned bytes (chars?)
-	public static short[] up 			= new short[] {KeyEvent.VK_W, KeyEvent.VK_UP };
-	public static short[] down 			= new short[] {KeyEvent.VK_S, KeyEvent.VK_DOWN };
-	public static short[] left 			= new short[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
-	public static short[] right 		= new short[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
-	public static short[] addbaddie		= new short[] {KeyEvent.VK_G};
-	public static short[] screenshot 	= new short[] {KeyEvent.VK_F1};
-	public static short[] save	 		= new short[] {KeyEvent.VK_F5};
-	public static short[] load	 		= new short[] {KeyEvent.VK_F9};
-	public static short[] devmode	 	= new short[] {KeyEvent.VK_F3};
+	// The keys that are relevant to this program (subject to change by other objects during execution, a settings file for example)\
+	// TODO test if bytes have to be unsigned (if they do, use chars or shorts?)
+	public static byte[] up 			= new byte[] {KeyEvent.VK_W, KeyEvent.VK_UP };
+	public static byte[] down 			= new byte[] {KeyEvent.VK_S, KeyEvent.VK_DOWN };
+	public static byte[] left 			= new byte[] {KeyEvent.VK_A, KeyEvent.VK_LEFT };
+	public static byte[] right 			= new byte[] {KeyEvent.VK_D, KeyEvent.VK_RIGHT };
+	public static byte[] addbaddie		= new byte[] {KeyEvent.VK_G};
+	public static byte[] screenshot 	= new byte[] {KeyEvent.VK_F1};
+	public static byte[] save	 		= new byte[] {KeyEvent.VK_F5};
+	public static byte[] load	 		= new byte[] {KeyEvent.VK_F9};
+	public static byte[] devmode	 	= new byte[] {KeyEvent.VK_F3};
 
 	public static final String SETTINGS_FILE = "settings.txt";
 
@@ -77,7 +77,7 @@ public class Keyboard implements KeyListener {
 	 *            the array to use as the default if the search doesn't find anything
 	 * @return the codes extracted into a short[]
 	 */
-	public static short[] extractKeyCodes(String settings, String query, short[] key) {
+	public static byte[] extractKeyCodes(String settings, String query, byte[] key) {
 		int index = settings.indexOf(query);
 		if (index != -1) { // if the query is found in the settings string
 			settings = settings.substring(index + query.length(), settings.indexOf(';', index)); // trim settings so it only contains the comma-delimited codes
@@ -87,11 +87,11 @@ public class Keyboard implements KeyListener {
 					commas++;
 				}
 			}
-			key = new short[commas + 1]; // there will always be 1 more code than there are commas
+			key = new byte[commas + 1]; // there will always be 1 more code than there are commas
 			Scanner scan = new Scanner(settings);
 			scan.useDelimiter(","); // because the codes are comma-delimited
 			for (int i = 0; scan.hasNextInt(); i++) { 
-				key[i] = scan.nextShort();
+				key[i] = scan.nextByte();
 			}
 		}
 		return key;
@@ -139,11 +139,11 @@ public class Keyboard implements KeyListener {
 	 * 
 	 * Keyboard's static key value arrays can be passed to easily check multiple keys that should all do the same thing.
 	 * 
-	 * @param keyCodes
+	 * @param devmode2
 	 *            the array of codes to check
 	 */
-	public static boolean pressed(short[] keyCodes) {
-		for (int keyCode : keyCodes) {
+	public static boolean pressed(byte[] devmode2) {
+		for (int keyCode : devmode2) {
 			if (keys[keyCode])
 				return true;
 		}
