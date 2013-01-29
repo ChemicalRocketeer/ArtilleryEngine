@@ -1,6 +1,5 @@
 package hellomisterme.artillery_engine.graphics;
 
-import hellomisterme.artillery_engine.Game;
 
 /**
  * Render handles computation and combination of the pixels that go onto the screen.
@@ -12,8 +11,8 @@ import hellomisterme.artillery_engine.Game;
  */
 public class Render {
 
-	private int width = Game.width;
-	private int height = Game.height;
+	private int width;
+	private int height;
 
 	/**
 	 * The array of pixels that will be manipulated through rendering

@@ -1,7 +1,6 @@
 package hellomisterme.artillery_engine.graphics;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.io.Savable;
 
 import java.io.DataInputStream;
@@ -24,10 +23,6 @@ public class CompoundImage extends Render implements BasicImage, Renderable, Sav
 	public int x = 0, y = 0;
 
 	private ArrayList<ImageData> images;
-
-	public CompoundImage() {
-		this(Game.width, Game.height);
-	}
 
 	/**
 	 * Generates a new CompoundImage with the desired width and height

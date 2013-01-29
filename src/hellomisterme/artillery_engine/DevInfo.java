@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 
 /**
  * DevInfo displays the current dev info when rendered.
@@ -51,7 +50,6 @@ public class DevInfo {
 	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
 	 */
 	public void render(Graphics2D g2) {
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON); // antialiasing
 		g2.setFont(new Font("Courier New", Font.BOLD, fontSize));
 		g2.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
 		render(g2, 0, 1);

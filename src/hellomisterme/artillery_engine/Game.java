@@ -8,8 +8,11 @@ import hellomisterme.artillery_engine.world.World;
 import hellomisterme.artillery_engine.world.testWorld;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -37,17 +40,17 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * A random number that can be used by objects in the game
 	 */
-	public static final Random RAND = new Random(System.currentTimeMillis());
+	public static final Random RAND = new Random((long) Math.toDegrees((double) (System.currentTimeMillis() << System.nanoTime())));
 
 	/**
 	 * The width of the game window
 	 */
-	public static int width = 800;
+	private int width = 800;
 
 	/**
 	 * The height of the game window
 	 */
-	public static int height = width * 10 / 16;
+	private int height = width * 10 / 16;
 
 	/**
 	 * The game's tick frequency, determining how quickly ingame actions happen
@@ -58,6 +61,7 @@ public class Game extends Canvas implements Runnable {
 
 	private BufferedImage image;
 	private Render render;
+	private RenderingHints renderHints;
 
 	private static World world;
 
@@ -188,13 +192,16 @@ public class Game extends Canvas implements Runnable {
 	private void render() {
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-		
+		Graphics2D g2 = image.createGraphics(); // drawing on this will draw to the same pixel array Render uses
+		g2.addRenderingHints(renderHints);
+		g2.setColor(Color.BLACK);
+
 		render.clear();
 
 		world.render(render);
 
-		if (devMode) devInfo.render(image.createGraphics());
-		
+		if (devMode) devInfo.render(g2);
+
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
@@ -212,6 +219,14 @@ public class Game extends Canvas implements Runnable {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
 		render = new Render(width, height);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
+
+		// TODO read rendering hints from settings file and make them customizable
+		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
 		world = new testWorld(width, height);
 		addKeyListener(new Keyboard());
