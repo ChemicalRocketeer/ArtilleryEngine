@@ -7,6 +7,7 @@ import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.world.World;
 
+import java.awt.Graphics2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -57,9 +58,9 @@ public abstract class Entity implements Savable, Renderable {
 	/**
 	 * Renders this Entity's image onto the given objects
 	 */
-	public void render(Render render) {
-		if (getImage() != null)
-			render.render(getImage(), getX(), getY());
+	public void render(Render render, Graphics2D g) {
+		render.render(getImage(), getX(), getY());
+		
 	}
 
 	/**

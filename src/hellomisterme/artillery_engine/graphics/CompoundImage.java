@@ -3,6 +3,7 @@ package hellomisterme.artillery_engine.graphics;
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.io.Savable;
 
+import java.awt.Graphics2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class CompoundImage extends Render implements BasicImage, Renderable, Sav
 		}
 	}
 
-	public void render(Render r) {
+	public void render(Render r, Graphics2D g) {
 		r.render(this, x, y);
 	}
 

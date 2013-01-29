@@ -5,6 +5,7 @@ import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.entities.Entity;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
 import hellomisterme.artillery_engine.graphics.BasicImage;
+import hellomisterme.artillery_engine.graphics.Sprite;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.world.World;
 
@@ -21,8 +22,10 @@ import java.io.DataOutputStream;
 public class Player extends Mob {
 
 	public World world;
-	
-	private double movementSpeed = 8.0;
+
+	private double movementSpeed = 0.1;
+
+	private Sprite damaged;
 
 	public static final double MAX_HEALTH = 10.0;
 	private double health = MAX_HEALTH;
@@ -34,8 +37,11 @@ public class Player extends Mob {
 	public Player() {
 		animation = new AnimatedSprite("graphics/sprites/player");
 		image = animation;
+		damaged = new Sprite("graphics/sprites/player_damaged.png");
 		hitbox = new Rectangle(10, 60, 50, 20);
 		world = getWorld();
+		movement = new Vector2D(0, 0);
+		System.out.println(movement.getXLength() + " " + movement.getYLength());
 	}
 
 	@Override
@@ -59,33 +65,30 @@ public class Player extends Mob {
 		// take damage if elegible
 		if (damageImmunityTimer > 0) {
 			damageImmunityTimer--;
+			if (damageImmunityTimer % 10 >= 0 && damageImmunityTimer % 10 < 5) {
+				image = animation;
+			} else {
+				image = damaged;
+			}
 		} else if (damage) {
 			takeDamage(1.0);
 		}
 	}
 
 	private void handleMovement() {
-		int xMotion = 0, yMotion = 0;
-		// Otherwise, must use more system resources to calculate.
 		if (Keyboard.pressed(Keyboard.up)) {
-			yMotion -= 1;
+			movement.add(new Vector2D(0, -movementSpeed));
 		}
 		if (Keyboard.pressed(Keyboard.down)) {
-			yMotion += 1;
+			movement.add(new Vector2D(0, movementSpeed));
 		}
 		if (Keyboard.pressed(Keyboard.left)) {
-			xMotion -= 1;
+			movement.add(new Vector2D(-movementSpeed, 0));
 		}
 		if (Keyboard.pressed(Keyboard.right)) {
-			xMotion += 1;
+			movement.add(new Vector2D(movementSpeed, 0));
 		}
-		// Keep player from going faster when moving diagonally
-		double diagAdjust = Math.sqrt(2);
-		if (xMotion != 0 && yMotion != 0) { // moving diagonally
-			setPos(x + (xMotion / diagAdjust) * movementSpeed, y + (yMotion / diagAdjust) * movementSpeed * Game.ISOMETRIC_RATIO);
-		} else {
-			setPos(x + xMotion * movementSpeed, y + yMotion * movementSpeed * Game.ISOMETRIC_RATIO);
-		}
+		setPos(x + movement.getXLength(), y + movement.getYLength() * Game.ISOMETRIC_RATIO);
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class Player extends Mob {
 		if (damageImmunityTimer % 10 >= 0 && damageImmunityTimer % 10 < 5) {
 			return super.getImage();
 		} else {
-			return null;
+			return damaged;
 		}
 	}
 

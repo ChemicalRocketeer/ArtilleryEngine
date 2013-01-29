@@ -8,6 +8,7 @@ import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Savable;
 
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,9 +39,9 @@ public abstract class World implements Tick, Savable, Renderable {
 	/**
 	 * Renders the world
 	 */
-	public void render(Render r) {
+	public void render(Render r, Graphics2D g) {
 		for (Entity e : entities) {
-			e.render(r);
+			e.render(r, g);
 		}
 	}
 

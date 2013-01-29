@@ -14,6 +14,16 @@ import java.awt.geom.Point2D;
  */
 public class Vector2D {
 
+	/**
+	 * Useful constant to set vector angles
+	 */
+	public static final double LEFT = Math.PI, DOWN = Math.PI / 2.0, UP = -DOWN, RIGHT = 0.0;
+
+	/**
+	 * Useful constants to rotate vector angles. A positive rotation will occur in the clockwise direction. These values can be divided and multiplied for the desired effect.
+	 */
+	public static final double QUARTER_TURN = Math.PI / 2, EIGHTH_TURN = QUARTER_TURN / 2.0, THIRD_TURN = (2.0 * Math.PI) / 3.0, SIXTH_TURN = THIRD_TURN / 2.0;
+
 	private double xLength;
 	private double yLength;
 
@@ -181,18 +191,22 @@ public class Vector2D {
 	}
 
 	/**
-	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head.
+	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar variable to allow viewing of the vector as longer than it
+	 * actually is for ease of use.
 	 * 
 	 * @param g the Graphics2D object to draw to
+	 * @param exaggeration the amount to exaggerate (the length will be multiplied by this amount)
 	 * @param x the x coordinate of the vector origin
 	 * @param y the y coordinate of the vector origin
 	 */
-	public void visualize(Graphics2D g, int x, int y) {
-		int endX = (int) xLength + x;
-		int endY = (int) yLength + y;
+	public void draw(Graphics2D g, double exaggeration, int x, int y) {
+		int endX = (int) (xLength * exaggeration) + x;
+		int endY = (int) (yLength * exaggeration) + y;
+		int dotX = (int) (xLength * (exaggeration - 0.8)) + x;
+		int dotY = (int) (yLength * (exaggeration - 0.8)) + y;
 		g.setColor(Color.BLACK);
 		g.drawLine(x, y, endX, endY);
 		g.setColor(Color.RED);
-		g.drawRect(endX, endY, 1, 1);
+		g.drawLine(endX, endY, dotX, dotY);
 	}
 }

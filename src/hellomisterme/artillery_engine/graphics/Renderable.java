@@ -1,5 +1,7 @@
 package hellomisterme.artillery_engine.graphics;
 
+import java.awt.Graphics2D;
+
 
 /**
  * Renderable objects can render themselves onto a Graphics object.
@@ -9,5 +11,5 @@ package hellomisterme.artillery_engine.graphics;
  */
 public interface Renderable {
 
-	public void render(Render r);
+	public void render(Render r, Graphics2D g);
 }

@@ -198,9 +198,12 @@ public class Game extends Canvas implements Runnable {
 
 		render.clear();
 
-		world.render(render);
+		world.render(render, g2);
 
-		if (devMode) devInfo.render(g2);
+		if (devMode) {
+			devInfo.render(g2);
+			world.player.movement.draw(g2, 10.0, world.player.getX(), world.player.getY());
+		}
 
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object

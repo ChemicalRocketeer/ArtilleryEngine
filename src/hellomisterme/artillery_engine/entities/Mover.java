@@ -2,6 +2,7 @@ package hellomisterme.artillery_engine.entities;
 
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Tick;
+import hellomisterme.artillery_engine.entities.mob.Vector2D;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,6 +19,7 @@ import java.io.IOException;
 public abstract class Mover extends Entity implements Tick {
 
 	protected double x = 0, y = 0;
+	public Vector2D movement = new Vector2D(0, 0);
 
 	public void save(DataOutputStream out) {
 		try {
