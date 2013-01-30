@@ -25,6 +25,7 @@ public class Baddie extends Mob {
 		animation = new AnimatedSprite("graphics/sprites/baddie");
 		image = animation;
 		hitbox = new Rectangle(3, 3, 20, 20);
+		movement = new Vector2D(Game.RAND.nextInt(2) + 1, Game.RAND.nextInt(2) + 1);
 	}
 
 	public void tick() {
@@ -33,10 +34,8 @@ public class Baddie extends Mob {
 	}
 
 	public void moveRandom() {
-		double angle = Game.RAND.nextDouble(); // between 0.0 and 1.0
-		angle *= Math.PI * 2; // direction is now between 0.0 and 2 pi. Gonna do some trig here
-		setPos(x + Math.cos(angle), y + Math.sin(angle) * Game.ISOMETRIC_RATIO);
-
+		movement.rotate(Game.RAND.nextDouble() - 0.5); // rotate by an amount between 0 and 1
+		setPos(x + movement.getXLength(), y + movement.getYLength() * Game.ISOMETRIC_RATIO);
 		correctOOB();
 	}
 }
