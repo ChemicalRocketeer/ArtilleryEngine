@@ -13,7 +13,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * An Entity is an object in a World.
+ * An Entity is an object in the World.
  * 
  * @since 10-16-12
  * @author David Aaron Suddjian
