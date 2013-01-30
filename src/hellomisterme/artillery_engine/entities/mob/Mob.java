@@ -41,15 +41,15 @@ public abstract class Mob extends Mover implements Physical {
 	 */
 	public void correctOOB() {
 		World w = getWorld();
-		if (x >= w.getWidth() - image.getWidth()) { // right
-			setPos(w.getWidth() - image.getWidth() - 1, y);
-		} else if (x < 0) { // left
-			setPos(0, y);
+		if (getExactX() >= w.getWidth() - image.getWidth()) { // right
+			setPos(w.getWidth() - image.getWidth() - 1, getExactY());
+		} else if (getExactX() < 0) { // left
+			setPos(0, getExactY());
 		}
-		if (y >= w.getHeight() - image.getHeight()) { // bottom
-			setPos(x, w.getHeight() - image.getHeight() - 1);
-		} else if (y < 0) { // top
-			setPos(x, 0);
+		if (getExactY() >= w.getHeight() - image.getHeight()) { // bottom
+			setPos(getExactX(), w.getHeight() - image.getHeight() - 1);
+		} else if (getExactY() < 0) { // top
+			setPos(getExactX(), 0);
 		}
 	}
 
@@ -92,6 +92,6 @@ public abstract class Mob extends Mover implements Physical {
 
 	@Override
 	public Rectangle getBounds() {
-		return new Rectangle((int) x + hitbox.x, (int) y + hitbox.y, hitbox.width, hitbox.height);
+		return new Rectangle((int) getExactX() + hitbox.x, (int) getExactY() + hitbox.y, hitbox.width, hitbox.height);
 	}
 }

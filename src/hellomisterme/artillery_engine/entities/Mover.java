@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public abstract class Mover extends Entity implements Tick {
 
-	protected double x = 0, y = 0;
+	private double x = 0, y = 0;
 	public Vector2D movement = new Vector2D(0, 0);
 
 	public void save(DataOutputStream out) {
@@ -38,6 +38,14 @@ public abstract class Mover extends Entity implements Tick {
 			Err.error("Can't read Mover data!");
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Moves this Mover along its movement vector.
+	 */
+	public void move() {
+		x += movement.getXLength();
+		y += movement.getYLength();
 	}
 	
 	public double getExactX() {

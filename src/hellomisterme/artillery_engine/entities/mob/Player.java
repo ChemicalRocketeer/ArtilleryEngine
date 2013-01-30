@@ -1,7 +1,6 @@
 package hellomisterme.artillery_engine.entities.mob;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.entities.Entity;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
 import hellomisterme.artillery_engine.graphics.BasicImage;
@@ -41,7 +40,6 @@ public class Player extends Mob {
 		hitbox = new Rectangle(10, 60, 50, 20);
 		world = getWorld();
 		movement = new Vector2D(0, 0);
-		System.out.println(movement.getXLength() + " " + movement.getYLength());
 	}
 
 	@Override
@@ -55,6 +53,7 @@ public class Player extends Mob {
 		animate();
 
 		handleMovement();
+		move();
 
 		correctOOB();
 
@@ -88,7 +87,6 @@ public class Player extends Mob {
 		if (Keyboard.pressed(Keyboard.right)) {
 			movement.add(new Vector2D(movementSpeed, 0));
 		}
-		setPos(x + movement.getXLength(), y + movement.getYLength() * Game.ISOMETRIC_RATIO);
 	}
 
 	/**

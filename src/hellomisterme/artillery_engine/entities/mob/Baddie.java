@@ -20,22 +20,17 @@ public class Baddie extends Mob {
 	}
 
 	public Baddie(double x, double y) {
-		this.x = x;
-		this.y = y;
+		setPos(x, y);
 		animation = new AnimatedSprite("graphics/sprites/baddie");
 		image = animation;
 		hitbox = new Rectangle(3, 3, 20, 20);
-		movement = new Vector2D(Game.RAND.nextInt(2) + 1, Game.RAND.nextInt(2) + 1);
+		movement = new Vector2D(Game.RAND.nextDouble() * 4 - 2, Game.RAND.nextDouble() * 4 - 2);
 	}
 
 	public void tick() {
 		animate();
-		moveRandom();
-	}
-
-	public void moveRandom() {
-		movement.rotate(Game.RAND.nextDouble() - 0.5); // rotate by an amount between 0 and 1
-		setPos(x + movement.getXLength(), y + movement.getYLength() * Game.ISOMETRIC_RATIO);
+		movement.rotate(Game.RAND.nextDouble() * 0.5 - 0.25); // rotate by an amount between 0 and 0.5
+		move();
 		correctOOB();
 	}
 }
