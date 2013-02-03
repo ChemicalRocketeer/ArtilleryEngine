@@ -1,7 +1,6 @@
 package hellomisterme.artillery_engine.entities;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.entities.mob.Vector2D;
 import hellomisterme.artillery_engine.world.World;
 
@@ -17,7 +16,7 @@ import java.io.IOException;
  * @since 10-18-12
  * @author David Aaron Suddjian
  */
-public abstract class Mover extends Entity implements Tick {
+public abstract class Mover extends Entity {
 
 	protected double x = 0, y = 0;
 	protected Vector2D movement = new Vector2D(0, 0);

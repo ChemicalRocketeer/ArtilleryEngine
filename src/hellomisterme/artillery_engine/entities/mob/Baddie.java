@@ -24,13 +24,13 @@ public class Baddie extends Mob {
 		animation = new AnimatedSprite("graphics/sprites/baddie");
 		image = animation;
 		hitbox = new Rectangle(3, 3, 20, 20);
-		movement = new Vector2D(Game.RAND.nextDouble() * 4 - 2, Game.RAND.nextDouble() * 4 - 2);
+		setMovement(new Vector2D(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1));
+		mass = 1;
 	}
 
 	public void tick() {
 		animate();
-		movement.rotate(Game.RAND.nextDouble() * 0.5 - 0.25); // rotate by an amount between 0 and 0.5
+		gravitate(getWorld().player);
 		move();
-		correctOOB();
 	}
 }

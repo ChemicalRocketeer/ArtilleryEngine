@@ -1,6 +1,7 @@
 package hellomisterme.artillery_engine.entities.mob;
 
 import hellomisterme.artillery_engine.Err;
+import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.entities.Mass;
 import hellomisterme.artillery_engine.entities.Mover;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
@@ -15,7 +16,7 @@ import java.io.DataOutputStream;
  * @since 11-22-12
  * @author David Aaron Suddjian
  */
-public abstract class Mob extends Mover implements Physical, Mass {
+public abstract class Mob extends Mover implements Physical, Mass, Tick {
 	
 	protected AnimatedSprite animation;
 	public static final int DEFAULT_ANIM_SPEED = 5;
