@@ -20,23 +20,17 @@ public class Baddie extends Mob {
 	}
 
 	public Baddie(double x, double y) {
-		this.x = x;
-		this.y = y;
+		setPos(x, y);
 		animation = new AnimatedSprite("graphics/sprites/baddie");
 		image = animation;
 		hitbox = new Rectangle(3, 3, 20, 20);
+		setMovement(new Vector2D(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1));
+		mass = 1;
 	}
 
 	public void tick() {
 		animate();
-		moveRandom();
-	}
-
-	public void moveRandom() {
-		double angle = Game.RAND.nextDouble(); // between 0.0 and 1.0
-		angle *= Math.PI * 2; // direction is now between 0.0 and 2 pi. Gonna do some trig here
-		setPos(x + Math.cos(angle), y + Math.sin(angle) * Game.ISOMETRIC_RATIO);
-
-		correctOOB();
+		gravitate(getWorld().player);
+		move();
 	}
 }

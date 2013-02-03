@@ -267,7 +267,6 @@ public abstract class World implements Tick, Savable, Renderable {
 	public void makePlayer() {
 		player = new Player();
 		add(player);
-		player.world = this;
 	}
 
 	/**

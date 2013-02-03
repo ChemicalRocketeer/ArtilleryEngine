@@ -1,9 +1,10 @@
 package hellomisterme.artillery_engine.entities.mob;
 
 import hellomisterme.artillery_engine.Err;
+import hellomisterme.artillery_engine.Tick;
+import hellomisterme.artillery_engine.entities.Mass;
 import hellomisterme.artillery_engine.entities.Mover;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
-import hellomisterme.artillery_engine.world.World;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
@@ -15,16 +16,17 @@ import java.io.DataOutputStream;
  * @since 11-22-12
  * @author David Aaron Suddjian
  */
-public abstract class Mob extends Mover implements Physical {
+public abstract class Mob extends Mover implements Physical, Mass, Tick {
 	
 	protected AnimatedSprite animation;
-	
 	public static final int DEFAULT_ANIM_SPEED = 5;
 	protected int animationSpeed = DEFAULT_ANIM_SPEED; // how many ticks between animation frames
 	protected int animationTimer = 0; // how many ticks since the last frame update
 
-	/** This Player's hitbox. The xLocation and yLocation variables are relative to the Player's position. */
-	public Rectangle hitbox;
+	/** This Mob's hitbox. The xLocation and yLocation variables are relative to the Mob's position. */
+	protected Rectangle hitbox;
+
+	protected double mass = 0;
 	
 	/**
 	 * If it's time to change frames, do it. Will not work if the image is not an animation.
@@ -35,22 +37,23 @@ public abstract class Mob extends Mover implements Physical {
 		}
 		animationTimer++;
 	}
-	
+
 	/**
-	 * If this Mob is outside the world bounds, sets the xLocation and yLocation positions to be exactly at the edge of the world bounds.
+	 * Calculates the gravitational force from a given Mover and adds it to the movement vector. Does not change values for the given Mover, only for this one.
+	 * 
+	 * @param body the Mover to gravitate towards
 	 */
-	public void correctOOB() {
-		World w = getWorld();
-		if (x >= w.getWidth() - image.getWidth()) { // right
-			setPos(w.getWidth() - image.getWidth() - 1, y);
-		} else if (x < 0) { // left
-			setPos(0, y);
-		}
-		if (y >= w.getHeight() - image.getHeight()) { // bottom
-			setPos(x, w.getHeight() - image.getHeight() - 1);
-		} else if (y < 0) { // top
-			setPos(x, 0);
-		}
+	public void gravitate(Mass body) {
+		// This is just the distance formula without the square root, because to apply gravity you have to square the distance, and that cancels out the sqare root operation
+		double xDist = body.getExactX() - getExactX(), yDist = body.getExactY() - y;
+		Vector2D gravity = new Vector2D(xDist, yDist);
+		// law of gravitation: F = (m1 * m2) / (distance * distance)  normally you would also use the Gravitational constant but that doesn't matter here because units are arbitrary
+		gravity.setMagnitude((mass * body.getMass()) / (xDist * xDist + yDist * yDist));
+		movement.add(gravity);
+	}
+	
+	public double getMass() {
+		return mass;
 	}
 
 	/**
@@ -92,6 +95,6 @@ public abstract class Mob extends Mover implements Physical {
 
 	@Override
 	public Rectangle getBounds() {
-		return new Rectangle((int) x + hitbox.x, (int) y + hitbox.y, hitbox.width, hitbox.height);
+		return new Rectangle((int) getExactX() + hitbox.x, (int) getExactY() + hitbox.y, hitbox.width, hitbox.height);
 	}
 }

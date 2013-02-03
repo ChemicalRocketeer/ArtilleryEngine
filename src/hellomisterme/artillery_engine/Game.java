@@ -33,11 +33,6 @@ public class Game extends Canvas implements Runnable {
 	public static String title = "Artillery Engine Pre-Alpha.0.06.2";
 
 	/**
-	 * A height to width ratio that objects can use for image transformations or for movement speed
-	 */
-	public static final double ISOMETRIC_RATIO = .5;
-
-	/**
 	 * A random number that can be used by objects in the game
 	 */
 	public static final Random RAND = new Random((long) Math.toDegrees((double) (System.currentTimeMillis() << System.nanoTime())));
@@ -201,8 +196,8 @@ public class Game extends Canvas implements Runnable {
 		world.render(render, g2);
 
 		if (devMode) {
+			world.player.getMovement().draw(g2, 8, world.player.getX(), world.player.getY());
 			devInfo.render(g2);
-			world.player.movement.draw(g2, 10.0, world.player.getX(), world.player.getY());
 		}
 
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
@@ -230,6 +225,7 @@ public class Game extends Canvas implements Runnable {
 		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
 		world = new testWorld(width, height);
 		addKeyListener(new Keyboard());
