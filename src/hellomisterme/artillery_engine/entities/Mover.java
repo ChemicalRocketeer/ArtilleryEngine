@@ -3,6 +3,7 @@ package hellomisterme.artillery_engine.entities;
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.entities.mob.Vector2D;
+import hellomisterme.artillery_engine.world.World;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,8 +19,8 @@ import java.io.IOException;
  */
 public abstract class Mover extends Entity implements Tick {
 
-	private double x = 0, y = 0;
-	public Vector2D movement = new Vector2D(0, 0);
+	protected double x = 0, y = 0;
+	protected Vector2D movement = new Vector2D(0, 0);
 
 	public void save(DataOutputStream out) {
 		try {
@@ -30,7 +31,7 @@ public abstract class Mover extends Entity implements Tick {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void load(DataInputStream in, String version) {
 		try {
 			setPos(in.readDouble(), in.readDouble());
@@ -39,7 +40,7 @@ public abstract class Mover extends Entity implements Tick {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Moves this Mover along its movement vector.
 	 */
@@ -47,7 +48,7 @@ public abstract class Mover extends Entity implements Tick {
 		x += movement.getXLength();
 		y += movement.getYLength();
 	}
-	
+
 	public double getExactX() {
 		return x;
 	}
@@ -55,7 +56,7 @@ public abstract class Mover extends Entity implements Tick {
 	public double getExactY() {
 		return y;
 	}
-	
+
 	@Override
 	public int getX() {
 		return (int) x;
@@ -74,5 +75,30 @@ public abstract class Mover extends Entity implements Tick {
 	@Override
 	public void setPos(int x, int y) {
 		setPos((double) x, (double) y);
+	}
+	
+	public void setMovement(Vector2D m) {
+		movement = m;
+	}
+	
+	public Vector2D getMovement() {
+		return movement;
+	}
+	
+	/**
+	 * If this Mover is outside the world bounds, sets the x and y positions to be exactly at the edge of the world bounds.
+	 */
+	public void correctOOB() {
+		World w = getWorld();
+		if (x >= w.getWidth() - image.getWidth()) { // right
+			setPos(w.getWidth() - image.getWidth() - 1, y);
+		} else if (getExactX() < 0) { // left
+			setPos(0, getExactY());
+		}
+		if (y >= w.getHeight() - image.getHeight()) { // bottom
+			setPos(x, w.getHeight() - image.getHeight() - 1);
+		} else if (y < 0) { // top
+			setPos(x, 0);
+		}
 	}
 }

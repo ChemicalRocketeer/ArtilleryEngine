@@ -6,7 +6,6 @@ import hellomisterme.artillery_engine.graphics.AnimatedSprite;
 import hellomisterme.artillery_engine.graphics.BasicImage;
 import hellomisterme.artillery_engine.graphics.Sprite;
 import hellomisterme.artillery_engine.io.Keyboard;
-import hellomisterme.artillery_engine.world.World;
 
 import java.awt.Rectangle;
 import java.io.DataInputStream;
@@ -19,8 +18,6 @@ import java.io.DataOutputStream;
  * @author David Aaron Suddjian
  */
 public class Player extends Mob {
-
-	public World world;
 
 	private double movementSpeed = 0.1;
 
@@ -38,8 +35,8 @@ public class Player extends Mob {
 		image = animation;
 		damaged = new Sprite("graphics/sprites/player_damaged.png");
 		hitbox = new Rectangle(10, 60, 50, 20);
-		world = getWorld();
-		movement = new Vector2D(0, 0);
+		setMovement(new Vector2D(0, 0));
+		mass = 500;
 	}
 
 	@Override
@@ -55,7 +52,7 @@ public class Player extends Mob {
 		handleMovement();
 		move();
 
-		correctOOB();
+		//correctOOB();
 
 		if (collides()) {
 			damage = true;
@@ -95,7 +92,7 @@ public class Player extends Mob {
 	 * @return true if there is a collision, else false
 	 */
 	private boolean collides() {
-		for (Entity e : world.getEntities()) {
+		for (Entity e : getWorld().getEntities()) {
 			if (e != this && e instanceof Physical && ((Physical) e).getBounds().intersects(getBounds())) { // TODO change implementation so it doesn't use instanceof
 				return true;
 			}
@@ -126,14 +123,7 @@ public class Player extends Mob {
 	}
 
 	/**
-	 * Writes this Player's data in order:
-	 * 
-	 * <ul>
-	 * <li>animationTimer int</li>
-	 * <li>health double</li>
-	 * <li>damageImmunityTimer int</li>
-	 * <li>animation.frame int</li>
-	 * </ul>
+	 * Writes this Player's data.
 	 */
 	@Override
 	public void save(DataOutputStream out) {
@@ -148,7 +138,7 @@ public class Player extends Mob {
 	}
 
 	/**
-	 * Loads a Player's saved data. See saveData().
+	 * Loads a Player's saved data.
 	 */
 	@Override
 	public void load(DataInputStream in, String version) {

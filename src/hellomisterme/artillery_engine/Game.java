@@ -196,7 +196,7 @@ public class Game extends Canvas implements Runnable {
 		world.render(render, g2);
 
 		if (devMode) {
-			world.player.movement.draw(g2, 8, world.player.getX(), world.player.getY());
+			world.player.getMovement().draw(g2, 8, world.player.getX(), world.player.getY());
 			devInfo.render(g2);
 		}
 

@@ -64,9 +64,9 @@ public abstract class Entity implements Savable, Renderable {
 	}
 
 	/**
-	 * Returns the Sprite. Can return null.
+	 * Returns the BasicImage. Can return null.
 	 * 
-	 * @return the Sprite associated with this Entity
+	 * @return the BasicImage associated with this Entity
 	 */
 	public BasicImage getImage() {
 		return image;
