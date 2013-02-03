@@ -43,12 +43,12 @@ public abstract class Mob extends Mover implements Physical, Mass, Tick {
 	 * 
 	 * @param body the Mover to gravitate towards
 	 */
-	public void gravitate(Mob body) {
+	public void gravitate(Mass body) {
 		// This is just the distance formula without the square root, because to apply gravity you have to square the distance, and that cancels out the sqare root operation
 		double xDist = body.getExactX() - getExactX(), yDist = body.getExactY() - y;
 		Vector2D gravity = new Vector2D(xDist, yDist);
 		// law of gravitation: F = (m1 * m2) / (distance * distance)  normally you would also use the Gravitational constant but that doesn't matter here because units are arbitrary
-		gravity.setMagnitude((mass * body.mass) / (xDist * xDist + yDist * yDist));
+		gravity.setMagnitude((mass * body.getMass()) / (xDist * xDist + yDist * yDist));
 		movement.add(gravity);
 	}
 	
