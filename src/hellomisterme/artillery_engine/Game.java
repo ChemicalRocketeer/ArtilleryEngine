@@ -55,6 +55,7 @@ public class Game extends Canvas implements Runnable {
 	private boolean running = false;
 
 	private BufferedImage image;
+	private Graphics2D graphics;
 	private Render render;
 	private RenderingHints renderHints;
 
@@ -80,6 +81,31 @@ public class Game extends Canvas implements Runnable {
 	 * Called by this Game's Thread thread.
 	 */
 	public void run() {
+		{
+			createBufferStrategy(3); // set up the buffer strategy for rendering
+
+			// TODO read rendering hints from settings file and make them customizable
+			renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+			renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+			renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
+			// initialize visual elements
+			render = new Render(width, height);
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
+			graphics = image.createGraphics();
+			graphics.addRenderingHints(renderHints);
+			render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
+
+			world = new testWorld(width, height);
+			addKeyListener(new Keyboard());
+			devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
+			Screenshot.readScreenshotNumber();
+		}
+
 		running = true;
 
 		long totalFrames = 0; // the total number of frames generated (never gets decremented, so it's a long)
@@ -132,6 +158,28 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	/**
+	 * Draws the current frame
+	 */
+	private void render() {
+		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
+		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
+		graphics.setColor(Color.BLACK);
+
+		render.clear();
+
+		world.render(render, graphics);
+
+		if (devMode) {
+			world.player.getVelocity().draw(graphics, 8, world.player.getIntX(), world.player.getIntY());
+			devInfo.render(graphics);
+		}
+
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		g.dispose(); // let go of the Graphics object
+		strategy.show(); // have the strategy do its thing
+	}
+
+	/**
 	 * Calls everybody's tick() methods, and checks for over-all game-related events, like screenshot key presses
 	 */
 	private void tick() {
@@ -145,7 +193,7 @@ public class Game extends Canvas implements Runnable {
 	 */
 	private void checkStatus() {
 		// if the screenshot key is pressed
-		if (Keyboard.pressed(Keyboard.screenshot)) {
+		if (Keyboard.Controls.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
 				new Screenshot(image);
 				screenshotOrdered = true; // remember that screenshot was pressed
@@ -156,12 +204,12 @@ public class Game extends Canvas implements Runnable {
 
 		// these if statements are organized to prevent save/load operations in the same tick
 		// if an io key is pressed
-		if (Keyboard.pressed(Keyboard.save)) {
+		if (Keyboard.Controls.SAVE.pressed()) {
 			if (!ioOrdered) { // if an io key was up before
 				new Savegame().saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
-		} else if (Keyboard.pressed(Keyboard.load)) {
+		} else if (Keyboard.Controls.LOAD.pressed()) {
 			if (!ioOrdered) { // if an io key was up before
 				new Savegame().loadData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
@@ -171,7 +219,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		// if devmode is being activated/deactivated
-		if (Keyboard.pressed(Keyboard.devmode)) {
+		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
 				devMode = !devMode; // toggle
 				devModeOrdered = true;
@@ -179,58 +227,6 @@ public class Game extends Canvas implements Runnable {
 		} else {
 			devModeOrdered = false;
 		}
-	}
-
-	/**
-	 * Draws the current frame
-	 */
-	private void render() {
-		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
-		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-		Graphics2D g2 = image.createGraphics(); // drawing on this will draw to the same pixel array Render uses
-		g2.addRenderingHints(renderHints);
-		g2.setColor(Color.BLACK);
-
-		render.clear();
-
-		world.render(render, g2);
-
-		if (devMode) {
-			world.player.getMovement().draw(g2, 8, world.player.getX(), world.player.getY());
-			devInfo.render(g2);
-		}
-
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
-		g.dispose(); // let go of the Graphics object
-		strategy.show(); // have the strategy do its thing
-	}
-
-	/**
-	 * Prepares game assets
-	 * 
-	 * TODO add loading bar and/or do some of this in a different thread and stuff
-	 */
-	public void setup() {
-		createBufferStrategy(3); // set up the buffer strategy for rendering
-
-		// initialize visual elements
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
-		render = new Render(width, height);
-		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
-
-		// TODO read rendering hints from settings file and make them customizable
-		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-		world = new testWorld(width, height);
-		addKeyListener(new Keyboard());
-		devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
-		Screenshot.readScreenshotNumber();
 	}
 
 	/**

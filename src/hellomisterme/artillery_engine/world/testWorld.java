@@ -25,7 +25,7 @@ public class testWorld extends World {
 
 	public void tick() {
 		// if the addbaddie key is pressed
-		if (Keyboard.pressed(Keyboard.addbaddie)) {
+		if (Keyboard.Controls.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
 				generateBaddie();
 				baddieOrdered = true; // remember that the key was pressed

@@ -1,11 +1,11 @@
-package hellomisterme.artillery_engine.entities.mob;
+package hellomisterme.util;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 /**
- * Describes a vector that can be used for movement or physics or whatever else.
+ * Describes a vector that can be used for velocity or physics or whatever else.
  * 
  * This implementation uses a length along both the X and Y cartesian coordinates, but it can also be thought of using a
  * polar coordinate system, and there are methods which return and set polar coordinates. As far as the programmer is concerned, the only difference between this implementation and one that uses polar
@@ -28,18 +28,17 @@ public class Vector2D {
 	 */
 	public static final double QUARTER_TURN = Math.PI / 2, EIGHTH_TURN = QUARTER_TURN / 2.0, THIRD_TURN = (2.0 * Math.PI) / 3.0, SIXTH_TURN = THIRD_TURN / 2.0;
 
-	private double xLength;
-	private double yLength;
+	public double x, y;
 
 	/**
 	 * Creates a Vector2D that has the given length along the X and Y cartesian coordinates.
 	 * 
-	 * @param xLength
-	 * @param yLength
+	 * @param x
+	 * @param y
 	 */
 	public Vector2D(double xLength, double yLength) {
-		this.xLength = xLength;
-		this.yLength = yLength;
+		this.x = xLength;
+		this.y = yLength;
 	}
 
 	/**
@@ -59,7 +58,7 @@ public class Vector2D {
 	/**
 	 * Creates a vector running from point A to point B.
 	 * 
-	 * While Vector2D does not store coordinate variables, the returned vector will have the correct xLength and yLength to get from A to B. This method is not as fast as using a constructor.
+	 * While Vector2D does not store coordinate variables, the returned vector will have the correct x and y to get from A to B. This method is not as fast as using a constructor.
 	 * 
 	 * @param xA the X value of point A
 	 * @param yA the Y value of point A
@@ -75,7 +74,7 @@ public class Vector2D {
 	 * Returns a new Vector2D with the same values as this Vector2D
 	 */
 	public Vector2D clone() {
-		return new Vector2D(xLength, yLength);
+		return new Vector2D(x, y);
 	}
 
 	/**
@@ -84,8 +83,8 @@ public class Vector2D {
 	 * @param other the Vector2D to add
 	 */
 	public void add(Vector2D other) {
-		xLength += other.xLength;
-		yLength += other.yLength;
+		x += other.x;
+		y += other.y;
 	}
 
 	/**
@@ -93,9 +92,9 @@ public class Vector2D {
 	 * 
 	 * @param other the Vector2D to subtract
 	 */
-	public void subtract(Vector2D other) {
-		xLength -= other.xLength;
-		yLength -= other.yLength;
+	public void sub(Vector2D other) {
+		x -= other.x;
+		y -= other.y;
 	}
 
 	/**
@@ -104,8 +103,8 @@ public class Vector2D {
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
 	public void scale(double scalar) {
-		xLength *= scalar;
-		yLength *= scalar;
+		x *= scalar;
+		y *= scalar;
 	}
 
 	/**
@@ -114,7 +113,46 @@ public class Vector2D {
 	 * @param m the new magnitude
 	 */
 	public void setMagnitude(double m) {
-		scale(m / getMagnitude());
+		scale(m / mag());
+	}
+
+	/**
+	 * Sets the angle of this Vector2D to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
+	 * getAngle() method will return an equivalent angle, but not necessarily the same number given here. For example, after a call to setAngle(3*pi), getAngle() will return pi.
+	 * 
+	 * @param angle the new angle, in radians
+	 */
+	public void setAngle(double angle) {
+		// magnitude can be thought of as the radius, so to get x and y to the right lengths, you just multiply the sin and cos by m
+		double m = mag();
+		x = m * Math.cos(angle);
+		y = m * Math.sin(angle);
+	}
+
+	/**
+	 * @return the angle of this Vector2D in radians
+	 */
+	public double angle() {
+		// acos will only ever return angles between pi and 0, so angles greater than pi have to be manually adjusted. Fortunately, we know whether y is positive or negative, so that is easy.
+		if (y >= 0) {
+			return Math.acos(x / mag());
+		}
+		return Math.PI * 2 - Math.acos(x / mag());
+	}
+
+	/**
+	 * @return the magnitude of this Vector2D
+	 */
+	public double mag() {
+		// pythagorean theorem at work, bitches!
+		return Math.sqrt(x * x + y * y);
+	}
+
+	/**
+	 * @return the magnitude squared of this Vector2D. This method is faster than mag() because it doesn't perform a sqrt operation.
+	 */
+	public double mag2() {
+		return x * x + y * y;
 	}
 
 	/**
@@ -126,23 +164,10 @@ public class Vector2D {
 	 * @param amount the amount to rotate
 	 */
 	public void rotate(double amount) {
-		double m = getMagnitude();
-		amount += getAngle();
-		xLength = m * Math.cos(amount);
-		yLength = m * Math.sin(amount);
-	}
-
-	/**
-	 * Sets the angle of this Vector2D to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
-	 * getAngle() method will return an equivalent angle, but not necessarily the same number given here. For example, after a call to setAngle(3*pi), getAngle() will return pi.
-	 * 
-	 * @param angle the new angle, in radians
-	 */
-	public void setAngle(double angle) {
-		// magnitude can be thought of as the radius, so to get x and y to the right lengths, you just multiply the sin and cos by m
-		double m = getMagnitude();
-		xLength = m * Math.cos(angle);
-		yLength = m * Math.sin(angle);
+		double m = mag();
+		amount += angle();
+		x = m * Math.cos(amount);
+		y = m * Math.sin(amount);
 	}
 
 	/**
@@ -150,10 +175,10 @@ public class Vector2D {
 	 * Use approximatelyEquals to detect when 2 vectors are about the same.
 	 * 
 	 * @param other the vector to compare with this one
-	 * @return whether the xLength and yLength variables of the two vectors are equal
+	 * @return whether the x and y variables of the two vectors are equal
 	 */
 	public boolean equals(Vector2D other) {
-		return this.xLength == other.xLength && this.yLength == other.yLength;
+		return this.x == other.x && this.y == other.y;
 	}
 
 	/**
@@ -164,7 +189,7 @@ public class Vector2D {
 	 * @return whether the given Vector2D can be considered "equal" to this one
 	 */
 	public boolean approximatelyEquals(Vector2D other) {
-		return (int) this.xLength == (int) other.xLength && (int) this.yLength == (int) other.yLength;
+		return (int) this.x == (int) other.x && (int) this.y == (int) other.y;
 	}
 
 	/**
@@ -175,59 +200,26 @@ public class Vector2D {
 	 * @return whether the vectors are close enough to be considered equal
 	 */
 	public boolean approximatelyEquals(Vector2D other, double precision) {
-		return (xLength >= other.xLength - precision && xLength <= other.xLength + precision) && (yLength >= other.yLength - precision && yLength <= other.yLength + precision);
-	}
-
-	/**
-	 * @return the polar angle of this Vector2D in radians
-	 */
-	public double getAngle() {
-		// acos will only ever return angles between pi and 0, so angles greater than pi have to be manually adjusted. Fortunately, we know whether yLength is positive or negative, so that is easy.
-		if (yLength >= 0) {
-			return Math.acos(xLength / getMagnitude());
-		}
-		return Math.PI * 2 - Math.acos(xLength / getMagnitude());
-	}
-
-	/**
-	 * @return the polar magnitude of this Vector2D
-	 */
-	public double getMagnitude() {
-		// pythagorean theorem at work, bitches!
-		return Math.sqrt(xLength * xLength + yLength * yLength);
-	}
-
-	/**
-	 * @return the cartesian X length of this Vector2D
-	 */
-	public double getXLength() {
-		return xLength;
-	}
-
-	/**
-	 * @return the cartesian Y length of this Vector2D
-	 */
-	public double getYLength() {
-		return yLength;
+		return (x >= other.x - precision && x <= other.x + precision) && (y >= other.y - precision && y <= other.y + precision);
 	}
 
 	/**
 	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar variable that does not affect the data of this vector,
-	 * only the way it is displayed. For a direct representation of the vector length, use an exaggeration of 1.0
+	 * only the way it is displayed. For a one-to-one representation of the vector length, use an exaggeration of 1.0
 	 * 
 	 * @param g the Graphics2D object to draw to
 	 * @param exaggeration the amount to exaggerate (the length will be multiplied by this amount)
-	 * @param x the x coordinate of the vector origin
-	 * @param y the y coordinate of the vector origin
+	 * @param xPos the x coordinate of the vector origin
+	 * @param yPos the y coordinate of the vector origin
 	 */
-	public void draw(Graphics2D g, double exaggeration, int x, int y) {
-		int endX = (int) (xLength * exaggeration) + x;
-		int endY = (int) (yLength * exaggeration) + y;
-		int dotX = (int) (xLength * 0.9 * exaggeration) + x;
-		int dotY = (int) (yLength * 0.9 * exaggeration) + y;
+	public void draw(Graphics2D g, double exaggeration, int xPos, int yPos) {
+		int endX = (int) (x * exaggeration) + xPos;
+		int endY = (int) (y * exaggeration) + yPos;
+		int dotX = (int) (x * 0.9 * exaggeration) + xPos;
+		int dotY = (int) (y * 0.9 * exaggeration) + yPos;
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(1f));
-		g.drawLine(x, y, endX, endY);
+		g.drawLine(xPos, yPos, endX, endY);
 		g.setColor(Color.RED);
 		g.setStroke(new BasicStroke(1.5f));
 		g.drawLine(endX, endY, dotX, dotY);

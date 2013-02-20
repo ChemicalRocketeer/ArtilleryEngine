@@ -1,25 +1,29 @@
 package hellomisterme.artillery_engine.entities;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.entities.mob.Vector2D;
+import hellomisterme.artillery_engine.Tick;
+import hellomisterme.artillery_engine.graphics.BasicImage;
 import hellomisterme.artillery_engine.world.World;
+import hellomisterme.util.Vector2D;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
  * 
- * The delta variables store the change in movement and can be used to manipulate a Mover's position over a period of time.
+ * The delta variables store the change in velocity and can be used to manipulate a Mover's position over a period of time.
  * 
  * @since 10-18-12
  * @author David Aaron Suddjian
  */
-public abstract class Mover extends Entity {
+public abstract class Mover extends Entity implements Mass, Tick {
 
 	protected double x = 0, y = 0;
-	protected Vector2D movement = new Vector2D(0, 0);
+	protected Vector2D velocity = new Vector2D(0, 0);
+	protected double mass = 0;
 
 	public void save(DataOutputStream out) {
 		try {
@@ -39,33 +43,36 @@ public abstract class Mover extends Entity {
 			e.printStackTrace();
 		}
 	}
+	
+	public void tick() {}
 
 	/**
-	 * Moves this Mover along its movement vector.
+	 * Moves this Mover along its velocity vector.
 	 */
 	public void move() {
-		x += movement.getXLength();
-		y += movement.getYLength();
+		x += velocity.x;
+		y += velocity.y;
 	}
 
-	public double getExactX() {
+	@Override
+	public double getX() {
 		return x;
 	}
 
-	public double getExactY() {
+	@Override
+	public double getY() {
 		return y;
 	}
-
-	@Override
-	public int getX() {
+	
+	public int getIntX() {
 		return (int) x;
 	}
-
-	@Override
-	public int getY() {
+	
+	public int getIntY() {
 		return (int) y;
 	}
 
+	@Override
 	public void setPos(double x, double y) {
 		this.x = x;
 		this.y = y;
@@ -76,12 +83,38 @@ public abstract class Mover extends Entity {
 		setPos((double) x, (double) y);
 	}
 	
-	public void setMovement(Vector2D m) {
-		movement = m;
+	public void setVelocity(Vector2D v) {
+		velocity = v;
 	}
 	
-	public Vector2D getMovement() {
-		return movement;
+	public Vector2D getVelocity() {
+		return velocity;
+	}
+	
+	public double getMass() {
+		return mass;
+	}
+
+	/**
+	 * Calculates the gravitational force from a given Mover and adds it to the velocity vector. Does not change values for the given Mover, only for this one.
+	 * 
+	 * @param body the Mover to gravitate towards
+	 */
+	public void gravitate(Mass body) {
+		// This is just the distance formula without the square root, because to apply gravity you have to square the distance, and that cancels out the sqare root operation
+		double xDist = body.getX() - x, yDist = body.getY() - y;
+		Vector2D gravity = new Vector2D(xDist, yDist);
+		// law of gravitation: F = (m1 * m2) / (distance * distance)  normally you would also use the Gravitational constant but that doesn't matter here because units are arbitrary
+		gravity.setMagnitude((mass * body.getMass()) / (xDist * xDist + yDist * yDist));
+		velocity.add(gravity);
+	}
+	
+	public void gravitate(List<Mass> bodies) {
+		for (Mass body : bodies) {
+			if (body != this) {
+				gravitate(body);
+			}
+		}
 	}
 	
 	/**
@@ -89,15 +122,16 @@ public abstract class Mover extends Entity {
 	 */
 	public void correctOOB() {
 		World w = getWorld();
-		if (x >= w.getWidth() - image.getWidth()) { // right
-			setPos(w.getWidth() - image.getWidth() - 1, y);
-		} else if (getExactX() < 0) { // left
-			setPos(0, getExactY());
+		BasicImage img = getImage();
+		if (x >= w.getWidth() - img.getWidth()) { // right
+			x = w.getWidth() - img.getWidth() - 1;
+		} else if (x < 0) { // left
+			x = 0;
 		}
-		if (y >= w.getHeight() - image.getHeight()) { // bottom
-			setPos(x, w.getHeight() - image.getHeight() - 1);
+		if (y >= w.getHeight() - img.getHeight()) { // bottom
+			y = w.getHeight() - img.getHeight() - 1;
 		} else if (y < 0) { // top
-			setPos(x, 0);
+			y = 0;
 		}
 	}
 }

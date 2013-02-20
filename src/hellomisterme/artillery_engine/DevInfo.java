@@ -70,9 +70,9 @@ public class DevInfo {
 		currentLine += fontSize;
 		g.drawString("   time: " + sec + " seconds", xLocation + xOff, yLocation + currentLine + yOff); // seconds
 		currentLine += fontSize * 2;
-		g.drawString("x: " + world.player.getExactX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+		g.drawString("x: " + world.player.getX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize;
-		g.drawString("y: " + world.player.getExactY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+		g.drawString("y: " + world.player.getY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize * 2;
 		g.drawString("e: " + world.getEntities().size(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
 	}
