@@ -1,5 +1,12 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.entities.collision.Collision;
+import hellomisterme.artillery_engine.entities.collision.Collision.Box;
+import hellomisterme.artillery_engine.entities.collision.Collision.Circle;
+
+import java.awt.Dimension;
+
+import javax.swing.JApplet;
 import javax.swing.JFrame;
 
 /**
@@ -8,11 +15,14 @@ import javax.swing.JFrame;
  * @since 11-9-12
  * @author David Aaron Suddjian
  */
-public class Start {
+@SuppressWarnings("serial")
+public class Start extends JApplet {
 
-	public static void main(String[] args) {
-		Game game = new Game();
-		
+	private Game game;
+	private Thread thread;
+
+	private void runGame() {
+		game = new Game();
 		JFrame frame = new JFrame();
 		frame.setResizable(false);
 		frame.setTitle(Game.title);
@@ -22,18 +32,37 @@ public class Start {
 		frame.setLocationRelativeTo(null); // center
 		frame.setVisible(true);
 		game.requestFocus(); // get focus if OS allows it
-		game.setup();
-		
-		//TODO figure fullscreen out
-		//GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
+		game.run();
+		// TODO figure fullscreen out
+		// GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
+	}
 
-		Thread thread = new Thread(game);
+	private static void collisionTest(Collision c, Collision c2) {
+		c.collides(c2, 0, 0, 0, 0);
+	}
+
+	public static void main(String[] args) {
+		Start.collisionTest(new Circle(0, 0, 10), new Box(0, 0, 10, 10));
+		new Start().runGame();
+	}
+
+	public void init() {
+		game = new Game();
+		add(game);
+		setSize(new Dimension(game.getWidth(), game.getHeight()));
+	}
+
+	public void start() {
+		thread = new Thread(game);
 		thread.start(); // calls game's run() method
+	}
+
+	public void stop() {
+		game.stop();
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.exit(0);
 	}
 }

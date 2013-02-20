@@ -32,7 +32,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	private List<Savable> savables = new ArrayList<Savable>();
 
 	/**
-	 * The ultimate ontrolling dude. The overarching overlord. The final cheese. The player.
+	 * The ultimate controlling dude. The overarching overlord. The final cheese. The player.
 	 */
 	public Player player;
 
@@ -51,7 +51,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * TODO add switch statements with number codes for classes instead of saving/reading class names
 	 * 
 	 * @param out
-	 *            the DataOutputStream used to save data
+	 *        the DataOutputStream used to save data
 	 */
 	public void save(DataOutputStream out) {
 		try {
@@ -80,7 +80,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Loads saved World data from a DataInputStream
 	 * 
 	 * @param in
-	 *            the DataInputStream to use to load data from
+	 *        the DataInputStream to use to load data from
 	 */
 	public void load(DataInputStream in, String version) {
 		// clear all lists. We're starting this world over from scratch.
@@ -97,6 +97,7 @@ public abstract class World implements Tick, Savable, Renderable {
 				Savable s = (Savable) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
 				add(s);
 				s.load(in, version);
+				if (s instanceof Player) player = (Player) s;
 			}
 		} catch (Exception e) {
 			Err.error("World can't load saved data! Please send the world save in a bug report.");
@@ -124,21 +125,17 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * TODO replace all add/remove calls with specific calls. add() and remove() are for ease of development purposes. In final versions their use should be avoided.
 	 * 
 	 * @param o
-	 *            the Object to add
+	 *        the Object to add
 	 */
 	public void add(Object o) {
-		if (o == null) {
-			Err.error("Trying to add null Object to World!"); // TODO remove
-		} else {
-			if (o instanceof Entity) {
-				addEntity((Entity) o);
-			}
-			if (o instanceof Tick) {
-				addTickable((Tick) o);
-			}
-			if (o instanceof Savable) {
-				addSavable((Savable) o);
-			}
+		if (o instanceof Entity) {
+			addEntity((Entity) o);
+		}
+		if (o instanceof Tick) {
+			addTickable((Tick) o);
+		}
+		if (o instanceof Savable) {
+			addSavable((Savable) o);
 		}
 	}
 
@@ -146,7 +143,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Removes every appropriate reference to an Object from this World
 	 * 
 	 * @param o
-	 *            the Object to remove
+	 *        the Object to remove
 	 */
 	public void remove(Object o) {
 		if (o == null) {
@@ -168,14 +165,14 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Adds an Entity to the World's Entity list, allowing it to be displayed. Also sets the Entity's world variable to this.
 	 * 
 	 * @param e
-	 *            the Entity to add
+	 *        the Entity to add
 	 */
 	public void addEntity(Entity e) {
 		if (e == null) {
 			Err.error("Trying to add null Entity to World!"); // TODO remove
 		} else if (!entities.contains(e)) {
 			entities.add(e);
-			e.addedToWorld(this);
+			e.addToWorld(this);
 		} else {
 			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
 		}
@@ -185,7 +182,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Removes an Entity from the World's Entity list
 	 * 
 	 * @param e
-	 *            the Entity to remove
+	 *        the Entity to remove
 	 */
 	public void removeEntity(Entity e) {
 		if (e == null) {
@@ -201,7 +198,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Adds an object implementing Tick to the World, thereby putting it in the tick cycle
 	 * 
 	 * @param t
-	 *            the object to add
+	 *        the object to add
 	 */
 	public void addTickable(Tick t) {
 		if (t == null) {
@@ -217,7 +214,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Removes an object implementing Tick from the World's Tick list, removing it from the tick cycle
 	 * 
 	 * @param t
-	 *            the object to remove
+	 *        the object to remove
 	 */
 	public void removeTickable(Tick t) {
 		if (t == null) {
@@ -233,7 +230,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Adds a Savable object to this World's list of Savables
 	 * 
 	 * @param s
-	 *            the Savable object to add
+	 *        the Savable object to add
 	 */
 	public void addSavable(Savable s) {
 		if (s == null) {
@@ -249,7 +246,7 @@ public abstract class World implements Tick, Savable, Renderable {
 	 * Removes a Savable object from the World's list of Savables
 	 * 
 	 * @param t
-	 *            the Savable object to remove
+	 *        the Savable object to remove
 	 */
 	public void removeSavable(Savable s) {
 		if (s == null) {

@@ -2,6 +2,7 @@ package hellomisterme.artillery_engine.entities.mob;
 
 import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
+import hellomisterme.util.Vector2D;
 
 import java.awt.Rectangle;
 
@@ -22,9 +23,9 @@ public class Baddie extends Mob {
 	public Baddie(double x, double y) {
 		setPos(x, y);
 		animation = new AnimatedSprite("graphics/sprites/baddie");
-		image = animation;
+		setImage(animation);
 		hitbox = new Rectangle(3, 3, 20, 20);
-		setMovement(new Vector2D(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1));
+		setVelocity(new Vector2D(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1));
 		mass = 1;
 	}
 

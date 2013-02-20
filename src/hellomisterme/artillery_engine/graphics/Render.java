@@ -137,14 +137,14 @@ public class Render {
 	public int getWidth() {
 		return width;
 	}
-
+	
 	/**
-	 * Resets the width and height of this Render. If pixels[] is shared another object, calling this will break the link.
+	 * If pixels[] was linked to something else, this will break the link. Be careful!
 	 * 
-	 * @param w the new width
-	 * @param h the new height
+	 * @param w
+	 * @param h
 	 */
-	public void setSize(int w, int h) {
+	protected void setSize(int w, int h) {
 		width = w;
 		height = h;
 		pixels = new int[width * height];

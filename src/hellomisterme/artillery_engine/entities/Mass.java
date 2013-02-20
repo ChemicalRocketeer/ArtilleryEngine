@@ -4,7 +4,7 @@ public interface Mass {
 
 	public double getMass();
 
-	public double getExactX();
+	public double getX();
 
-	public double getExactY();
+	public double getY();
 }
