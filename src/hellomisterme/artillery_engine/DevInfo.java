@@ -19,7 +19,7 @@ public class DevInfo {
 	 * The on-screen coordinates at which the info will be displayed
 	 */
 	public int xLocation = 10, yLocation = 20;
-	
+
 	/**
 	 * The font size that will be used when rendering
 	 */
@@ -29,22 +29,18 @@ public class DevInfo {
 	 * Total memory available
 	 */
 	public long maxMem = 0;
-	
+
 	/**
 	 * Memory currently being used by the program
 	 */
 	public long usedMem = 0;
-	
+
 	/**
 	 * Game status variable
 	 */
 	public int fps = 0, avg = 0, tps = 0, sec = 0;
 
 	private static final int MB = 1048576; // bytes in a megabyte
-
-	public DevInfo(Graphics g) {
-		setup(g);
-	}
 
 	/**
 	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
@@ -83,8 +79,8 @@ public class DevInfo {
 	 * 
 	 * @param g
 	 */
-	public void setup(Graphics g) {
-		g.setFont(new Font("Courier New", Font.PLAIN, fontSize));
-		g.drawString(" ", xLocation, yLocation);
+	public static void setup(Graphics g) {
+		g.setFont(new Font("Courier New", Font.PLAIN, 12));
+		g.drawString(" ", 0, 0);
 	}
 }

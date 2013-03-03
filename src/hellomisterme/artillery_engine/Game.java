@@ -12,11 +12,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Random;
+
+import javax.swing.JFrame;
 
 /**
  * The Game handles display and management of the game loop.
@@ -30,22 +33,16 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This game's title
 	 */
-	public static String title = "Artillery Engine Pre-Alpha.0.06.2";
+	private final String title = "Artillery Engine Pre-Alpha.0.06.2";
 
 	/**
 	 * A random number that can be used by objects in the game
 	 */
-	public static final Random RAND = new Random((long) Math.toDegrees((double) (System.currentTimeMillis() << System.nanoTime())));
+	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 
-	/**
-	 * The width of the game window
-	 */
-	private int width = 800;
-
-	/**
-	 * The height of the game window
-	 */
-	private int height = width * 10 / 16;
+	private static double aspectRatio = 9.0 / 16.0;
+	private static int width = 1920;
+	private static int height = (int) (width * aspectRatio);
 
 	/**
 	 * The game's tick frequency, determining how quickly ingame actions happen
@@ -53,6 +50,8 @@ public class Game extends Canvas implements Runnable {
 	public static final int TICKS_PER_SECOND = 60;
 
 	private boolean running = false;
+
+	private JFrame frame;
 
 	private BufferedImage image;
 	private Graphics2D graphics;
@@ -68,9 +67,32 @@ public class Game extends Canvas implements Runnable {
 	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
+	private boolean fullscreen = false;
+	private boolean fullscreenOrdered = false;
 
 	public Game() {
-		setPreferredSize(new Dimension(width, height));
+		// TODO read rendering hints from settings file and make them customizable
+		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
+		frame = new JFrame();
+		frame.add(this);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.setTitle(title);
+		setupGraphics();
+
+		addKeyListener(new Keyboard());
+		devInfo = new DevInfo();
+		DevInfo.setup(graphics);
+		Screenshot.readScreenshotNumber();
+
+		run();
 	}
 
 	/**
@@ -80,31 +102,9 @@ public class Game extends Canvas implements Runnable {
 	 * 
 	 * Called by this Game's Thread thread.
 	 */
+	@Override
 	public void run() {
-		{
-			createBufferStrategy(3); // set up the buffer strategy for rendering
-
-			// TODO read rendering hints from settings file and make them customizable
-			renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-			renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-			renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-			// initialize visual elements
-			render = new Render(width, height);
-			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
-			graphics = image.createGraphics();
-			graphics.addRenderingHints(renderHints);
-			render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's data with render
-
-			world = new testWorld(width, height);
-			addKeyListener(new Keyboard());
-			devInfo = new DevInfo(getBufferStrategy().getDrawGraphics());
-			Screenshot.readScreenshotNumber();
-		}
+		world = new testWorld(width, height);
 
 		running = true;
 
@@ -115,7 +115,7 @@ public class Game extends Canvas implements Runnable {
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
 
 		// variables to regulate tick frequency
-		double ns = 1000000000.0 / (double) TICKS_PER_SECOND; // time between ticks
+		double ns = 1000000000.0 / TICKS_PER_SECOND; // time between ticks
 		double delta = 1; // difference between now and the last tick
 		long lastTime = System.nanoTime();
 
@@ -174,7 +174,7 @@ public class Game extends Canvas implements Runnable {
 			devInfo.render(graphics);
 		}
 
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		g.drawImage(image, 0, 0, width, height, null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
@@ -192,7 +192,6 @@ public class Game extends Canvas implements Runnable {
 	 * Checks certain large-scale state conditions like screenshots and devmode
 	 */
 	private void checkStatus() {
-		// if the screenshot key is pressed
 		if (Keyboard.Controls.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
 				new Screenshot(image);
@@ -218,7 +217,6 @@ public class Game extends Canvas implements Runnable {
 			ioOrdered = false;
 		}
 
-		// if devmode is being activated/deactivated
 		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
 				devMode = !devMode; // toggle
@@ -227,8 +225,48 @@ public class Game extends Canvas implements Runnable {
 		} else {
 			devModeOrdered = false;
 		}
+
+		// TODO fix bug where key is still thought to be pressed on transition from fullscreen to windowed
+		if (Keyboard.Controls.FULLSCREEN.pressed()) {
+			if (!fullscreenOrdered) {
+				fullscreen = !fullscreen; // toggle
+				fullscreenOrdered = true;
+				setupGraphics();
+			}
+		} else {
+			fullscreenOrdered = false;
+		}
 	}
 
+	private void setupGraphics() {
+		if (fullscreen) {
+			width = 1920;
+		} else {
+			width = 800;
+		}
+		height = (int) (width * aspectRatio);
+		setPreferredSize(new Dimension(width, height));
+		frame.dispose();
+		if (fullscreen) {
+			frame.setUndecorated(true);
+			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
+		} else {
+			frame.setUndecorated(false);
+			frame.pack(); // automatically set window size
+			frame.setLocationRelativeTo(null); // center
+			frame.setVisible(true);
+		}
+		requestFocus();
+
+		createBufferStrategy(3);
+
+		// initialize visual elements
+		render = new Render(width, height);
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
+		graphics = image.createGraphics();
+		graphics.addRenderingHints(renderHints);
+		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data with render
+	}
 	/**
 	 * Stops running the game
 	 */

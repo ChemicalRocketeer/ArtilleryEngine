@@ -3,7 +3,6 @@ package hellomisterme.artillery_engine.io;
 import hellomisterme.artillery_engine.Err;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Calendar;
@@ -19,7 +18,7 @@ public class Screenshot implements Runnable {
 
 	private static int number = 0;
 	public static final String prefix = "screen ";
-	private BufferedImage image;
+	private final BufferedImage image;
 
 	/**
 	 * Creates a new Screenshot using the provided BufferedImage
@@ -27,8 +26,7 @@ public class Screenshot implements Runnable {
 	 * @param img the Image to use
 	 */
 	public Screenshot(BufferedImage img) {
-		ColorModel cm = img.getColorModel();
-		image = new BufferedImage(cm, img.copyData(null), cm.isAlphaPremultiplied(), null);
+		image = new BufferedImage(img.getColorModel(), img.copyData(null), img.getColorModel().isAlphaPremultiplied(), null);
 		Thread shot = new Thread(this);
 		shot.start();
 	}
@@ -43,7 +41,7 @@ public class Screenshot implements Runnable {
 		// put date and time in the filename
 		{
 			Calendar c = Calendar.getInstance();
-			fileName = "screenshots/" + prefix + number + "  " + c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + " " + c.get(Calendar.HOUR_OF_DAY) + "'" + c.get(Calendar.MINUTE) + "'" + c.get(Calendar.SECOND) + ".png";
+			fileName = "screenshots/" + prefix + number + "  " + c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + " " + c.get(Calendar.HOUR_OF_DAY) + "." + c.get(Calendar.MINUTE) + "." + c.get(Calendar.SECOND) + ".png";
 		}
 		try {
 			File outFile = new File(fileName);
