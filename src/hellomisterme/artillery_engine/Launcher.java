@@ -11,12 +11,12 @@ import javax.swing.JApplet;
  * @author David Aaron Suddjian
  */
 @SuppressWarnings("serial")
-public class Start extends JApplet {
+public class Launcher extends JApplet {
 
 	private Game game;
 	private Thread thread;
 
-	public Start() {
+	public Launcher() {
 		game = new Game();
 	}
 
@@ -25,7 +25,7 @@ public class Start extends JApplet {
 	}
 
 	public static void main(String[] args) {
-		new Start().runGame();
+		new Launcher().runGame();
 	}
 
 	@Override

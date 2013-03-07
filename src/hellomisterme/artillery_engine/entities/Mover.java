@@ -3,13 +3,14 @@ package hellomisterme.artillery_engine.entities;
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.graphics.BasicImage;
+import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.world.World;
 import hellomisterme.util.Vector2D;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A Mover has the ability to move to different positions. It moves "smoothly" with the use of doubles for storage of position data instead of ints.
@@ -19,11 +20,18 @@ import java.util.List;
  * @since 10-18-12
  * @author David Aaron Suddjian
  */
-public abstract class Mover extends Entity implements Mass, Tick {
+public abstract class Mover extends Entity implements Mass, Tick, Savable {
 
 	protected double x = 0, y = 0;
 	protected Vector2D velocity = new Vector2D(0, 0);
 	protected double mass = 0;
+	
+	protected Mover() {
+		super();
+		getWorld().addBody(this);
+		getWorld().addSavable(this);
+		getWorld().addTickable(this);
+	}
 
 	public void save(DataOutputStream out) {
 		try {
@@ -44,7 +52,9 @@ public abstract class Mover extends Entity implements Mass, Tick {
 		}
 	}
 	
-	public void tick() {}
+	public void tick() {
+		
+	}
 
 	/**
 	 * Moves this Mover along its velocity vector.
@@ -96,7 +106,7 @@ public abstract class Mover extends Entity implements Mass, Tick {
 	}
 
 	/**
-	 * Calculates the gravitational force from a given Mover and adds it to the velocity vector. Does not change values for the given Mover, only for this one.
+	 * Calculates the gravitational force from a given Mass and adds it to the velocity vector. Does not change values for the given Mover, only for this one.
 	 * 
 	 * @param body the Mover to gravitate towards
 	 */
@@ -109,7 +119,7 @@ public abstract class Mover extends Entity implements Mass, Tick {
 		velocity.add(gravity);
 	}
 	
-	public void gravitate(List<Mass> bodies) {
+	public void gravitate(Collection<Mass> bodies) {
 		for (Mass body : bodies) {
 			if (body != this) {
 				gravitate(body);

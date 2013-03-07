@@ -21,6 +21,7 @@ public class Baddie extends Mob {
 	}
 
 	public Baddie(double x, double y) {
+		super();
 		setPos(x, y);
 		animation = new AnimatedSprite("graphics/sprites/baddie");
 		setImage(animation);
@@ -31,7 +32,7 @@ public class Baddie extends Mob {
 
 	public void tick() {
 		animate();
-		gravitate(getWorld().player);
+		gravitate(getWorld().getBodies());
 		move();
 	}
 }
