@@ -69,6 +69,8 @@ public class DevInfo {
 		g.drawString("x: " + world.player.getX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize;
 		g.drawString("y: " + world.player.getY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+		currentLine += fontSize;
+		g.drawString("v: " + world.player.getVelocity().mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize * 2;
 		g.drawString("e: " + world.getEntities().size(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
 	}

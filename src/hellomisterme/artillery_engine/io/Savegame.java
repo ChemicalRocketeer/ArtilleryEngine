@@ -22,8 +22,8 @@ public class Savegame {
 	/**
 	 * The current numerical version of the save system.
 	 */
-	public String version = "0";
-	
+	public static final String version = "0";
+
 	public static final String extension = ".arte";
 
 	/**
@@ -51,9 +51,9 @@ public class Savegame {
 	public void loadData(Savable savable, String name) {
 		try {
 			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(new File("saves/" + name + extension))));
-			version = in.readUTF();
-			if (version.equals("0")) {
-				savable.load(in, version);
+			String v = in.readUTF();
+			if (v.equals(version)) {
+				savable.load(in, v);
 			} else {
 				Err.error("Trying to load a save with an invalid version number!");
 			}

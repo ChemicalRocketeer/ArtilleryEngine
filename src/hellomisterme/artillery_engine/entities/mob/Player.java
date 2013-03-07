@@ -16,58 +16,40 @@ import java.io.DataOutputStream;
  */
 public class Player extends Mob {
 
-	private double movementSpeed = 0.1;
-
-	public static final double MAX_HEALTH = 10.0;
-	private double health = MAX_HEALTH;
-	private static final int DAMAGE_IMMUNITY_TIME = 30; // how long player will be immune after being damaged
-	private int damageImmunityTimer = 0;
+	private double enginePower = 0.1;
+	private double throttle = 0;
+	private static final double MAX_THROTTLE = 1;
+	private double throttleRate = 0.01;
 
 	private boolean dead = false;
 
 	public Player() {
+		super();
 		setImage(new Sprite("graphics/sprites/ship.png"));
 		setVelocity(new Vector2D(0, 0));
-		mass = 500;
+		mass = 1;
 	}
 
 	@Override
 	public void tick() {
-
-		if (health <= 0) {
-			die();
-		}
-
+		gravitate(getWorld().getBodies());
 		handleMovement();
 		move();
 	}
 
 	private void handleMovement() {
-		if (Keyboard.Controls.UP.pressed()) {
-			velocity.add(new Vector2D(0, -movementSpeed));
+		if (Keyboard.Controls.UP.pressed()) 	velocity.add(new Vector2D(0, -enginePower));
+		if (Keyboard.Controls.DOWN.pressed()) 	velocity.add(new Vector2D(0, enginePower));
+		if (Keyboard.Controls.LEFT.pressed()) 	velocity.add(new Vector2D(-enginePower, 0));
+		if (Keyboard.Controls.RIGHT.pressed()) 	velocity.add(new Vector2D(enginePower, 0));
+		if (Keyboard.Controls.THROTTLEUP.pressed()) throttle += throttleRate;
+		if (Keyboard.Controls.THROTTLEDOWN.pressed()) throttle -= throttleRate;
+		
+		if (throttle < 0) {
+			throttle = 0;
+		} else if (throttle > MAX_THROTTLE) {
+			throttle = MAX_THROTTLE;
 		}
-		if (Keyboard.Controls.DOWN.pressed()) {
-			velocity.add(new Vector2D(0, movementSpeed));
-		}
-		if (Keyboard.Controls.LEFT.pressed()) {
-			velocity.add(new Vector2D(-movementSpeed, 0));
-		}
-		if (Keyboard.Controls.RIGHT.pressed()) {
-			velocity.add(new Vector2D(movementSpeed, 0));
-		}
-	}
-
-	public void takeDamage(double damage) {
-		health -= damage;
-		damageImmunityTimer = DAMAGE_IMMUNITY_TIME;
-	}
-
-	public void die() {
-		dead = true;
-	}
-
-	public boolean dead() {
-		return dead;
 	}
 
 	/**
@@ -77,8 +59,6 @@ public class Player extends Mob {
 	public void save(DataOutputStream out) {
 		super.save(out);
 		try {
-			out.writeDouble(health);
-			out.writeInt(damageImmunityTimer);
 		} catch (Exception e) {
 			Err.error("Player can't save data!");
 			e.printStackTrace();
@@ -92,11 +72,17 @@ public class Player extends Mob {
 	public void load(DataInputStream in, String version) {
 		super.load(in, version);
 		try {
-			health = in.readDouble();
-			damageImmunityTimer = in.readInt();
 		} catch (Exception e) {
 			Err.error("Player can't load data!");
 			e.printStackTrace();
 		}
+	}
+
+	public void die() {
+		dead = true;
+	}
+
+	public boolean dead() {
+		return dead;
 	}
 }

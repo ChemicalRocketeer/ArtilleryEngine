@@ -5,7 +5,6 @@ import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savegame;
 import hellomisterme.artillery_engine.io.Screenshot;
 import hellomisterme.artillery_engine.world.World;
-import hellomisterme.artillery_engine.world.testWorld;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -33,7 +32,7 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This game's title
 	 */
-	private final String title = "Artillery Engine Pre-Alpha.0.06.2";
+	private final String title = "Space Game Alpha.0.1";
 
 	/**
 	 * A random number that can be used by objects in the game
@@ -42,7 +41,6 @@ public class Game extends Canvas implements Runnable {
 
 	private static double aspectRatio = 9.0 / 16.0;
 	private static int width = 1920;
-	private static int height = (int) (width * aspectRatio);
 
 	/**
 	 * The game's tick frequency, determining how quickly ingame actions happen
@@ -67,7 +65,7 @@ public class Game extends Canvas implements Runnable {
 	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
-	private boolean fullscreen = false;
+	private boolean fullscreen = true;
 	private boolean fullscreenOrdered = false;
 
 	public Game() {
@@ -104,7 +102,8 @@ public class Game extends Canvas implements Runnable {
 	 */
 	@Override
 	public void run() {
-		world = new testWorld(width, height);
+		world = new World(getWidth(), getHeight());
+		world.init();
 
 		running = true;
 
@@ -116,7 +115,7 @@ public class Game extends Canvas implements Runnable {
 
 		// variables to regulate tick frequency
 		double ns = 1000000000.0 / TICKS_PER_SECOND; // time between ticks
-		double delta = 1; // difference between now and the last tick
+		double delta = 1; // difference between now and the last tick (1 so that it starts immediately)
 		long lastTime = System.nanoTime();
 
 		while (running) {
@@ -174,7 +173,7 @@ public class Game extends Canvas implements Runnable {
 			devInfo.render(graphics);
 		}
 
-		g.drawImage(image, 0, 0, width, height, null); // draw the rendered image onto the Graphics object
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
@@ -185,7 +184,6 @@ public class Game extends Canvas implements Runnable {
 	private void tick() {
 		checkStatus();
 		world.tick();
-		world.callTick();
 	}
 
 	/**
@@ -244,8 +242,7 @@ public class Game extends Canvas implements Runnable {
 		} else {
 			width = 800;
 		}
-		height = (int) (width * aspectRatio);
-		setPreferredSize(new Dimension(width, height));
+		setPreferredSize(new Dimension(getWidth(), getHeight()));
 		frame.dispose();
 		if (fullscreen) {
 			frame.setUndecorated(true);
@@ -261,12 +258,21 @@ public class Game extends Canvas implements Runnable {
 		createBufferStrategy(3);
 
 		// initialize visual elements
-		render = new Render(width, height);
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
+		render = new Render(getWidth(), getHeight());
+		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
 		graphics = image.createGraphics();
 		graphics.addRenderingHints(renderHints);
 		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data with render
 	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return (int) (width * aspectRatio);
+	}
+	
 	/**
 	 * Stops running the game
 	 */

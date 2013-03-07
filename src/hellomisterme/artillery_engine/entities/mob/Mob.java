@@ -1,7 +1,6 @@
 package hellomisterme.artillery_engine.entities.mob;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.entities.Mass;
 import hellomisterme.artillery_engine.entities.Mover;
 import hellomisterme.artillery_engine.graphics.AnimatedSprite;
 
@@ -15,7 +14,7 @@ import java.io.DataOutputStream;
  * @since 11-22-12
  * @author David Aaron Suddjian
  */
-public abstract class Mob extends Mover implements Mass {
+public abstract class Mob extends Mover {
 	
 	protected AnimatedSprite animation;
 	public static final int DEFAULT_ANIM_SPEED = 5;
@@ -24,6 +23,10 @@ public abstract class Mob extends Mover implements Mass {
 
 	/** This Mob's hitbox. The xLocation and yLocation variables are relative to the Mob's pos. */
 	protected Rectangle hitbox;
+	
+	protected Mob() {
+		super();
+	}
 	
 	/**
 	 * If it's time to change frames, do it. Will not work if the image is not an animation.

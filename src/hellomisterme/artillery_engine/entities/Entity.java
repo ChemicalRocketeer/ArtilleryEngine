@@ -18,7 +18,9 @@ public abstract class Entity implements Renderable {
 
 	private BasicImage image;
 
-	public void addToWorld(World w) {}
+	protected Entity() {
+		getWorld().addEntity(this);
+	}
 
 	/**
 	 * Renders this Entity's image onto the given objects
@@ -39,16 +41,19 @@ public abstract class Entity implements Renderable {
 	protected void setImage(BasicImage img) {
 		image = img;
 	}
-	
+
 	public abstract double getX();
+
 	public abstract double getY();
 
 	public abstract int getIntX();
+
 	public abstract int getIntY();
 
 	public abstract void setPos(int x, int y);
+
 	public abstract void setPos(double x, double y);
-	
+
 	public static World getWorld() {
 		return Game.getWorld();
 	}
