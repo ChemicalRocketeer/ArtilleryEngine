@@ -1,8 +1,9 @@
 package hellomisterme.util;
 
+import hellomisterme.artillery_engine.graphics.Render;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
 
 /**
  * Describes a vector that can be used for velocity or physics or whatever else.
@@ -26,7 +27,7 @@ public class Vector2D {
 	/**
 	 * Useful constants to rotate vector angles. A positive rotation will occur in the clockwise direction. These values can be divided and multiplied for the desired effect.
 	 */
-	public static final double QUARTER_TURN = Math.PI / 2, EIGHTH_TURN = QUARTER_TURN / 2.0, THIRD_TURN = (2.0 * Math.PI) / 3.0, SIXTH_TURN = THIRD_TURN / 2.0;
+	public static final double QUARTER_TURN = Math.PI / 2, EIGHTH_TURN = QUARTER_TURN / 2.0, THIRD_TURN = 2.0 * Math.PI / 3.0, SIXTH_TURN = THIRD_TURN / 2.0;
 
 	public double x, y;
 
@@ -73,6 +74,7 @@ public class Vector2D {
 	/**
 	 * Returns a new Vector2D with the same values as this Vector2D
 	 */
+	@Override
 	public Vector2D clone() {
 		return new Vector2D(x, y);
 	}
@@ -102,18 +104,36 @@ public class Vector2D {
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
-	public void scale(double scalar) {
+	public void mul(double scalar) {
 		x *= scalar;
 		y *= scalar;
 	}
 
 	/**
-	 * Sets the length, or magnitude, of this Vector2D to the given amount.
+	 * Divides this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 no change)
+	 */
+	public void div(double scalar) {
+		if (scalar == 0) return;
+		x /= scalar;
+		y /= scalar;
+	}
+
+	public void norm() {
+		div(mag());
+	}
+
+	/**
+	 * Sets the length, or magnitude, of this Vector2D to the given amount.If the current magnitude is zero, does nothing.
 	 * 
 	 * @param m the new magnitude
 	 */
 	public void setMagnitude(double m) {
-		scale(m / mag());
+		double mag = mag();
+		if (mag != 0.0) {
+			mul(m / mag);
+		}
 	}
 
 	/**
@@ -145,7 +165,7 @@ public class Vector2D {
 	 */
 	public double mag() {
 		// pythagorean theorem at work, bitches!
-		return Math.sqrt(x * x + y * y);
+		return Math.sqrt(mag2());
 	}
 
 	/**
@@ -186,7 +206,7 @@ public class Vector2D {
 	 * 
 	 * @see #approximatelyEquals(Vector2D, double)
 	 * @param other the vector to test
-	 * @return whether the given Vector2D can be considered "equal" to this one
+	 * @return true if the given Vector2D can be considered "equal" to this one
 	 */
 	public boolean approximatelyEquals(Vector2D other) {
 		return (int) this.x == (int) other.x && (int) this.y == (int) other.y;
@@ -197,14 +217,14 @@ public class Vector2D {
 	 * 
 	 * @param other the vector to test
 	 * @param precision how close equal is (in both the positive and negative direction)
-	 * @return whether the vectors are close enough to be considered equal
+	 * @return true if the vectors are close enough to be considered equal
 	 */
 	public boolean approximatelyEquals(Vector2D other, double precision) {
-		return (x >= other.x - precision && x <= other.x + precision) && (y >= other.y - precision && y <= other.y + precision);
+		return x >= other.x - precision && x <= other.x + precision && y >= other.y - precision && y <= other.y + precision;
 	}
 
 	/**
-	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar variable that does not affect the data of this vector,
+	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
 	 * only the way it is displayed. For a one-to-one representation of the vector length, use an exaggeration of 1.0
 	 * 
 	 * @param g the Graphics2D object to draw to
@@ -212,16 +232,16 @@ public class Vector2D {
 	 * @param xPos the x coordinate of the vector origin
 	 * @param yPos the y coordinate of the vector origin
 	 */
-	public void draw(Graphics2D g, double exaggeration, int xPos, int yPos) {
+	public void draw(Render r, double exaggeration, int xPos, int yPos) {
 		int endX = (int) (x * exaggeration) + xPos;
 		int endY = (int) (y * exaggeration) + yPos;
 		int dotX = (int) (x * 0.9 * exaggeration) + xPos;
 		int dotY = (int) (y * 0.9 * exaggeration) + yPos;
-		g.setColor(Color.BLACK);
-		g.setStroke(new BasicStroke(1f));
-		g.drawLine(xPos, yPos, endX, endY);
-		g.setColor(Color.RED);
-		g.setStroke(new BasicStroke(1.5f));
-		g.drawLine(endX, endY, dotX, dotY);
+		r.graphics.setColor(Color.BLACK);
+		r.graphics.setStroke(new BasicStroke(1f));
+		r.graphics.drawLine(xPos, yPos, endX, endY);
+		r.graphics.setColor(Color.RED);
+		r.graphics.setStroke(new BasicStroke(1.5f));
+		r.graphics.drawLine(endX, endY, dotX, dotY);
 	}
 }

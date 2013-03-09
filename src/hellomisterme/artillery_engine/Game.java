@@ -4,18 +4,13 @@ import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savegame;
 import hellomisterme.artillery_engine.io.Screenshot;
-import hellomisterme.artillery_engine.world.World;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -50,11 +45,9 @@ public class Game extends Canvas implements Runnable {
 	private boolean running = false;
 
 	private JFrame frame;
-
-	private BufferedImage image;
-	private Graphics2D graphics;
+	
 	private Render render;
-	private RenderingHints renderHints;
+	public RenderingHints renderHints;
 
 	private static World world;
 
@@ -87,7 +80,7 @@ public class Game extends Canvas implements Runnable {
 
 		addKeyListener(new Keyboard());
 		devInfo = new DevInfo();
-		DevInfo.setup(graphics);
+		DevInfo.setup(render.graphics);
 		Screenshot.readScreenshotNumber();
 
 		run();
@@ -162,18 +155,17 @@ public class Game extends Canvas implements Runnable {
 	private void render() {
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-		graphics.setColor(Color.BLACK);
 
 		render.clear();
 
-		world.render(render, graphics);
+		world.render(render);
 
 		if (devMode) {
-			world.player.getVelocity().draw(graphics, 8, world.player.getIntX(), world.player.getIntY());
-			devInfo.render(graphics);
+			world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
+			devInfo.render(render);
 		}
 
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		g.drawImage(render.image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
@@ -192,7 +184,7 @@ public class Game extends Canvas implements Runnable {
 	private void checkStatus() {
 		if (Keyboard.Controls.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
-				new Screenshot(image);
+				new Screenshot(render.image);
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
 		} else { // screenshot key not pressed
@@ -257,12 +249,7 @@ public class Game extends Canvas implements Runnable {
 
 		createBufferStrategy(3);
 
-		// initialize visual elements
-		render = new Render(getWidth(), getHeight());
-		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB); // this is what gets drawn onto the buffer strategy
-		graphics = image.createGraphics();
-		graphics.addRenderingHints(renderHints);
-		render.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data with render
+		render = new Render(getWidth(), getHeight(), this);
 	}
 	
 	public int getWidth() {

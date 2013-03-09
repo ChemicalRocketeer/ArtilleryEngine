@@ -1,6 +1,5 @@
 package hellomisterme.artillery_engine.graphics;
 
-import java.awt.Graphics2D;
 
 
 /**
@@ -11,5 +10,5 @@ import java.awt.Graphics2D;
  */
 public interface Renderable {
 
-	public void render(Render r, Graphics2D g);
+	public void render(Render r);
 }

@@ -1,8 +1,5 @@
-package hellomisterme.artillery_engine.world;
+package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.Game;
-import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.entities.Entity;
 import hellomisterme.artillery_engine.entities.Mass;
 import hellomisterme.artillery_engine.entities.mob.Baddie;
@@ -14,7 +11,6 @@ import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savable;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -39,7 +35,7 @@ public class World implements Tick, Savable, Renderable {
 
 	/** The ultimate controlling dude. The overarching overlord. The final cheese. The player. */
 	public Player player;
-	
+
 	private boolean baddieOrdered = false;
 
 	public World(int w, int h) {
@@ -49,42 +45,44 @@ public class World implements Tick, Savable, Renderable {
 		savables = new ArrayList<Savable>();
 		bodies = new ArrayList<Mass>();
 	}
-	
+
 	public World(DataInputStream in, String version) {
 		load(in, version);
 	}
-	
+
 	public void init() {
 		player = new Player();
-		new Planet(200, bounds.width / 2, bounds.height / 2);
-		//new Baddie((double) Game.RAND.nextInt(getWidth()), (double) Game.RAND.nextInt(getHeight()));
-		//new Baddie((double) Game.RAND.nextInt(getWidth()), (double) Game.RAND.nextInt(getHeight()));
+		new Planet(10000, bounds.width / 2, bounds.height / 2);
 	}
 
+	@Override
 	public void tick() {
 		// tick all the registered Tick objects
+		player.tick();
 		for (Tick tock : tickables) {
 			tock.tick();
 		}
-		
+
 		// if the addbaddie key is pressed
 		if (Keyboard.Controls.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
-				new Baddie((double) Game.RAND.nextInt(getWidth()), (double) Game.RAND.nextInt(getHeight()));
+				new Baddie(Game.RAND.nextInt(getWidth()), Game.RAND.nextInt(getHeight()));
 				baddieOrdered = true; // remember that the key was pressed
 			}
 		} else { // key not pressed
 			baddieOrdered = false;
 		}
 	}
-	
+
 	/**
 	 * Renders the world
 	 */
-	public void render(Render r, Graphics2D g) {
+	@Override
+	public void render(Render r) {
 		for (Entity e : entities) {
-			e.render(r, g);
+			e.render(r);
 		}
+		player.render(r);
 	}
 
 	/**
@@ -95,6 +93,7 @@ public class World implements Tick, Savable, Renderable {
 	 * @param out
 	 *        the DataOutputStream used to save data
 	 */
+	@Override
 	public void save(DataOutputStream out) {
 		try {
 			out.writeUTF(name);
@@ -116,6 +115,7 @@ public class World implements Tick, Savable, Renderable {
 			}
 			s.save(out);
 		}
+		player.save(out);
 	}
 
 	/**
@@ -124,6 +124,7 @@ public class World implements Tick, Savable, Renderable {
 	 * @param in
 	 *        the DataInputStream to use to load data from
 	 */
+	@Override
 	public void load(DataInputStream in, String version) {
 		// clear all lists. We're starting this world over from scratch.
 		entities.clear();
@@ -139,12 +140,12 @@ public class World implements Tick, Savable, Renderable {
 				// whatever we're reading must be savable because it saved its data
 				Savable s = (Savable) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
 				s.load(in, version);
-				if (s instanceof Player) player = (Player) s;
 			}
 		} catch (Exception e) {
 			Err.error("World can't load saved data! Please send the world save in a bug report.");
 			e.printStackTrace();
 		}
+		player.load(in, version);
 	}
 
 	public void addEntity(Entity e) {
