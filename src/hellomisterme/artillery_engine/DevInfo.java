@@ -1,11 +1,11 @@
 package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.world.World;
+
+import hellomisterme.artillery_engine.graphics.Render;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 
 /**
  * DevInfo displays the current dev info when rendered.
@@ -19,11 +19,6 @@ public class DevInfo {
 	 * The on-screen coordinates at which the info will be displayed
 	 */
 	public int xLocation = 10, yLocation = 20;
-
-	/**
-	 * The font size that will be used when rendering
-	 */
-	public int fontSize = 22;
 
 	/**
 	 * Total memory available
@@ -42,15 +37,22 @@ public class DevInfo {
 
 	private static final int MB = 1048576; // bytes in a megabyte
 
+	public static int fontSize = 22;
+	public static Font font = new Font("Courier New", Font.BOLD, fontSize);
+
 	/**
 	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
 	 */
-	public void render(Graphics2D g2) {
-		g2.setFont(new Font("Courier New", Font.BOLD, fontSize));
-		g2.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
-		render(g2, 0, 1);
-		g2.setColor(new Color(0, 0xBB, 0)); // render the primary color
-		render(g2, 0, 0);
+	public void render(Render r) {
+		Font savedFont = r.graphics.getFont();
+		Color savedColor = r.graphics.getColor();
+		r.graphics.setFont(font);
+		r.graphics.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
+		render(r.graphics, 0, 1);
+		r.graphics.setColor(new Color(0, 0xBB, 0)); // render the primary color
+		render(r.graphics, 0, 0);
+		r.graphics.setFont(savedFont);
+		r.graphics.setColor(savedColor);
 	}
 
 	private void render(Graphics g, int xOff, int yOff) {
@@ -58,19 +60,15 @@ public class DevInfo {
 		int currentLine = 0; // used to tell how far down each info line should render
 		g.drawString("memory usage: " + usedMem / MB + " MB used of " + maxMem / MB + " total", xLocation + xOff, yLocation + yOff + currentLine); // render the memory info
 		currentLine += fontSize * 2;
-		g.drawString("    FPS: " + fps, xLocation + xOff, yLocation + currentLine + yOff); // fps
-		currentLine += fontSize;
-		g.drawString("average: " + avg, xLocation + xOff, yLocation + currentLine + yOff); // average fps
-		currentLine += fontSize;
-		g.drawString("    TPS: " + tps, xLocation + xOff, yLocation + currentLine + yOff); // ticks per second
-		currentLine += fontSize;
-		g.drawString("   time: " + sec + " seconds", xLocation + xOff, yLocation + currentLine + yOff); // seconds
+		g.drawString("FPS: " + fps, xLocation + xOff, yLocation + currentLine + yOff); // fps
 		currentLine += fontSize * 2;
 		g.drawString("x: " + world.player.getX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize;
 		g.drawString("y: " + world.player.getY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 		currentLine += fontSize;
-		g.drawString("v: " + world.player.getVelocity().mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+		g.drawString("v: " + world.player.getVelocity().mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's velocity
+		currentLine += fontSize;
+		g.drawString("r: " + world.player.getVelocity().angle(), xLocation + xOff, yLocation + currentLine + yOff); // player's rotation
 		currentLine += fontSize * 2;
 		g.drawString("e: " + world.getEntities().size(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
 	}
@@ -82,7 +80,7 @@ public class DevInfo {
 	 * @param g
 	 */
 	public static void setup(Graphics g) {
-		g.setFont(new Font("Courier New", Font.PLAIN, 12));
+		g.setFont(font);
 		g.drawString(" ", 0, 0);
 	}
 }

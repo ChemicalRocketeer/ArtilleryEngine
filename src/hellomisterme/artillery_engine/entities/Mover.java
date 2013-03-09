@@ -2,9 +2,9 @@ package hellomisterme.artillery_engine.entities;
 
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Tick;
+import hellomisterme.artillery_engine.World;
 import hellomisterme.artillery_engine.graphics.BasicImage;
 import hellomisterme.artillery_engine.io.Savable;
-import hellomisterme.artillery_engine.world.World;
 import hellomisterme.util.Vector2D;
 
 import java.io.DataInputStream;

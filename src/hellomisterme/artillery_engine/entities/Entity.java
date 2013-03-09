@@ -1,12 +1,10 @@
 package hellomisterme.artillery_engine.entities;
 
 import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.World;
 import hellomisterme.artillery_engine.graphics.BasicImage;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
-import hellomisterme.artillery_engine.world.World;
-
-import java.awt.Graphics2D;
 
 /**
  * An Entity is an object in the World.
@@ -25,7 +23,7 @@ public abstract class Entity implements Renderable {
 	/**
 	 * Renders this Entity's image onto the given objects
 	 */
-	public void render(Render render, Graphics2D g) {
+	public void render(Render render) {
 		render.render(getImage(), getIntX(), getIntY());
 	}
 
