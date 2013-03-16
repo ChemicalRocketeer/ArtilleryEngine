@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.graphics;
+package hellomisterme.artillery_engine.game.components.rendering;
 
 import hellomisterme.artillery_engine.Err;
 
@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  * @since 11-11-12
  * @author David Aaron Suddjian
  */
-public class AnimatedSprite implements BasicImage {
+public class AnimatedSprite extends BasicImage {
 
 	protected int frame = 0; // the current frame
 	private int width;
@@ -121,6 +121,7 @@ public class AnimatedSprite implements BasicImage {
 	/**
 	 * @return the pixels of the current frame. Can return null!
 	 */
+	@Override
 	public int[] getPixels() {
 		return frames[frame];
 	}
@@ -128,6 +129,7 @@ public class AnimatedSprite implements BasicImage {
 	/**
 	 * @return the width in pixels of this AnimatedSprite
 	 */
+	@Override
 	public int getWidth() {
 		return width;
 	}
@@ -135,6 +137,7 @@ public class AnimatedSprite implements BasicImage {
 	/**
 	 * @return the height in pixels of this AnimatedSprite
 	 */
+	@Override
 	public int getHeight() {
 		return frames[frame].length / width;
 	}

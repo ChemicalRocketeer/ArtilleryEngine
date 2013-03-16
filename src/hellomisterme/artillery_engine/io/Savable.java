@@ -10,8 +10,13 @@ import java.io.DataOutputStream;
  * @author David Aaron Suddjian
  */
 public interface Savable {
-	
-	public void save(DataOutputStream out);
-	public void load(DataInputStream in, String version);
-	
+
+	public void write(DataOutputStream out);
+
+	public void writeStatic(DataOutputStream out);
+
+	public void read(DataInputStream in);
+
+	public void readStatic(DataInputStream in);
+
 }

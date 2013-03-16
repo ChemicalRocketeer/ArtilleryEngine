@@ -1,6 +1,8 @@
 package hellomisterme.artillery_engine.graphics;
 
 import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.game.components.rendering.BasicImage;
+import hellomisterme.util.Vector2;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -136,23 +138,27 @@ public class Render {
 	 */
 	public static int blendRGB(int src, int dest) {
 
-		int a = (src >> 24) & 0xFF; // alpha value of src
+		int a = src >> 24 & 0xFF; // alpha value of src
 
-		// no sameness edge case because that will basically never happen
-		if (a == 0xFF) { // src is 100% opaque
-			return src & 0xFFFFFF; // return rgb-only value of src
-		} else if (a == 0x00000000) { // src is transparent
-			return dest;
-		}
+			// no sameness edge case because that will basically never happen
+			if (a == 0xFF) { // src is 100% opaque
+				return src & 0xFFFFFF; // return rgb-only value of src
+			} else if (a == 0x00000000) { // src is transparent
+				return dest;
+			}
 
-		float alpha = (float) (a / 255.0); // alpha value of src between 0 and 1, has to be a float or it will only be 0 or 1!
-		// individual rgb sub-pixel values
-		int r = (dest >> 16) & 0xFF;
-		int g = (dest >> 8) & 0xFF;
+			float alpha = (float) (a / 255.0); // alpha value of src between 0 and 1, has to be a float or it will only be 0 or 1!
+			// individual rgb sub-pixel values
+			int r = dest >> 16 & 0xFF;
+		int g = dest >> 8 & 0xFF;
 		int b = dest & 0xFF;
 		// (src >> hex & 0xFF) is the sub-pixel value of src.
 		// return hex color made of the calculated RGB values: R << 16 OR G << 8 OR B
-		return ((int) (((src >> 16 & 0xFF) - r) * alpha + r) << 16) | ((int) (((src >> 8 & 0xFF) - g) * alpha + g) << 8) | (int) (((src & 0xFF) - b) * alpha + b);
+		return (int) (((src >> 16 & 0xFF) - r) * alpha + r) << 16 | (int) (((src >> 8 & 0xFF) - g) * alpha + g) << 8 | (int) (((src & 0xFF) - b) * alpha + b);
+	}
+
+	public void render(BasicImage img, Vector2 pos) {
+		render(img, (int) pos.x, (int) pos.y);
 	}
 
 	/**

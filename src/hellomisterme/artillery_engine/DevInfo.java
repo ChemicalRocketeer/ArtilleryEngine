@@ -1,7 +1,8 @@
 package hellomisterme.artillery_engine;
 
-
+import hellomisterme.artillery_engine.game.Entity;
 import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.util.Vector2;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -57,20 +58,24 @@ public class DevInfo {
 
 	private void render(Graphics g, int xOff, int yOff) {
 		World world = Game.getWorld();
+		Entity player = world.getEntity("player");
 		int currentLine = 0; // used to tell how far down each info line should render
 		g.drawString("memory usage: " + usedMem / MB + " MB used of " + maxMem / MB + " total", xLocation + xOff, yLocation + yOff + currentLine); // render the memory info
 		currentLine += fontSize * 2;
 		g.drawString("FPS: " + fps, xLocation + xOff, yLocation + currentLine + yOff); // fps
 		currentLine += fontSize * 2;
-		g.drawString("x: " + world.player.getX(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
-		currentLine += fontSize;
-		g.drawString("y: " + world.player.getY(), xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
-		currentLine += fontSize;
-		g.drawString("v: " + world.player.getVelocity().mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's velocity
-		currentLine += fontSize;
-		g.drawString("r: " + world.player.getVelocity().angle(), xLocation + xOff, yLocation + currentLine + yOff); // player's rotation
-		currentLine += fontSize * 2;
-		g.drawString("e: " + world.getEntities().size(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
+		if (player != null) {
+			g.drawString("x: " + player.transform.position.x, xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+			currentLine += fontSize;
+			g.drawString("y: " + player.transform.position.y, xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
+			currentLine += fontSize;
+			Vector2 velocity = player.getForces().velocity;
+			g.drawString("v: " + velocity.mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's velocity
+			currentLine += fontSize;
+			g.drawString("r: " + velocity.angle(), xLocation + xOff, yLocation + currentLine + yOff); // player's rotation
+			currentLine += fontSize * 2;
+		}
+		g.drawString("e: " + world.entityCount(), xLocation + xOff, yLocation + currentLine + yOff); // how many entities in the world
 	}
 
 	/**

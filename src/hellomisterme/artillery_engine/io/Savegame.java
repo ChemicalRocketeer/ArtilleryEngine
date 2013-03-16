@@ -23,6 +23,7 @@ public class Savegame {
 	 * The current numerical version of the save system.
 	 */
 	public static final String version = "0";
+	private static String currentVersion = version;
 
 	public static final String extension = ".arte";
 
@@ -39,7 +40,7 @@ public class Savegame {
 			new File("saves").mkdir(); // make the diectory
 			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File("saves/" + name + extension))));
 			out.writeUTF(version);
-			savable.save(out);
+			savable.write(out);
 			out.close();
 			System.out.println("Saved " + name + ".arte!"); // TODO put text on the screen instead
 		} catch (IOException e) {
@@ -53,7 +54,7 @@ public class Savegame {
 			DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(new File("saves/" + name + extension))));
 			String v = in.readUTF();
 			if (v.equals(version)) {
-				savable.load(in, v);
+				savable.read(in);
 			} else {
 				Err.error("Trying to load a save with an invalid version number!");
 			}
@@ -61,5 +62,9 @@ public class Savegame {
 		} catch (IOException e) {
 			Err.error("Savegame can't load saves/" + name + extension);
 		}
+	}
+
+	public static String getCurrentVersion() {
+		return currentVersion;
 	}
 }
