@@ -1,10 +1,10 @@
 package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.entities.Entity;
-import hellomisterme.artillery_engine.entities.Mass;
-import hellomisterme.artillery_engine.entities.mob.Baddie;
-import hellomisterme.artillery_engine.entities.mob.Planet;
-import hellomisterme.artillery_engine.entities.mob.Player;
+import hellomisterme.artillery_engine.game.Entity;
+import hellomisterme.artillery_engine.game.components.Component;
+import hellomisterme.artillery_engine.game.components.Mass;
+import hellomisterme.artillery_engine.game.components.PhysicsForces;
+import hellomisterme.artillery_engine.game.components.scripts.PlayerMovement;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Keyboard;
@@ -15,7 +15,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An abstract class to describe a world. World keeps track of anything in the game.
@@ -28,45 +30,48 @@ public class World implements Tick, Savable, Renderable {
 	private String name = "New Game";
 	private Dimension bounds;
 
-	private List<Entity> entities;
+	private Map<String, Entity> entities = new Hashtable<String, Entity>();
+
+	private List<Entity> entities1;
 	private List<Tick> tickables;
 	private List<Savable> savables;
 	private List<Mass> bodies;
-
-	/** The ultimate controlling dude. The overarching overlord. The final cheese. The player. */
-	public Player player;
 
 	private boolean baddieOrdered = false;
 
 	public World(int w, int h) {
 		bounds = new Dimension(w, h);
-		entities = new ArrayList<Entity>();
+		entities1 = new ArrayList<Entity>();
 		tickables = new ArrayList<Tick>();
 		savables = new ArrayList<Savable>();
 		bodies = new ArrayList<Mass>();
 	}
 
-	public World(DataInputStream in, String version) {
-		load(in, version);
+	public World(DataInputStream in) {
+		read(in);
 	}
 
 	public void init() {
-		player = new Player();
-		new Planet(10000, bounds.width / 2, bounds.height / 2);
+		addEntity("player", new Entity(new Component[] { new PlayerMovement(), new PhysicsForces(), new Mass() }));
+		// new Planet(10000, bounds.width / 2, bounds.height / 2);
 	}
 
 	@Override
 	public void tick() {
 		// tick all the registered Tick objects
-		player.tick();
-		for (Tick tock : tickables) {
-			tock.tick();
+		try {
+			for (Map.Entry<String, Entity> e : entities.entrySet()) {
+				((Entity) e).tick();
+			}
+		} catch (NullPointerException e) {
+			Err.error("Null Pointer in a tick() method!");
+			e.printStackTrace();
 		}
 
 		// if the addbaddie key is pressed
 		if (Keyboard.Controls.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
-				new Baddie(Game.RAND.nextInt(getWidth()), Game.RAND.nextInt(getHeight()));
+				// add baddie here
 				baddieOrdered = true; // remember that the key was pressed
 			}
 		} else { // key not pressed
@@ -79,10 +84,9 @@ public class World implements Tick, Savable, Renderable {
 	 */
 	@Override
 	public void render(Render r) {
-		for (Entity e : entities) {
+		for (Entity e : entities1) {
 			e.render(r);
 		}
-		player.render(r);
 	}
 
 	/**
@@ -94,7 +98,7 @@ public class World implements Tick, Savable, Renderable {
 	 *        the DataOutputStream used to save data
 	 */
 	@Override
-	public void save(DataOutputStream out) {
+	public void write(DataOutputStream out) {
 		try {
 			out.writeUTF(name);
 			// the first int saved is width, second is height
@@ -113,9 +117,8 @@ public class World implements Tick, Savable, Renderable {
 				Err.error("Can't save class name " + s.getClass().getName() + "!");
 				e.printStackTrace();
 			}
-			s.save(out);
+			s.write(out);
 		}
-		player.save(out);
 	}
 
 	/**
@@ -125,9 +128,9 @@ public class World implements Tick, Savable, Renderable {
 	 *        the DataInputStream to use to load data from
 	 */
 	@Override
-	public void load(DataInputStream in, String version) {
+	public void read(DataInputStream in) {
 		// clear all lists. We're starting this world over from scratch.
-		entities.clear();
+		entities1.clear();
 		tickables.clear();
 		savables.clear();
 		try {
@@ -139,20 +142,35 @@ public class World implements Tick, Savable, Renderable {
 			for (int i = in.readInt(); i > 0; i--) {
 				// whatever we're reading must be savable because it saved its data
 				Savable s = (Savable) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
-				s.load(in, version);
+				s.read(in);
 			}
 		} catch (Exception e) {
 			Err.error("World can't load saved data! Please send the world save in a bug report.");
 			e.printStackTrace();
 		}
-		player.load(in, version);
+	}
+
+	public Entity getEntity(String name) {
+		return entities.get(name);
+	}
+
+	public void addEntity(String name, Entity e) {
+		entities.put(name, e);
+	}
+
+	public void removeEntity(String name) {
+		entities.remove(name);
+	}
+
+	public int entityCount() {
+		return entities.size();
 	}
 
 	public void addEntity(Entity e) {
 		if (e == null) {
 			Err.error("Trying to add null Entity to World!"); // TODO remove
-		} else if (!entities.contains(e)) {
-			entities.add(e);
+		} else if (!entities1.contains(e)) {
+			entities1.add(e);
 		} else {
 			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
 		}
@@ -161,8 +179,8 @@ public class World implements Tick, Savable, Renderable {
 	public void removeEntity(Entity e) {
 		if (e == null) {
 			Err.error("Trying to remove null Entity from World!");
-		} else if (entities.contains(e)) {
-			entities.remove(e);
+		} else if (entities1.contains(e)) {
+			entities1.remove(e);
 		} else {
 			System.out.println("Trying to remove an Entity that isn't in World..."); // TODO use in debug mode
 		}
@@ -274,7 +292,7 @@ public class World implements Tick, Savable, Renderable {
 	 * @return all known Enitities
 	 */
 	public List<Entity> getEntities() {
-		return entities;
+		return entities1;
 	}
 
 	/**
@@ -296,5 +314,17 @@ public class World implements Tick, Savable, Renderable {
 	 */
 	public List<Mass> getBodies() {
 		return bodies;
+	}
+
+	@Override
+	public void writeStatic(DataOutputStream out) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void readStatic(DataInputStream in) {
+		// TODO Auto-generated method stub
+
 	}
 }

@@ -1,12 +1,17 @@
 package hellomisterme.util;
 
+import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.io.Savable;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
- * Describes a vector that can be used for velocity or physics or whatever else.
+ * Describes a vector that can be used for velocity or forces or whatever else.
  * 
  * This implementation uses a length along both the X and Y cartesian coordinates, but it can also be thought of using a
  * polar coordinate system, and there are methods which return and set polar coordinates. As far as the programmer is concerned, the only difference between this implementation and one that uses polar
@@ -17,7 +22,7 @@ import java.awt.Color;
  * @since 1-27-13
  * @author David Aaron Suddjian
  */
-public class Vector2D {
+public class Vector2 implements Savable {
 
 	/**
 	 * Useful constant to set vector angles
@@ -37,7 +42,7 @@ public class Vector2D {
 	 * @param x
 	 * @param y
 	 */
-	public Vector2D(double xLength, double yLength) {
+	public Vector2(double xLength, double yLength) {
 		this.x = xLength;
 		this.y = yLength;
 	}
@@ -52,8 +57,8 @@ public class Vector2D {
 	 * @param magnitude the length of the vector
 	 * @return a new Vector2D with the given properties
 	 */
-	public static Vector2D fromAngle(double angle, double magnitude) {
-		return new Vector2D(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+	public static Vector2 fromAngle(double angle, double magnitude) {
+		return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
 	}
 
 	/**
@@ -67,16 +72,16 @@ public class Vector2D {
 	 * @param yB the Y value of point B
 	 * @return A new Vector running from point A to point B
 	 */
-	public static Vector2D fromAtoB(double xA, double yA, double xB, double yB) {
-		return new Vector2D(xB - xA, yB - yA);
+	public static Vector2 fromAtoB(double xA, double yA, double xB, double yB) {
+		return new Vector2(xB - xA, yB - yA);
 	}
 
 	/**
 	 * Returns a new Vector2D with the same values as this Vector2D
 	 */
 	@Override
-	public Vector2D clone() {
-		return new Vector2D(x, y);
+	public Vector2 clone() {
+		return new Vector2(x, y);
 	}
 
 	/**
@@ -84,9 +89,18 @@ public class Vector2D {
 	 * 
 	 * @param other the Vector2D to add
 	 */
-	public void add(Vector2D other) {
+	public void add(Vector2 other) {
 		x += other.x;
 		y += other.y;
+	}
+
+	/**
+	 * Adds another Vector2D to this one
+	 * 
+	 * @param other the Vector2D to add
+	 */
+	public Vector2 ADD(Vector2 other) {
+		return new Vector2(x + other.x, y + other.y);
 	}
 
 	/**
@@ -94,9 +108,18 @@ public class Vector2D {
 	 * 
 	 * @param other the Vector2D to subtract
 	 */
-	public void sub(Vector2D other) {
+	public void sub(Vector2 other) {
 		x -= other.x;
 		y -= other.y;
+	}
+
+	/**
+	 * Subtracts another Vector2D from this one
+	 * 
+	 * @param other the Vector2D to subtract
+	 */
+	public Vector2 SUB(Vector2 other) {
+		return new Vector2(x - other.x, y - other.y);
 	}
 
 	/**
@@ -110,6 +133,15 @@ public class Vector2D {
 	}
 
 	/**
+	 * Multiplies this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
+	 */
+	public Vector2 MUL(double scalar) {
+		return new Vector2(x * scalar, y * scalar);
+	}
+
+	/**
 	 * Divides this Vector2D by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 no change)
@@ -118,6 +150,16 @@ public class Vector2D {
 		if (scalar == 0) return;
 		x /= scalar;
 		y /= scalar;
+	}
+
+	/**
+	 * Divides this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 returns this)
+	 */
+	public Vector2 DIV(double scalar) {
+		if (scalar == 0) return clone();
+		return new Vector2(x / scalar, y / scalar);
 	}
 
 	public void norm() {
@@ -155,9 +197,9 @@ public class Vector2D {
 	public double angle() {
 		// acos will only ever return angles between pi and 0, so angles greater than pi have to be manually adjusted. Fortunately, we know whether y is positive or negative, so that is easy.
 		if (y >= 0) {
-			return Math.acos(x / mag());
+			return Math.atan(y / x);
 		}
-		return Math.PI * 2 - Math.acos(x / mag());
+		return Math.PI * 2 - Math.atan(y / x);
 	}
 
 	/**
@@ -197,18 +239,18 @@ public class Vector2D {
 	 * @param other the vector to compare with this one
 	 * @return whether the x and y variables of the two vectors are equal
 	 */
-	public boolean equals(Vector2D other) {
+	public boolean equals(Vector2 other) {
 		return this.x == other.x && this.y == other.y;
 	}
 
 	/**
 	 * Returns whether this vector is approximately equal to another using integer arithmetic instead of double precision.
 	 * 
-	 * @see #approximatelyEquals(Vector2D, double)
+	 * @see #approximatelyEquals(Vector2, double)
 	 * @param other the vector to test
 	 * @return true if the given Vector2D can be considered "equal" to this one
 	 */
-	public boolean approximatelyEquals(Vector2D other) {
+	public boolean approximatelyEquals(Vector2 other) {
 		return (int) this.x == (int) other.x && (int) this.y == (int) other.y;
 	}
 
@@ -219,7 +261,7 @@ public class Vector2D {
 	 * @param precision how close equal is (in both the positive and negative direction)
 	 * @return true if the vectors are close enough to be considered equal
 	 */
-	public boolean approximatelyEquals(Vector2D other, double precision) {
+	public boolean approximatelyEquals(Vector2 other, double precision) {
 		return x >= other.x - precision && x <= other.x + precision && y >= other.y - precision && y <= other.y + precision;
 	}
 
@@ -243,5 +285,35 @@ public class Vector2D {
 		r.graphics.setColor(Color.RED);
 		r.graphics.setStroke(new BasicStroke(1.5f));
 		r.graphics.drawLine(endX, endY, dotX, dotY);
+	}
+
+	@Override
+	public void write(DataOutputStream out) {
+		try {
+			out.writeDouble(x);
+			out.writeDouble(y);
+		} catch (IOException e) {
+			Err.error("Can't write Vector2 data!");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void read(DataInputStream in) {
+		try {
+			x = in.readDouble();
+			y = in.readDouble();
+		} catch (IOException e) {
+			Err.error("Can't read Vector2 data!");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void writeStatic(DataOutputStream out) {
+	}
+
+	@Override
+	public void readStatic(DataInputStream in) {
 	}
 }

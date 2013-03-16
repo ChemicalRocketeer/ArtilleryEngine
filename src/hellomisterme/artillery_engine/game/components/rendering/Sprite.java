@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.graphics;
+package hellomisterme.artillery_engine.game.components.rendering;
 
 import hellomisterme.artillery_engine.Err;
 
@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class Sprite implements BasicImage {
+public class Sprite extends BasicImage {
 	protected int width;
 	protected int[] pixels;
 
@@ -28,7 +28,7 @@ public class Sprite implements BasicImage {
 	public Sprite() { // has to be here so the LightwightImage can be initialized and then manipulated without wasting system resources.
 		useDefaultImage();
 	}
-	
+
 	/**
 	 * Creates a new Sprite from the specified path
 	 * 
@@ -77,10 +77,12 @@ public class Sprite implements BasicImage {
 	 * 
 	 * @return this Sprite's pixel data
 	 */
+	@Override
 	public int[] getPixels() {
 		return pixels;
 	}
 
+	@Override
 	public int getWidth() {
 		return width;
 	}
@@ -89,6 +91,7 @@ public class Sprite implements BasicImage {
 		width = w;
 	}
 
+	@Override
 	public int getHeight() {
 		return pixels.length / width;
 	}

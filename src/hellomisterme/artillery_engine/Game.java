@@ -45,13 +45,14 @@ public class Game extends Canvas implements Runnable {
 	private boolean running = false;
 
 	private JFrame frame;
-	
+
 	private Render render;
 	public RenderingHints renderHints;
 
 	private static World world;
 
 	private DevInfo devInfo;
+	private static GameLog log;
 
 	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devMode = false;
@@ -161,7 +162,7 @@ public class Game extends Canvas implements Runnable {
 		world.render(render);
 
 		if (devMode) {
-			world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
+			// world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
 			devInfo.render(render);
 		}
 
@@ -251,15 +252,17 @@ public class Game extends Canvas implements Runnable {
 
 		render = new Render(getWidth(), getHeight(), this);
 	}
-	
+
+	@Override
 	public int getWidth() {
 		return width;
 	}
-	
+
+	@Override
 	public int getHeight() {
 		return (int) (width * aspectRatio);
 	}
-	
+
 	/**
 	 * Stops running the game
 	 */
@@ -269,5 +272,9 @@ public class Game extends Canvas implements Runnable {
 
 	public static World getWorld() {
 		return world;
+	}
+
+	public static GameLog getLog() {
+		return log;
 	}
 }
