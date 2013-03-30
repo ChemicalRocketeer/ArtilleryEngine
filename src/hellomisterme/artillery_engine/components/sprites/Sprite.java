@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.game.components.rendering;
+package hellomisterme.artillery_engine.components.sprites;
 
 import hellomisterme.artillery_engine.Err;
 
@@ -40,8 +40,6 @@ public class Sprite extends BasicImage {
 
 	/**
 	 * Loads color data from an image file at the relative path
-	 * 
-	 * TODO check for efficiency
 	 * 
 	 * @param path
 	 *            the path to the image file

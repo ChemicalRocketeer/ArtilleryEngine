@@ -1,6 +1,7 @@
-package hellomisterme.artillery_engine.game.components;
+package hellomisterme.artillery_engine.components.physics;
 
-import hellomisterme.artillery_engine.game.Transform;
+import hellomisterme.artillery_engine.components.IngameComponent;
+import hellomisterme.util.Transform;
 import hellomisterme.util.Vector2;
 
 import java.awt.geom.Rectangle2D;

@@ -1,11 +1,11 @@
-package hellomisterme.artillery_engine.game.components.rendering;
+package hellomisterme.artillery_engine.components.sprites;
 
-import hellomisterme.artillery_engine.game.components.IngameComponent;
+import hellomisterme.artillery_engine.components.IngameComponent;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 
 /**
- * Methods to interact with image data.
+ * A class dealing with image data.
  * 
  * @since 11-12-12
  * @author David Aaron Suddjian
@@ -14,7 +14,7 @@ public abstract class BasicImage extends IngameComponent implements Renderable {
 
 	@Override
 	public void render(Render render) {
-		render.render(this, entity.transform.position);
+		render.render(this, globalPosition());
 	}
 
 	/**

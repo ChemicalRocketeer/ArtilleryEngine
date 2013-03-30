@@ -1,8 +1,7 @@
-package hellomisterme.artillery_engine.game;
+package hellomisterme.util;
 
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.io.Savable;
-import hellomisterme.util.Vector2;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,7 +13,7 @@ public class Transform implements Savable {
 	public Vector2 scale = new Vector2(1, 1);
 
 	public Transform() {
-		// everything is already the default!
+		// everything is already set to the default!
 	}
 
 	public Transform(Vector2 position, double rotation, Vector2 scale) {
@@ -29,41 +28,63 @@ public class Transform implements Savable {
 		scale = new Vector2(scaleX, scaleY);
 	}
 
+	public void add(Transform other) {
+		position.add(other.position);
+		rotation += other.rotation;
+		scale.add(other.scale);
+	}
+
+	public Transform ADD(Transform other) {
+		return new Transform(position.ADD(other.position), rotation + other.rotation, scale.ADD(other.scale));
+	}
+
+	public void sub(Transform other) {
+		position.sub(other.position);
+		rotation -= other.rotation;
+		scale.sub(other.scale);
+	}
+
+	public Transform SUB(Transform other) {
+		return new Transform(position.SUB(other.position), rotation - other.rotation, scale.SUB(other.scale));
+	}
+
 	public void forward(double amount) {
 		position.add(Vector2.fromAngle(rotation, amount));
 	}
 
 	@Override
+	public Transform clone() {
+		return new Transform(position, rotation, scale);
+	}
+
+	@Override
 	public void write(DataOutputStream out) {
+		position.write(out);
+		scale.write(out);
 		try {
-			out.writeDouble(position.x);
-			out.writeDouble(position.y);
 			out.writeDouble(rotation);
-			out.writeDouble(scale.x);
-			out.writeDouble(scale.y);
 		} catch (IOException e) {
-			Err.error("Can't save transform data!");
+			Err.error("Can't save transform data!", e);
 			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void read(DataInputStream in) {
+		position.read(in);
+		scale.read(in);
 		try {
-			position.read(in);
 			rotation = in.readDouble();
-			scale.read(in);
 		} catch (IOException e) {
-			Err.error("Can't read transform data!");
-			e.printStackTrace();
+			Err.error("Can't read transform data!", e);
 		}
 	}
 
 	@Override
-	public void writeStatic(DataOutputStream out) {
+	public void writeOncePerClass(DataOutputStream out) {
 	}
 
 	@Override
-	public void readStatic(DataInputStream in) {
+	public void readOncePerClass(DataInputStream in) {
 	}
 }

@@ -13,10 +13,10 @@ public interface Savable {
 
 	public void write(DataOutputStream out);
 
-	public void writeStatic(DataOutputStream out);
+	public void writeOncePerClass(DataOutputStream out);
 
 	public void read(DataInputStream in);
 
-	public void readStatic(DataInputStream in);
+	public void readOncePerClass(DataInputStream in);
 
 }

@@ -9,7 +9,6 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
-import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
 
@@ -27,7 +26,7 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This game's title
 	 */
-	private final String title = "Space Game Alpha.0.1";
+	private final String title = "Space Game Alpha.0.1.1";
 
 	/**
 	 * A random number that can be used by objects in the game
@@ -47,7 +46,6 @@ public class Game extends Canvas implements Runnable {
 	private JFrame frame;
 
 	private Render render;
-	public RenderingHints renderHints;
 
 	private static World world;
 
@@ -55,7 +53,6 @@ public class Game extends Canvas implements Runnable {
 	private static GameLog log;
 
 	// control booleans TODO put these in a different class or something, I don't think they really belong here...
-	private boolean devMode = false;
 	private boolean devModeOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
@@ -63,15 +60,6 @@ public class Game extends Canvas implements Runnable {
 	private boolean fullscreenOrdered = false;
 
 	public Game() {
-		// TODO read rendering hints from settings file and make them customizable
-		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
 		frame = new JFrame();
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -161,7 +149,7 @@ public class Game extends Canvas implements Runnable {
 
 		world.render(render);
 
-		if (devMode) {
+		if (render.devMode) {
 			// world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
 			devInfo.render(render);
 		}
@@ -210,7 +198,8 @@ public class Game extends Canvas implements Runnable {
 
 		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
-				devMode = !devMode; // toggle
+				render.devMode = !render.devMode;
+				render.simpleRendering = render.devMode;
 				devModeOrdered = true;
 			}
 		} else {
@@ -250,7 +239,7 @@ public class Game extends Canvas implements Runnable {
 
 		createBufferStrategy(3);
 
-		render = new Render(getWidth(), getHeight(), this);
+		render = new Render(getWidth(), getHeight());
 	}
 
 	@Override

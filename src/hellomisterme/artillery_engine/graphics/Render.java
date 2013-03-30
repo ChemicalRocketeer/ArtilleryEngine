@@ -1,11 +1,11 @@
 package hellomisterme.artillery_engine.graphics;
 
-import hellomisterme.artillery_engine.Game;
-import hellomisterme.artillery_engine.game.components.rendering.BasicImage;
+import hellomisterme.artillery_engine.components.sprites.BasicImage;
 import hellomisterme.util.Vector2;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -22,6 +22,13 @@ public class Render {
 	private int width;
 	private int height;
 
+	public RenderingHints renderHints;
+
+	/**
+	 * Flag to tell objects how they should render themselves
+	 */
+	public boolean simpleRendering = false, devMode = false;
+
 	/**
 	 * The array of pixels that will be manipulated through rendering
 	 */
@@ -29,26 +36,33 @@ public class Render {
 	public BufferedImage image;
 	public Graphics2D graphics;
 
-	public Game game;
-
-	public Render(int width, int height, Game game) {
+	public Render(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.game = game;
+
+		// TODO read rendering hints from settings file and make them customizable
+		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
 		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		graphics = image.createGraphics();
-		graphics.addRenderingHints(game.renderHints);
+		graphics.addRenderingHints(renderHints);
 		graphics.setColor(Color.BLACK);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data to the pixels array
 	}
 
-	public void render(BufferedImage img, double xPos, double yPos, double xCenter, double yCenter, double rotation) {
+	public void render(BufferedImage img, Vector2 pos, Vector2 center, double rotation, Vector2 scale) {
 		AffineTransform saved = graphics.getTransform();
 		AffineTransform trans = new AffineTransform();
 		graphics.setTransform(trans);
-		graphics.rotate(rotation, xPos, yPos);
-		graphics.drawImage(img, null, (int) (xPos - xCenter), (int) (yPos - yCenter));
+		graphics.rotate(rotation, center.x, center.y);
+		graphics.scale(scale.x, scale.y);
+		graphics.drawImage(img, null, (int) pos.x, (int) pos.y);
 		graphics.setTransform(saved);
 	}
 
@@ -56,11 +70,11 @@ public class Render {
 	 * Draws Sprite data at the indicated point on screen
 	 * 
 	 * @param img
-	 *            the BasicImage to be drawn
+	 *        the BasicImage to be drawn
 	 * @param xPos
-	 *            the xLocation coordinate of the top-left corner of the Sprite
+	 *        the xLocation coordinate of the top-left corner of the Sprite
 	 * @param yPos
-	 *            the yLocation coordinate of the top-left corner of the Sprite
+	 *        the yLocation coordinate of the top-left corner of the Sprite
 	 */
 	public void render(BasicImage img, int xPos, int yPos) {
 		// check if img is completely off-screen
@@ -131,9 +145,9 @@ public class Render {
 	 * make it closer to dest.
 	 * 
 	 * @param dest
-	 *            the rgb color to be blended (the "bottom" color)
+	 *        the rgb color to be blended (the "bottom" color)
 	 * @param src
-	 *            the argb color to be blended (the "top" color)
+	 *        the argb color to be blended (the "top" color)
 	 * @return the two colors blended together
 	 */
 	public static int blendRGB(int src, int dest) {

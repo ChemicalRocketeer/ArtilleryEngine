@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.game.components.rendering;
+package hellomisterme.artillery_engine.components.sprites.animation;
 
 import hellomisterme.artillery_engine.Err;
 
@@ -8,7 +8,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 /**
- * An AnimatedSprite represents a series of images. It has a "current frame" that can be changed by cycling through the animation, and is returned as the Sprite's image representation. The animation
+ * An BasicAnimation represents a series of images. It has a "current frame" that can be changed by cycling through the animation, and is returned as the Sprite's image representation. The animation
  * starts at frame 0.
  * 
  * All the frames must have the same dimensions, otherwise results are unpredictable.
@@ -16,27 +16,26 @@ import javax.imageio.ImageIO;
  * @since 11-11-12
  * @author David Aaron Suddjian
  */
-public class AnimatedSprite extends BasicImage {
+public class BasicAnimation implements Animation {
 
-	protected int frame = 0; // the current frame
-	private int width;
+	private int width, height;
 	protected int[][] frames;
 
 	/**
 	 * Uses the default encoded image.
 	 */
-	public AnimatedSprite() {
+	public BasicAnimation() {
 		useDefaultImage();
 	}
 
 	/**
-	 * This AnimatedSprite will use the frames found at the specified path.
+	 * This BasicAnimation will use the frames found at the specified path.
 	 * 
 	 * @param path
 	 *            The path of the directory where the images are located
 	 * @see #setImage(String)
 	 */
-	public AnimatedSprite(String path) {
+	public BasicAnimation(String path) {
 		setImage(path);
 	}
 
@@ -69,18 +68,9 @@ public class AnimatedSprite extends BasicImage {
 				}
 			}
 			width = src.getWidth(); // set width to the width of the last image
+			width = src.getHeight(); // set width to the width of the last image
 		} else {
 			Err.error(path + "Does not exist! Make sure your game files are all in the right place!");
-		}
-	}
-
-	/**
-	 * Switches to the next frame.
-	 */
-	public void next() {
-		frame++;
-		if (frame >= frames.length) {
-			frame = 0;
 		}
 	}
 
@@ -88,57 +78,30 @@ public class AnimatedSprite extends BasicImage {
 	 * Generates a default animation of 2 frames.
 	 */
 	public void useDefaultImage() {
-		frame = 0;
 		width = 20;
-		frames = new int[2][width * width];
-		for (int i = 0; i < width * width; i++) {
+		height = 20;
+		frames = new int[2][width * height];
+		for (int i = 0; i < width * height; i++) {
 			frames[0][i] = 0x33FFFFFF;
 			frames[1][i] = 0xAAFFFFFF;
 		}
 	}
 
 	/**
-	 * Sets the current frame to the specified number. Will loop if the number specified is greater than the number of frames.
-	 * 
-	 * @param f
-	 *            the number of the desired frame
-	 */
-	public void setFrame(int f) {
-		if (frames.length == 0) {
-			frame = 0;
-		} else {
-			frame = f % frames.length;
-		}
-	}
-
-	/**
-	 * @return the current frame
-	 */
-	public int getFrame() {
-		return frame;
-	}
-
-	/**
 	 * @return the pixels of the current frame. Can return null!
 	 */
 	@Override
-	public int[] getPixels() {
+	public int[] getPixels(int frame) {
 		return frames[frame];
 	}
 
-	/**
-	 * @return the width in pixels of this AnimatedSprite
-	 */
 	@Override
 	public int getWidth() {
 		return width;
 	}
 
-	/**
-	 * @return the height in pixels of this AnimatedSprite
-	 */
 	@Override
 	public int getHeight() {
-		return frames[frame].length / width;
+		return height;
 	}
 }

@@ -1,7 +1,7 @@
-package hellomisterme.artillery_engine.game.components.scripts;
+package hellomisterme.artillery_engine.components.scripts;
 
 import hellomisterme.artillery_engine.Tick;
-import hellomisterme.artillery_engine.game.components.Component;
+import hellomisterme.artillery_engine.components.Component;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,7 +23,7 @@ public abstract class Script extends Component implements Tick {
 	}
 
 	@Override
-	public void writeStatic(DataOutputStream out) {
+	public void writeOncePerClass(DataOutputStream out) {
 	}
 
 	@Override
@@ -31,6 +31,6 @@ public abstract class Script extends Component implements Tick {
 	}
 
 	@Override
-	public void readStatic(DataInputStream in) {
+	public void readOncePerClass(DataInputStream in) {
 	}
 }

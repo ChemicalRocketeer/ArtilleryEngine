@@ -27,21 +27,21 @@ public class Keyboard implements KeyListener {
 	public static final String SETTINGS_FILE = "settings.txt";
 
 	public static enum Controls {
-		UP(				new byte[] {KeyEvent.VK_W}),
-		DOWN(			new byte[] {KeyEvent.VK_S}),
-		LEFT(			new byte[] {KeyEvent.VK_A}),
-		RIGHT(			new byte[] {KeyEvent.VK_D}),
-		ROTLEFT(		new byte[] {KeyEvent.VK_Q}),
-		ROTRIGHT(		new byte[] {KeyEvent.VK_E}),
-		THROTTLEUP(		new byte[] {KeyEvent.VK_SHIFT}),
-		THROTTLEDOWN(	new byte[] {KeyEvent.VK_CONTROL}),
-		THROTTLECUT(	new byte[] {KeyEvent.VK_X}),
-		ADDBADDIE(		new byte[] {KeyEvent.VK_G}),
-		SCREENSHOT(		new byte[] {KeyEvent.VK_F1}),
-		SAVE(			new byte[] {KeyEvent.VK_F5}),
-		LOAD(			new byte[] {KeyEvent.VK_F9}),
-		DEVMODE(		new byte[] {KeyEvent.VK_F3}),
-		FULLSCREEN(		new byte[] {KeyEvent.VK_F12});
+		UP				(new byte[] {KeyEvent.VK_W}),
+		DOWN			(new byte[] {KeyEvent.VK_S}),
+		LEFT			(new byte[] {KeyEvent.VK_A}),
+		RIGHT			(new byte[] {KeyEvent.VK_D}),
+		ROTLEFT			(new byte[] {KeyEvent.VK_Q}),
+		ROTRIGHT		(new byte[] {KeyEvent.VK_E}),
+		THROTTLEUP		(new byte[] {KeyEvent.VK_SHIFT}),
+		THROTTLEDOWN	(new byte[] {KeyEvent.VK_CONTROL}),
+		THROTTLECUT		(new byte[] {KeyEvent.VK_X}),
+		ADDBADDIE		(new byte[] {KeyEvent.VK_G}),
+		SCREENSHOT		(new byte[] {KeyEvent.VK_F1}),
+		SAVE			(new byte[] {KeyEvent.VK_F5}),
+		LOAD			(new byte[] {KeyEvent.VK_F9}),
+		DEVMODE			(new byte[] {KeyEvent.VK_F3}),
+		FULLSCREEN		(new byte[] {KeyEvent.VK_F11});
 
 		private final byte[] defaultCodes;
 		private byte[] codes;

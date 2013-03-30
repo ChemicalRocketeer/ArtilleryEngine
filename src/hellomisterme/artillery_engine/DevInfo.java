@@ -1,6 +1,5 @@
 package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.game.Entity;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.util.Vector2;
 
@@ -69,7 +68,7 @@ public class DevInfo {
 			currentLine += fontSize;
 			g.drawString("y: " + player.transform.position.y, xLocation + xOff, yLocation + currentLine + yOff); // player's x coordinate
 			currentLine += fontSize;
-			Vector2 velocity = player.getForces().velocity;
+			Vector2 velocity = player.getFreeBody().velocity;
 			g.drawString("v: " + velocity.mag(), xLocation + xOff, yLocation + currentLine + yOff); // player's velocity
 			currentLine += fontSize;
 			g.drawString("r: " + velocity.angle(), xLocation + xOff, yLocation + currentLine + yOff); // player's rotation

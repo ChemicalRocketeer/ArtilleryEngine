@@ -11,7 +11,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * Describes a vector that can be used for velocity or forces or whatever else.
+ * Describes a vector that can be used for velocity or freeBody or whatever else.
  * 
  * This implementation uses a length along both the X and Y cartesian coordinates, but it can also be thought of using a
  * polar coordinate system, and there are methods which return and set polar coordinates. As far as the programmer is concerned, the only difference between this implementation and one that uses polar
@@ -162,6 +162,56 @@ public class Vector2 implements Savable {
 		return new Vector2(x / scalar, y / scalar);
 	}
 
+	/**
+	 * Multiplies this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
+	 */
+	public void mul(Vector2 other) {
+		x *= other.x;
+		y *= other.y;
+	}
+
+	/**
+	 * Multiplies this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
+	 */
+	public Vector2 MUL(Vector2 other) {
+		return new Vector2(x * other.x, y * other.y);
+	}
+
+	/**
+	 * Divides this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 no change)
+	 */
+	public void div(Vector2 other) {
+		if (other.x != 0) x /= other.x;
+		if (other.y != 0) y /= other.y;
+	}
+
+	/**
+	 * Divides this Vector2D by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 returns this)
+	 */
+	public Vector2 DIV(Vector2 other) {
+		double newX;
+		double newY;
+		if (other.x == 0) {
+			newX = x;
+		} else {
+			newX = x / other.x;
+		}
+		if (other.y == 0) {
+			newY = y;
+		} else {
+			newY = y / other.y;
+		}
+		return new Vector2(newX, newY);
+	}
+
 	public void norm() {
 		div(mag());
 	}
@@ -310,10 +360,10 @@ public class Vector2 implements Savable {
 	}
 
 	@Override
-	public void writeStatic(DataOutputStream out) {
+	public void writeOncePerClass(DataOutputStream out) {
 	}
 
 	@Override
-	public void readStatic(DataInputStream in) {
+	public void readOncePerClass(DataInputStream in) {
 	}
 }

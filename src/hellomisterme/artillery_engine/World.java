@@ -1,21 +1,21 @@
 package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.game.Entity;
-import hellomisterme.artillery_engine.game.components.Component;
-import hellomisterme.artillery_engine.game.components.Mass;
-import hellomisterme.artillery_engine.game.components.PhysicsForces;
-import hellomisterme.artillery_engine.game.components.scripts.PlayerMovement;
+import hellomisterme.artillery_engine.components.Component;
+import hellomisterme.artillery_engine.components.physics.FreeBody;
+import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
+import hellomisterme.artillery_engine.components.sprites.HeavySprite;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savable;
+import hellomisterme.util.Vector2;
 
 import java.awt.Dimension;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,20 +31,12 @@ public class World implements Tick, Savable, Renderable {
 	private Dimension bounds;
 
 	private Map<String, Entity> entities = new Hashtable<String, Entity>();
-
-	private List<Entity> entities1;
-	private List<Tick> tickables;
-	private List<Savable> savables;
-	private List<Mass> bodies;
+	public List<FreeBody> freeBodies = new LinkedList<FreeBody>();
 
 	private boolean baddieOrdered = false;
 
 	public World(int w, int h) {
 		bounds = new Dimension(w, h);
-		entities1 = new ArrayList<Entity>();
-		tickables = new ArrayList<Tick>();
-		savables = new ArrayList<Savable>();
-		bodies = new ArrayList<Mass>();
 	}
 
 	public World(DataInputStream in) {
@@ -52,8 +44,9 @@ public class World implements Tick, Savable, Renderable {
 	}
 
 	public void init() {
-		addEntity("player", new Entity(new Component[] { new PlayerMovement(), new PhysicsForces(), new Mass() }));
-		// new Planet(10000, bounds.width / 2, bounds.height / 2);
+		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), new HeavySprite("graphics/sprites/player.png") });
+		player.transform.position = new Vector2(getWidth() * 0.5, getHeight() * 0.5);
+		addEntity("player", player);
 	}
 
 	@Override
@@ -61,7 +54,7 @@ public class World implements Tick, Savable, Renderable {
 		// tick all the registered Tick objects
 		try {
 			for (Map.Entry<String, Entity> e : entities.entrySet()) {
-				((Entity) e).tick();
+				e.getValue().tick();
 			}
 		} catch (NullPointerException e) {
 			Err.error("Null Pointer in a tick() method!");
@@ -83,20 +76,60 @@ public class World implements Tick, Savable, Renderable {
 	 * Renders the world
 	 */
 	@Override
-	public void render(Render r) {
-		for (Entity e : entities1) {
-			e.render(r);
+	public void render(Render render) {
+		for (Map.Entry<String, Entity> e : entities.entrySet()) {
+			e.getValue().render(render);
 		}
 	}
 
-	/**
-	 * Writes this World's data to wherever the DataOutputStream goes. This World's data includes the data of all its registered savables.
-	 * 
-	 * TODO add switch statements with number codes for classes instead of saving/reading class names
-	 * 
-	 * @param out
-	 *        the DataOutputStream used to save data
-	 */
+	public Entity getEntity(String key) {
+		return entities.get(key);
+	}
+
+	public void addEntity(String key, Entity e) {
+		entities.put(key, e);
+		FreeBody body = e.getFreeBody();
+		if (body != null) freeBodies.add(body);
+	}
+
+	public void removeEntity(String key) {
+		freeBodies.remove(entities.get(key).getFreeBody());
+		entities.remove(key);
+	}
+
+	public void removeEntity(Entity e) {
+		freeBodies.remove(e);
+		entities.values().remove(e.getFreeBody());
+	}
+
+	public int entityCount() {
+		return entities.size();
+	}
+
+	public int getWidth() {
+		return bounds.width;
+	}
+
+	public void setWidth(int width) {
+		bounds.width = width;
+	}
+
+	public int getHeight() {
+		return bounds.height;
+	}
+
+	public void setHeight(int height) {
+		bounds.height = height;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public void write(DataOutputStream out) {
 		try {
@@ -104,227 +137,49 @@ public class World implements Tick, Savable, Renderable {
 			// the first int saved is width, second is height
 			out.writeInt(bounds.width);
 			out.writeInt(bounds.height);
-			out.writeInt(savables.size()); // write how many savables there are
+			out.writeInt(entities.size()); // write how many savables there are
 		} catch (IOException e) {
 			Err.error("World can't write data!");
 		}
 
-		// save all the savable data
-		for (Savable s : savables) {
+		// save all the entity data
+		for (Map.Entry<String, Entity> entry : entities.entrySet()) {
 			try {
-				out.writeUTF(s.getClass().getName()); // save the class name so we'll know what class it is later TODO: use switch statements or something, I dunno
+				out.writeUTF(entry.getKey()); // write the key, then write the entity data
 			} catch (IOException e) {
-				Err.error("Can't save class name " + s.getClass().getName() + "!");
+				Err.error("Can't save entity name " + entry.getKey() + "!");
 				e.printStackTrace();
 			}
-			s.write(out);
+			entry.getValue().write(out);
 		}
 	}
 
-	/**
-	 * Loads saved World data from a DataInputStream
-	 * 
-	 * @param in
-	 *        the DataInputStream to use to load data from
-	 */
 	@Override
 	public void read(DataInputStream in) {
-		// clear all lists. We're starting this world over from scratch.
-		entities1.clear();
-		tickables.clear();
-		savables.clear();
+		entities.clear();
+		freeBodies.clear();
 		try {
 			name = in.readUTF();
-			// the first int read is width, second is height
 			bounds.width = in.readInt();
 			bounds.height = in.readInt();
 
 			for (int i = in.readInt(); i > 0; i--) {
-				// whatever we're reading must be savable because it saved its data
-				Savable s = (Savable) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
-				s.read(in);
+				String key = in.readUTF(); // read the key, then read the entity
+				Entity e = new Entity();
+				e.read(in);
+				addEntity(key, e);
 			}
 		} catch (Exception e) {
-			Err.error("World can't load saved data! Please send the world save in a bug report.");
+			Err.error("World can't load saved data! Please send the world save in a bug report, or something. Make yourself useful.");
 			e.printStackTrace();
 		}
 	}
 
-	public Entity getEntity(String name) {
-		return entities.get(name);
-	}
-
-	public void addEntity(String name, Entity e) {
-		entities.put(name, e);
-	}
-
-	public void removeEntity(String name) {
-		entities.remove(name);
-	}
-
-	public int entityCount() {
-		return entities.size();
-	}
-
-	public void addEntity(Entity e) {
-		if (e == null) {
-			Err.error("Trying to add null Entity to World!"); // TODO remove
-		} else if (!entities1.contains(e)) {
-			entities1.add(e);
-		} else {
-			System.out.println("Trying to add an Entity that is already in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void removeEntity(Entity e) {
-		if (e == null) {
-			Err.error("Trying to remove null Entity from World!");
-		} else if (entities1.contains(e)) {
-			entities1.remove(e);
-		} else {
-			System.out.println("Trying to remove an Entity that isn't in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void addTickable(Tick t) {
-		if (t == null) {
-			Err.error("Trying to add null Tick to World!");
-		} else if (!tickables.contains(t)) {
-			tickables.add(t);
-		} else {
-			System.out.println("Trying to add a Tick that is already in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void removeTickable(Tick t) {
-		if (t == null) {
-			Err.error("Trying to remove null Tick from World!");
-		} else if (tickables.contains(t)) {
-			tickables.add(t);
-		} else {
-			System.out.println("Trying to remove a Tick that isn't in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void addSavable(Savable s) {
-		if (s == null) {
-			Err.error("Trying to add null Savable to World!");
-		} else if (!savables.contains(s)) {
-			savables.add(s);
-		} else {
-			System.out.println("Trying to add a Savable already in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void removeSavable(Savable s) {
-		if (s == null) {
-			Err.error("Trying to remove null Savable from World!");
-		} else if (savables.contains(s)) {
-			savables.remove(s);
-		} else {
-			System.out.println("Trying to remove a Savable that isn't in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void addBody(Mass m) {
-		if (m == null) {
-			Err.error("Trying to add null Mass to World!");
-		} else if (!bodies.contains(m)) {
-			bodies.add(m);
-		} else {
-			System.out.println("Trying to add a Mass object already in World..."); // TODO use in debug mode
-		}
-	}
-
-	public void removeBody(Mass m) {
-		if (m == null) {
-			Err.error("Trying to remove null Mass object from World!");
-		} else if (bodies.contains(m)) {
-			bodies.remove(m);
-		} else {
-			System.out.println("Trying to remove a Mass object that isn't in World..."); // TODO use in debug mode
-		}
-	}
-
-	/**
-	 * @return the width of the world
-	 */
-	public int getWidth() {
-		return bounds.width;
-	}
-
-	/**
-	 * @param width the width to set
-	 */
-	public void setWidth(int width) {
-		bounds.width = width;
-	}
-
-	/**
-	 * @return the height of the world
-	 */
-	public int getHeight() {
-		return bounds.height;
-	}
-
-	/**
-	 * @param height the height to set
-	 */
-	public void setHeight(int height) {
-		bounds.height = height;
-	}
-
-	/**
-	 * @return this world's name, can be used for whatever a name is useful for
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the string that will be considered this world's name from now on
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return all known Enitities
-	 */
-	public List<Entity> getEntities() {
-		return entities1;
-	}
-
-	/**
-	 * @return all known Enitities
-	 */
-	public List<Tick> getTickables() {
-		return tickables;
-	}
-
-	/**
-	 * @return all known Enitities
-	 */
-	public List<Savable> getSavables() {
-		return savables;
-	}
-
-	/**
-	 * @return all known Enitities
-	 */
-	public List<Mass> getBodies() {
-		return bodies;
+	@Override
+	public void writeOncePerClass(DataOutputStream out) {
 	}
 
 	@Override
-	public void writeStatic(DataOutputStream out) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void readStatic(DataInputStream in) {
-		// TODO Auto-generated method stub
-
+	public void readOncePerClass(DataInputStream in) {
 	}
 }
