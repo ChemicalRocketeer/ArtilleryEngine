@@ -44,7 +44,7 @@ public class Entity implements Renderable, Savable, Tick {
 	 * 
 	 * @return the BasicImage associated with this Entity
 	 */
-	public BasicImage getImage() {
+	public BasicImage getBasicImage() {
 		return (BasicImage) getComponent(BasicImage.class);
 	}
 
@@ -118,12 +118,14 @@ public class Entity implements Renderable, Savable, Tick {
 	}
 
 	/**
-	 * Renders all of this Entity's images
+	 * Renders all of this Entity's basicImages
 	 */
 	@Override
 	public void render(Render render) {
-		for (Component i : getComponents(BasicImage.class)) {
-			((BasicImage) i).render(render);
+		for (Component c : components) {
+			if (c instanceof Renderable) {
+				((Renderable) c).render(render);
+			}
 		}
 	}
 
@@ -144,8 +146,8 @@ public class Entity implements Renderable, Savable, Tick {
 	public Vector2 globalScale() {
 		if (parent == null) return transform.scale.clone();
 
-		Vector2 scale = parent.globalPosition();
-		scale.add(transform.scale);
+		Vector2 scale = parent.globalScale();
+		scale.mul(transform.scale);
 		return scale;
 	}
 

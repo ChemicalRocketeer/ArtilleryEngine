@@ -26,7 +26,7 @@ public class Game extends Canvas implements Runnable {
 	/**
 	 * This game's title
 	 */
-	private final String title = "Space Game Alpha.0.1.1";
+	private final String title = "Space Game Alpha.0.1.2";
 
 	/**
 	 * A random number that can be used by objects in the game
@@ -42,6 +42,7 @@ public class Game extends Canvas implements Runnable {
 	public static final int TICKS_PER_SECOND = 60;
 
 	private boolean running = false;
+	private boolean paused = false;
 
 	private JFrame frame;
 
@@ -54,6 +55,7 @@ public class Game extends Canvas implements Runnable {
 
 	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devModeOrdered = false;
+	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
 	private boolean fullscreen = true;
@@ -134,7 +136,6 @@ public class Game extends Canvas implements Runnable {
 				tickCount = 0;
 				lastRecord = System.currentTimeMillis();
 			}
-
 		}
 	}
 
@@ -164,7 +165,9 @@ public class Game extends Canvas implements Runnable {
 	 */
 	private void tick() {
 		checkStatus();
-		world.tick();
+		if (!paused) {
+			world.tick();
+		}
 	}
 
 	/**
@@ -178,6 +181,15 @@ public class Game extends Canvas implements Runnable {
 			}
 		} else { // screenshot key not pressed
 			screenshotOrdered = false;
+		}
+
+		if (Keyboard.Controls.PAUSE.pressed()) {
+			if (!pauseOrdered) { // if the pause key was up before
+				paused = !paused;
+				pauseOrdered = true; // remember that pause was pressed
+			}
+		} else { // screenshot key not pressed
+			pauseOrdered = false;
 		}
 
 		// these if statements are organized to prevent save/load operations in the same tick
@@ -250,6 +262,10 @@ public class Game extends Canvas implements Runnable {
 	@Override
 	public int getHeight() {
 		return (int) (width * aspectRatio);
+	}
+
+	public void pause() {
+
 	}
 
 	/**

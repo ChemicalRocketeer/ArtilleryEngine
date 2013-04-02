@@ -8,7 +8,7 @@ public abstract class Component implements Savable {
 	public Entity entity;
 
 	/**
-	 * Call this in the constructor to require another Component for this Component to work
+	 * Call this in init() to require another Component for this Component to work
 	 * 
 	 * @param c
 	 */

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An abstract class to describe a world. World keeps track of anything in the game.
+ * World keeps track of objects in the game.
  * 
  * @since 10-23-12
  * @author David Aaron Suddjian
@@ -31,7 +31,8 @@ public class World implements Tick, Savable, Renderable {
 	private Dimension bounds;
 
 	private Map<String, Entity> entities = new Hashtable<String, Entity>();
-	public List<FreeBody> freeBodies = new LinkedList<FreeBody>();
+	public List<FreeBody> freebodies = new LinkedList<FreeBody>();
+	public List<Renderable> images = new LinkedList<Renderable>();
 
 	private boolean baddieOrdered = false;
 
@@ -44,8 +45,12 @@ public class World implements Tick, Savable, Renderable {
 	}
 
 	public void init() {
-		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), new HeavySprite("graphics/sprites/player.png") });
-		player.transform.position = new Vector2(getWidth() * 0.5, getHeight() * 0.5);
+		HeavySprite playerSprite = new HeavySprite("graphics/sprites/player.png");
+		playerSprite.transform.rotation = Math.PI * 0.5;
+		playerSprite.transform.position = new Vector2(playerSprite.getWidth() * -0.5, playerSprite.getHeight() * -0.5);
+		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), playerSprite });
+		player.transform.position = new Vector2(getWidth() * 0.2, getHeight() * 0.2);
+		player.transform.rotation = -Math.PI * 0.5;
 		addEntity("player", player);
 	}
 
@@ -89,16 +94,16 @@ public class World implements Tick, Savable, Renderable {
 	public void addEntity(String key, Entity e) {
 		entities.put(key, e);
 		FreeBody body = e.getFreeBody();
-		if (body != null) freeBodies.add(body);
+		if (body != null) freebodies.add(body);
 	}
 
 	public void removeEntity(String key) {
-		freeBodies.remove(entities.get(key).getFreeBody());
+		freebodies.remove(entities.get(key).getFreeBody());
 		entities.remove(key);
 	}
 
 	public void removeEntity(Entity e) {
-		freeBodies.remove(e);
+		freebodies.remove(e);
 		entities.values().remove(e.getFreeBody());
 	}
 
@@ -157,7 +162,7 @@ public class World implements Tick, Savable, Renderable {
 	@Override
 	public void read(DataInputStream in) {
 		entities.clear();
-		freeBodies.clear();
+		freebodies.clear();
 		try {
 			name = in.readUTF();
 			bounds.width = in.readInt();

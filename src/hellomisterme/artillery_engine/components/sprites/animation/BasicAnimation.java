@@ -31,8 +31,7 @@ public class BasicAnimation implements Animation {
 	/**
 	 * This BasicAnimation will use the frames found at the specified path.
 	 * 
-	 * @param path
-	 *            The path of the directory where the images are located
+	 * @param path The path of the directory where the images are located
 	 * @see #setImage(String)
 	 */
 	public BasicAnimation(String path) {
@@ -44,8 +43,7 @@ public class BasicAnimation implements Animation {
 	 * 
 	 * Each frame in the animation must be saved as its own image file, in png format. The files must be saved as 0.png, 1.png, etc. for as many files as there are frames in the animation.
 	 * 
-	 * @param path
-	 *            The path of the directory where the images are located
+	 * @param path The path of the directory where the images are located
 	 */
 	public void setImage(String path) {
 		if (new File(path).isDirectory()) {

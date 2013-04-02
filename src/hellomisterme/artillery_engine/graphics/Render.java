@@ -29,12 +29,11 @@ public class Render {
 	 */
 	public boolean simpleRendering = false, devMode = false;
 
-	/**
-	 * The array of pixels that will be manipulated through rendering
-	 */
 	public int[] pixels;
 	public BufferedImage image;
 	public Graphics2D graphics;
+
+	public AffineTransform defaultTransform;
 
 	public Render(int width, int height) {
 		this.width = width;
@@ -54,20 +53,30 @@ public class Render {
 		graphics.addRenderingHints(renderHints);
 		graphics.setColor(Color.BLACK);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data to the pixels array
-	}
-
-	public void render(BufferedImage img, Vector2 pos, Vector2 center, double rotation, Vector2 scale) {
-		AffineTransform saved = graphics.getTransform();
-		AffineTransform trans = new AffineTransform();
-		graphics.setTransform(trans);
-		graphics.rotate(rotation, center.x, center.y);
-		graphics.scale(scale.x, scale.y);
-		graphics.drawImage(img, null, (int) pos.x, (int) pos.y);
-		graphics.setTransform(saved);
+		defaultTransform = graphics.getTransform();
 	}
 
 	/**
-	 * Draws Sprite data at the indicated point on screen
+	 * Renders the given BufferedImage.
+	 * 
+	 * This method does not change the current AffineTransform before drawing the image, but it sets it to the defaultTransform after it is done.
+	 * 
+	 * @param img
+	 * @param center
+	 * @param offset
+	 * @param rotation
+	 * @param scale
+	 */
+	public void render(BufferedImage img, Vector2 center, Vector2 offset, double rotation, Vector2 scale) {
+		graphics.setTransform((AffineTransform) defaultTransform.clone());
+		graphics.rotate(rotation, center.x, center.y);
+		graphics.scale(scale.x, scale.y);
+		graphics.translate(center.x / scale.x + offset.x, center.y / scale.y + offset.y); // Move graphics to the correct spot on the screen
+		graphics.drawImage(img, null, 0, 0);
+	}
+
+	/**
+	 * Draws image data at the indicated point on screen
 	 * 
 	 * @param img
 	 *        the BasicImage to be drawn

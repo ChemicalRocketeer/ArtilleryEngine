@@ -31,30 +31,73 @@ public class Transform implements Savable {
 	public void add(Transform other) {
 		position.add(other.position);
 		rotation += other.rotation;
-		scale.add(other.scale);
+		scale.mul(other.scale);
 	}
 
 	public Transform ADD(Transform other) {
-		return new Transform(position.ADD(other.position), rotation + other.rotation, scale.ADD(other.scale));
+		return new Transform(position.ADD(other.position), rotation + other.rotation, scale.MUL(other.scale));
 	}
 
 	public void sub(Transform other) {
 		position.sub(other.position);
 		rotation -= other.rotation;
-		scale.sub(other.scale);
+		scale.div(other.scale);
 	}
 
 	public Transform SUB(Transform other) {
-		return new Transform(position.SUB(other.position), rotation - other.rotation, scale.SUB(other.scale));
+		return new Transform(position.SUB(other.position), rotation - other.rotation, scale.DIV(other.scale));
 	}
 
+	/**
+	 * Adds a vector of angle <code>rotation</code> and magnitude <code>amount</code> to the position vector.
+	 * 
+	 * Visualize it as if the rotation determines what direction "forward" is, and the amount determines the amount to move forward.
+	 * 
+	 * @param amount the amount to move forward
+	 */
 	public void forward(double amount) {
 		position.add(Vector2.fromAngle(rotation, amount));
 	}
 
+	/**
+	 * Creates a vector of angle <code>rotation</code> and magnitude <code>amount</code>, effectively making a vector pointed "forward" relative to this transformation.
+	 * 
+	 * Visualize it as if the rotation determines what direction "forward" is, and the amount determines the amount to move forward.
+	 * 
+	 * @param amount the amount to move forward
+	 * @return a new vector in the forward direction (as defined by this Transform) with the given amount as magnitude
+	 */
+	public Vector2 FORWARD(double amount) {
+		return Vector2.fromAngle(rotation, amount);
+	}
+
+	/**
+	 * Applies this transformation to the given vector in scale, rotation, position order
+	 * 
+	 * @param vector the vector to be transformed
+	 */
+	public void apply(Vector2 vector) {
+		vector.mul(scale);
+		vector.rotate(rotation);
+		vector.add(position);
+	}
+
+	/**
+	 * Calculates the result of the given vector with this transformation applied in scale, rotation, position order. Does not change the given vector.
+	 * 
+	 * @param vector the vector to use for calculation
+	 * @return a new vector with this transformation applied
+	 */
+	public Vector2 APPLY(Vector2 vector) {
+		Vector2 vect = vector.MUL(scale);
+		vect.rotate(rotation);
+		vect.add(position);
+		return vect;
+	}
+
 	@Override
 	public Transform clone() {
-		return new Transform(position, rotation, scale);
+		return new Transform(position.clone(), rotation, scale.clone());
 	}
 
 	@Override

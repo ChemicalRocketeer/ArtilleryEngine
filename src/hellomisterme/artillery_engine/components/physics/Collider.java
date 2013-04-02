@@ -82,11 +82,9 @@ public abstract class Collider extends IngameComponent {
 
 	public static class Circle extends Collider {
 
-		public double x, y, radius;
+		public double radius;
 
-		public Circle(double x, double y, double r) {
-			this.x = x;
-			this.y = y;
+		public Circle(double r) {
 			radius = r;
 		}
 
@@ -103,8 +101,8 @@ public abstract class Collider extends IngameComponent {
 
 		@Override
 		public boolean collides(Circle other) {
-			double xDist = other.x - x;
-			double yDist = other.y - y;
+			double xDist = other.transform.position.x - transform.position.x;
+			double yDist = other.transform.position.y - transform.position.y;
 			double totalRadius = other.radius + radius;
 			return xDist * xDist + yDist * yDist <= totalRadius * totalRadius;
 		}
@@ -118,7 +116,7 @@ public abstract class Collider extends IngameComponent {
 
 		@Override
 		public Rectangle2D getBounds() {
-			return new Rectangle2D.Double(x, y, radius * 2, radius * 2);
+			return new Rectangle2D.Double(transform.position.x, transform.position.y, radius * 2, radius * 2);
 		}
 	}
 

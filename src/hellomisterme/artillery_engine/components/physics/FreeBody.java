@@ -20,6 +20,7 @@ public class FreeBody extends Component implements Tick {
 
 	public Vector2 velocity = new Vector2(0, 0);
 	public double mass = 1.0;
+	public double spin = 0.0;
 
 	public FreeBody() {
 		this(new Vector2(0, 0));
@@ -32,6 +33,7 @@ public class FreeBody extends Component implements Tick {
 	@Override
 	public void tick() {
 		entity.transform.position.add(velocity);
+		entity.transform.rotation += spin;
 	}
 
 	/**

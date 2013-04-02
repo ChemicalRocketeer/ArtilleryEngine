@@ -41,7 +41,8 @@ public class Keyboard implements KeyListener {
 		SAVE			(new byte[] {KeyEvent.VK_F5}),
 		LOAD			(new byte[] {KeyEvent.VK_F9}),
 		DEVMODE			(new byte[] {KeyEvent.VK_F3}),
-		FULLSCREEN		(new byte[] {KeyEvent.VK_F11});
+		FULLSCREEN		(new byte[] {KeyEvent.VK_F11}),
+		PAUSE			(new byte[] {KeyEvent.VK_ESCAPE});
 
 		private final byte[] defaultCodes;
 		private byte[] codes;

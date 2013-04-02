@@ -24,10 +24,11 @@ public class HeavySprite extends BasicImage {
 
 	@Override
 	public void render(Render render) {
+		Vector2 scale = globalScale();
+		double rotation = globalRotation();
 		Vector2 center = entity.globalPosition();
-		Vector2 scale = entity.globalScale();
-		scale.mul(transform.scale);
-		render.render(sprite, center.ADD(transform.position), center, entity.transform.rotation, scale);
+		// img, center, offset, rotation, scale
+		render.render(sprite, center, transform.position, rotation, scale);
 	}
 
 	@Override

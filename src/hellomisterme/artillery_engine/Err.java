@@ -19,6 +19,7 @@ public class Err {
 	}
 
 	public static void error(String message, Exception e) {
-		System.out.println(PREPEND + message + APPEND + "\n\n" + e.getStackTrace());
+		System.out.println(PREPEND + message + APPEND + "\n\n" + e.getLocalizedMessage());
+		e.printStackTrace();
 	}
 }

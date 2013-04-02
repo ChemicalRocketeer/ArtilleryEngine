@@ -1,13 +1,12 @@
 package hellomisterme.artillery_engine.components;
 
-import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.util.Transform;
 import hellomisterme.util.Vector2;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class IngameComponent extends Component implements Savable {
+public abstract class IngameComponent extends Component {
 
 	public Transform transform = new Transform();
 
@@ -18,6 +17,16 @@ public class IngameComponent extends Component implements Savable {
 		Vector2 pos = entity.globalPosition();
 		pos.add(transform.position);
 		return pos;
+	}
+
+	public Vector2 globalScale() {
+		Vector2 scale = entity.globalScale();
+		scale.mul(transform.scale);
+		return scale;
+	}
+
+	public double globalRotation() {
+		return entity.globalRotation() + transform.rotation;
 	}
 
 	public Transform globalTransform() {
