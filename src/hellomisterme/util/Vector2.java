@@ -14,7 +14,7 @@ import java.io.IOException;
  * Describes a vector that can be used for velocity or freeBody or whatever else.
  * 
  * This implementation uses a length along both the X and Y cartesian coordinates, but it can also be thought of using a
- * polar coordinate system, and there are methods which return and set polar coordinates. As far as the programmer is concerned, the only difference between this implementation and one that uses polar
+ * polar coordinate system, and there are methods which return and set polar coordinates. The only difference between this implementation and one that might use polar
  * coordinate data storage is a small difference in computation time for different methods.
  * 
  * All angle measurements are in radians.
@@ -27,17 +27,17 @@ public class Vector2 implements Savable {
 	/**
 	 * Useful constant to set vector angles
 	 */
-	public static final double LEFT = Math.PI, DOWN = Math.PI / 2.0, UP = -DOWN, RIGHT = 0.0;
+	public static final double LEFT = Math.PI, DOWN = Math.PI * 0.5, UP = -DOWN, RIGHT = 0.0;
 
 	/**
-	 * Useful constants to rotate vector angles. A positive rotation will occur in the clockwise direction. These values can be divided and multiplied for the desired effect.
+	 * Useful constant to rotate vector angles. A positive rotation will occur in the clockwise direction. These values can be divided and multiplied for the desired effect.
 	 */
-	public static final double QUARTER_TURN = Math.PI / 2, EIGHTH_TURN = QUARTER_TURN / 2.0, THIRD_TURN = 2.0 * Math.PI / 3.0, SIXTH_TURN = THIRD_TURN / 2.0;
+	public static final double QUARTER_TURN = Math.PI * 0.5, EIGHTH_TURN = QUARTER_TURN * 0.5, THIRD_TURN = 1.5 * Math.PI, SIXTH_TURN = THIRD_TURN * 0.5;
 
 	public double x, y;
 
 	/**
-	 * Creates a Vector2D that has the given length along the X and Y cartesian coordinates.
+	 * Creates a Vector2 that has the given length along the X and Y cartesian coordinates.
 	 * 
 	 * @param x
 	 * @param y
@@ -48,14 +48,14 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Creates a new Vector2D using the given angle and length. If getLength() or getAngle() are called later, the returned numbers will be close, but not exactly the same as provided because of
+	 * Creates a new Vector2 using the given angle and length. If getLength() or getAngle() are called later, the returned numbers will be close, but not exactly the same as provided because of
 	 * floating-point arithmetic. This method is not as fast as using a constructor.
 	 * 
 	 * The angle variable is assumed to be in radians, not degrees.
 	 * 
 	 * @param angle the angle, in radians
 	 * @param magnitude the length of the vector
-	 * @return a new Vector2D with the given properties
+	 * @return a new Vector2 with the given properties
 	 */
 	public static Vector2 fromAngle(double angle, double magnitude) {
 		return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
@@ -64,7 +64,7 @@ public class Vector2 implements Savable {
 	/**
 	 * Creates a vector running from point A to point B.
 	 * 
-	 * While Vector2D does not store coordinate variables, the returned vector will have the correct x and y to get from A to B. This method is not as fast as using a constructor.
+	 * While Vector2 does not store coordinate variables, the returned vector will have the correct x and y to get from A to B. This method is not as fast as using a constructor.
 	 * 
 	 * @param xA the X value of point A
 	 * @param yA the Y value of point A
@@ -77,7 +77,7 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Returns a new Vector2D with the same values as this Vector2D
+	 * Returns a new Vector2 with the same values as this Vector2
 	 */
 	@Override
 	public Vector2 clone() {
@@ -85,9 +85,9 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Adds another Vector2D to this one
+	 * Adds another Vector2 to this one
 	 * 
-	 * @param other the Vector2D to add
+	 * @param other the Vector2 to add
 	 */
 	public void add(Vector2 other) {
 		x += other.x;
@@ -95,18 +95,18 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Adds another Vector2D to this one
+	 * Adds another Vector2 to this one
 	 * 
-	 * @param other the Vector2D to add
+	 * @param other the Vector2 to add
 	 */
 	public Vector2 ADD(Vector2 other) {
 		return new Vector2(x + other.x, y + other.y);
 	}
 
 	/**
-	 * Subtracts another Vector2D from this one
+	 * Subtracts another Vector2 from this one
 	 * 
-	 * @param other the Vector2D to subtract
+	 * @param other the Vector2 to subtract
 	 */
 	public void sub(Vector2 other) {
 		x -= other.x;
@@ -114,16 +114,16 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Subtracts another Vector2D from this one
+	 * Subtracts another Vector2 from this one
 	 * 
-	 * @param other the Vector2D to subtract
+	 * @param other the Vector2 to subtract
 	 */
 	public Vector2 SUB(Vector2 other) {
 		return new Vector2(x - other.x, y - other.y);
 	}
 
 	/**
-	 * Multiplies this Vector2D by the given scalar
+	 * Multiplies this Vector2 by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
@@ -133,7 +133,7 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Multiplies this Vector2D by the given scalar
+	 * Multiplies this Vector2 by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
@@ -142,28 +142,39 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Divides this Vector2D by the given scalar
+	 * Divides this Vector2 by the given scalar
 	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 no change)
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
 	 */
 	public void div(double scalar) {
-		if (scalar == 0) return;
-		x /= scalar;
-		y /= scalar;
+		if (scalar == 0) {
+			if (x >= 0) {
+				x = Double.POSITIVE_INFINITY;
+			} else {
+				x = Double.NEGATIVE_INFINITY;
+			}
+			y = Double.MAX_VALUE;
+		} else {
+			x /= scalar;
+			y /= scalar;
+		}
 	}
 
 	/**
-	 * Divides this Vector2D by the given scalar
+	 * Divides this Vector2 by the given scalar
 	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 returns this)
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
 	 */
 	public Vector2 DIV(double scalar) {
-		if (scalar == 0) return clone();
+		if (scalar == 0) {
+			// test condition ? true result : false result
+			return new Vector2(x >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY, y >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+		}
 		return new Vector2(x / scalar, y / scalar);
 	}
 
 	/**
-	 * Multiplies this Vector2D by the given scalar
+	 * Multiplies this Vector2 by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
@@ -173,7 +184,7 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Multiplies this Vector2D by the given scalar
+	 * Multiplies this Vector2 by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
@@ -182,30 +193,56 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Divides this Vector2D by the given scalar
+	 * Divides this Vector2 by the given scalar
 	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 no change)
+	 * @param other the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
 	 */
 	public void div(Vector2 other) {
-		if (other.x != 0) x /= other.x;
-		if (other.y != 0) y /= other.y;
+		if (other.x == 0) {
+			if (x >= 0) {
+				x = Double.POSITIVE_INFINITY;
+			} else {
+				x = Double.NEGATIVE_INFINITY;
+			}
+		} else {
+			x /= other.x;
+		}
+
+		if (other.y == 0) {
+			if (y >= 0) {
+				y = Double.POSITIVE_INFINITY;
+			} else {
+				y = Double.NEGATIVE_INFINITY;
+			}
+		} else {
+			y /= other.y;
+		}
 	}
 
 	/**
-	 * Divides this Vector2D by the given scalar
+	 * Divides this Vector2 by the given scalar
 	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 returns this)
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
 	 */
 	public Vector2 DIV(Vector2 other) {
 		double newX;
 		double newY;
 		if (other.x == 0) {
-			newX = x;
+			if (x >= 0) {
+				newX = Double.POSITIVE_INFINITY;
+			} else {
+				newX = Double.NEGATIVE_INFINITY;
+			}
 		} else {
 			newX = x / other.x;
 		}
+
 		if (other.y == 0) {
-			newY = y;
+			if (y >= 0) {
+				newY = Double.POSITIVE_INFINITY;
+			} else {
+				newY = Double.NEGATIVE_INFINITY;
+			}
 		} else {
 			newY = y / other.y;
 		}
@@ -217,19 +254,21 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Sets the length, or magnitude, of this Vector2D to the given amount.If the current magnitude is zero, does nothing.
+	 * Sets the length, or magnitude, of this Vector2 to the given amount. If the current magnitude is zero, sets x to the value of m.
 	 * 
 	 * @param m the new magnitude
 	 */
 	public void setMagnitude(double m) {
 		double mag = mag();
-		if (mag != 0.0) {
+		if (mag == 0.0) {
+			x = m;
+		} else {
 			mul(m / mag);
 		}
 	}
 
 	/**
-	 * Sets the angle of this Vector2D to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
+	 * Sets the angle of this Vector2 to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
 	 * getAngle() method will return an equivalent angle, but not necessarily the same number given here. For example, after a call to setAngle(3*pi), getAngle() will return pi.
 	 * 
 	 * @param angle the new angle, in radians
@@ -242,18 +281,14 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * @return the angle of this Vector2D in radians
+	 * @return the angle of this Vector2 in radians
 	 */
 	public double angle() {
-		// acos will only ever return angles between pi and 0, so angles greater than pi have to be manually adjusted. Fortunately, we know whether y is positive or negative, so that is easy.
-		if (y >= 0) {
-			return Math.atan(y / x);
-		}
-		return Math.PI * 2 - Math.atan(y / x);
+		return Math.atan2(y, x);
 	}
 
 	/**
-	 * @return the magnitude of this Vector2D
+	 * @return the magnitude of this Vector2
 	 */
 	public double mag() {
 		// pythagorean theorem at work, bitches!
@@ -261,14 +296,14 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * @return the magnitude squared of this Vector2D. This method is faster than mag() because it doesn't perform a sqrt operation.
+	 * @return the magnitude squared of this Vector2. This method is faster than mag() because it doesn't perform a sqrt operation.
 	 */
 	public double mag2() {
 		return x * x + y * y;
 	}
 
 	/**
-	 * Rotates this Vector2D around its origin by the given amount.
+	 * Rotates this Vector2 around its origin by the given amount.
 	 * 
 	 * The angle should be given in radians.The method will still work if it isn't, but you won't get the intended result. It is important to note that if your coordinate system has y increasing from
 	 * top to bottom, then the effect will be a clockwise rotation. Trigonometrically, however, the rotation is counter-clockwise.
@@ -298,7 +333,7 @@ public class Vector2 implements Savable {
 	 * 
 	 * @see #approximatelyEquals(Vector2, double)
 	 * @param other the vector to test
-	 * @return true if the given Vector2D can be considered "equal" to this one
+	 * @return true if the given Vector2 can be considered "equal" to this one
 	 */
 	public boolean approximatelyEquals(Vector2 other) {
 		return (int) this.x == (int) other.x && (int) this.y == (int) other.y;
@@ -316,7 +351,7 @@ public class Vector2 implements Savable {
 	}
 
 	/**
-	 * Visualizes this Vector2D on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
+	 * Visualizes this Vector2 on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
 	 * only the way it is displayed. For a one-to-one representation of the vector length, use an exaggeration of 1.0
 	 * 
 	 * @param g the Graphics2D object to draw to
@@ -335,6 +370,11 @@ public class Vector2 implements Savable {
 		r.graphics.setColor(Color.RED);
 		r.graphics.setStroke(new BasicStroke(1.5f));
 		r.graphics.drawLine(endX, endY, dotX, dotY);
+	}
+
+	@Override
+	public String toString() {
+		return "x: " + x + " y: " + y;
 	}
 
 	@Override

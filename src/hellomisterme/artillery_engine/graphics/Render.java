@@ -68,11 +68,12 @@ public class Render {
 	 * @param scale
 	 */
 	public void render(BufferedImage img, Vector2 center, Vector2 offset, double rotation, Vector2 scale) {
-		graphics.setTransform((AffineTransform) defaultTransform.clone());
+		graphics.setTransform(new AffineTransform(defaultTransform));
 		graphics.rotate(rotation, center.x, center.y);
 		graphics.scale(scale.x, scale.y);
 		graphics.translate(center.x / scale.x + offset.x, center.y / scale.y + offset.y); // Move graphics to the correct spot on the screen
 		graphics.drawImage(img, null, 0, 0);
+		graphics.setTransform(defaultTransform);
 	}
 
 	/**
