@@ -1,6 +1,7 @@
 package hellomisterme.artillery_engine.components;
 
 import hellomisterme.artillery_engine.Entity;
+import hellomisterme.artillery_engine.World;
 import hellomisterme.artillery_engine.io.Savable;
 
 public abstract class Component implements Savable {
@@ -29,5 +30,9 @@ public abstract class Component implements Savable {
 	 */
 	public static boolean isMutuallyExclusive() {
 		return false;
+	}
+
+	public static World getWorld() {
+		return Entity.getWorld();
 	}
 }

@@ -17,13 +17,13 @@ import javax.imageio.ImageIO;
 public class Screenshot implements Runnable {
 
 	private static int number = 0;
-	public static final String prefix = "screen ";
+	public static final String PREFIX = "screen ";
 	private final BufferedImage image;
 
 	/**
 	 * Creates a new Screenshot using the provided BufferedImage
 	 * 
-	 * @param img the Image to use
+	 * @param img the BufferedImage to use
 	 */
 	public Screenshot(BufferedImage img) {
 		image = new BufferedImage(img.getColorModel(), img.copyData(null), img.getColorModel().isAlphaPremultiplied(), null);
@@ -41,7 +41,7 @@ public class Screenshot implements Runnable {
 		// put date and time in the filename
 		{
 			Calendar c = Calendar.getInstance();
-			fileName = "screenshots/" + prefix + number + "  " + c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + " " + c.get(Calendar.HOUR_OF_DAY) + "." + c.get(Calendar.MINUTE) + "." + c.get(Calendar.SECOND) + ".png";
+			fileName = "screenshots/" + PREFIX + number + "  " + c.get(Calendar.MONTH) + 1 + "-" + c.get(Calendar.DAY_OF_MONTH) + "-" + c.get(Calendar.YEAR) + " " + c.get(Calendar.HOUR_OF_DAY) + "." + c.get(Calendar.MINUTE) + "." + c.get(Calendar.SECOND) + ".png";
 		}
 		try {
 			File outFile = new File(fileName);
@@ -65,8 +65,8 @@ public class Screenshot implements Runnable {
 		}
 		for (int i = 0; i < shots.length; i++) {
 			String name = shots[i].getName();
-			int index = name.indexOf(prefix); // find the prefix in file
-			index += prefix.length();
+			int index = name.indexOf(PREFIX); // find the PREFIX in file
+			index += PREFIX.length();
 			if (index != -1) {
 				name = name.substring(index); // name now starts with its screenshot number
 				index = name.indexOf(' '); // find the end of the number

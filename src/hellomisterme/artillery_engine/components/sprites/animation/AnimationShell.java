@@ -1,8 +1,8 @@
 package hellomisterme.artillery_engine.components.sprites.animation;
 
-import hellomisterme.artillery_engine.components.sprites.BasicImage;
+import hellomisterme.artillery_engine.components.sprites.ImageShell;
 
-public class AnimationShell extends BasicImage {
+public class AnimationShell extends ImageShell {
 
 	public Animation anim;
 	public String file;

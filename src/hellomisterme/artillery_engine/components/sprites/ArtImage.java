@@ -10,11 +10,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class HeavySprite extends BasicImage {
+public class ArtImage extends ImageShell {
 
 	private BufferedImage sprite;
 
-	public HeavySprite(String imageFile) {
+	public ArtImage(String imageFile) {
 		try {
 			sprite = ImageIO.read(new File(imageFile));
 		} catch (IOException e) {
@@ -24,11 +24,13 @@ public class HeavySprite extends BasicImage {
 
 	@Override
 	public void render(Render render) {
-		Vector2 scale = globalScale();
-		double rotation = globalRotation();
-		Vector2 center = entity.globalPosition();
-		// img, center, offset, rotation, scale
-		render.render(sprite, center, transform.position, rotation, scale);
+		if (visible) {
+			Vector2 scale = globalScale();
+			double rotation = globalRotation();
+			Vector2 center = entity.globalPosition();
+			// img, center, offset, rotation, scale
+			render.render(sprite, center, transform.position, rotation, scale);
+		}
 	}
 
 	@Override

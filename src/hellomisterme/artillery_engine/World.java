@@ -1,9 +1,11 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
+import hellomisterme.artillery_engine.components.scripts.Planet;
 import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
-import hellomisterme.artillery_engine.components.sprites.HeavySprite;
+import hellomisterme.artillery_engine.components.sprites.ArtImage;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Keyboard;
@@ -36,6 +38,8 @@ public class World implements Tick, Savable, Renderable {
 
 	private boolean baddieOrdered = false;
 
+	public Camera activeCamera = new Camera();
+
 	public World(int w, int h) {
 		bounds = new Dimension(w, h);
 	}
@@ -45,13 +49,23 @@ public class World implements Tick, Savable, Renderable {
 	}
 
 	public void init() {
-		HeavySprite playerSprite = new HeavySprite("graphics/sprites/player.png");
-		playerSprite.transform.rotation = Math.PI * 0.5;
-		playerSprite.transform.position = new Vector2(playerSprite.getWidth() * -0.5, playerSprite.getHeight() * -0.5);
-		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), playerSprite });
+		ArtImage playerImage = new ArtImage("graphics/sprites/player.png");
+		playerImage.transform.rotation = Math.PI * 0.5;
+		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
+		playerImage.transform.scale = new Vector2(1, 1);
+		Camera camera = new Camera(true, true, true);
+		camera.transform.scale = new Vector2(0.5, 0.5);
+		camera.transform.rotation = Math.PI * 0.5;
+		activeCamera = camera;
+		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), playerImage, camera });
 		player.transform.position = new Vector2(getWidth() * 0.2, getHeight() * 0.2);
 		player.transform.rotation = -Math.PI * 0.5;
 		addEntity("player", player);
+
+		FreeBody planetBody = new FreeBody(new Vector2(0, 0), 1000, 0);
+		Entity planet = new Entity(new Component[] { new Planet(), planetBody });
+		planet.transform.position = new Vector2(getWidth() * 0.8, getHeight() * 0.8);
+		addEntity("planet", planet);
 	}
 
 	@Override

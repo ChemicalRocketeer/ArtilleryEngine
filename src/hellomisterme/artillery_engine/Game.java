@@ -46,7 +46,7 @@ public class Game extends Canvas implements Runnable {
 
 	private JFrame frame;
 
-	private Render render;
+	private static Render render;
 
 	private static World world;
 
@@ -259,9 +259,17 @@ public class Game extends Canvas implements Runnable {
 		return width;
 	}
 
+	public static int getDisplayWidth() {
+		return render.getWidth();
+	}
+
 	@Override
 	public int getHeight() {
 		return (int) (width * aspectRatio);
+	}
+
+	public static int getDisplayHeight() {
+		return render.getHeight();
 	}
 
 	public void pause() {

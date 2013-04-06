@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-public class Sprite extends BasicImage {
+public class Sprite extends ImageShell {
 	protected int width;
 	protected int[] pixels;
 

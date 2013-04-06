@@ -23,23 +23,40 @@ public class FreeBody extends Component implements Tick {
 	public double spin = 0.0;
 
 	public FreeBody() {
-		this(new Vector2(0, 0));
+		this(new Vector2(0, 0), 1, 0);
 	}
 
-	public FreeBody(Vector2 velocity) {
+	public FreeBody(Vector2 velocity, double mass, double spin) {
 		this.velocity = velocity;
+		this.mass = mass;
+		this.spin = spin;
 	}
 
 	@Override
 	public void tick() {
+		applyForce(gravity(getWorld().freebodies));
 		entity.transform.position.add(velocity);
 		entity.transform.rotation += spin;
 	}
 
+	public void applyForce(Vector2 force) {
+		velocity.add(force.DIV(mass));
+	}
+
+	public Vector2 gravity(Collection<FreeBody> bodies) {
+		Vector2 gravity = new Vector2(0, 0);
+		for (FreeBody body : bodies) {
+			if (body != this) {
+				gravity.add(gravity(body));
+			}
+		}
+		return gravity;
+	}
+
 	/**
-	 * Calculates the gravitational force from a given Mass and adds it to the velocity vector. Does not change values for the given Mover, only for this one.
+	 * Calculates the gravitational force from a given FreeBody.
 	 * 
-	 * @param body the Mover to gravitate towards
+	 * @param body the FreeBody to gravitate towards
 	 */
 	public Vector2 gravity(FreeBody body) {
 		double bodyMass = body.mass;
@@ -56,24 +73,6 @@ public class FreeBody extends Component implements Tick {
 		return gravity;
 	}
 
-	public Vector2 gravity(Collection<FreeBody> bodies) {
-		Vector2 gravity = new Vector2(0, 0);
-		for (FreeBody body : bodies) {
-			if (body != this) {
-				gravity.add(gravity(body));
-			}
-		}
-		return gravity;
-	}
-
-	public void applyForce(Vector2 force) {
-		velocity.add(force.DIV(mass));
-	}
-
-	@Override
-	public void writeOncePerClass(DataOutputStream out) {
-	}
-
 	@Override
 	public void read(DataInputStream in) {
 		velocity.read(in);
@@ -85,10 +84,6 @@ public class FreeBody extends Component implements Tick {
 	}
 
 	@Override
-	public void readOncePerClass(DataInputStream in) {
-	}
-
-	@Override
 	public void write(DataOutputStream out) {
 		velocity.write(out);
 		try {
@@ -96,5 +91,13 @@ public class FreeBody extends Component implements Tick {
 		} catch (IOException e) {
 			Err.error("Can't write FreeBody data!", e);
 		}
+	}
+
+	@Override
+	public void readOncePerClass(DataInputStream in) {
+	}
+
+	@Override
+	public void writeOncePerClass(DataOutputStream out) {
 	}
 }

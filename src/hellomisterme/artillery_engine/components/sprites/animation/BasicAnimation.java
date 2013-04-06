@@ -61,7 +61,7 @@ public class BasicAnimation implements Animation {
 					frames[i] = new int[src.getWidth() * src.getHeight()];
 					src.getRGB(0, 0, src.getWidth(), src.getHeight(), frames[i], 0, src.getWidth()); // copy colors from src to pixels
 				} catch (Exception e) {
-					Err.error("BasicImage can't read " + file.getAbsolutePath() + "! Make sure all the game files are correctly named!");
+					Err.error("ImageShell can't read " + file.getAbsolutePath() + "! Make sure all the game files are correctly named!");
 					e.printStackTrace();
 				}
 			}

@@ -2,7 +2,7 @@ package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
-import hellomisterme.artillery_engine.components.sprites.BasicImage;
+import hellomisterme.artillery_engine.components.sprites.ImageShell;
 import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Savable;
@@ -40,12 +40,12 @@ public class Entity implements Renderable, Savable, Tick {
 	}
 
 	/**
-	 * Returns the BasicImage. Can return null.
+	 * Returns the ImageShell. Can return null.
 	 * 
-	 * @return the BasicImage associated with this Entity
+	 * @return the ImageShell associated with this Entity
 	 */
-	public BasicImage getBasicImage() {
-		return (BasicImage) getComponent(BasicImage.class);
+	public ImageShell getImageShell() {
+		return (ImageShell) getComponent(ImageShell.class);
 	}
 
 	public FreeBody getFreeBody() {
