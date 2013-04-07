@@ -2,14 +2,14 @@ package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.Component;
+import hellomisterme.artillery_engine.components.imagery.ArtImage;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
 import hellomisterme.artillery_engine.components.scripts.Planet;
 import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
-import hellomisterme.artillery_engine.components.sprites.ArtImage;
-import hellomisterme.artillery_engine.graphics.Render;
-import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savable;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.util.Vector2;
 
 import java.awt.Dimension;
@@ -54,7 +54,7 @@ public class World implements Tick, Savable, Renderable {
 		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
 		playerImage.transform.scale = new Vector2(1, 1);
 		Camera camera = new Camera(true, true, true);
-		camera.transform.scale = new Vector2(0.5, 0.5);
+		// camera.transform.scale = new Vector2(0.5, 0.5);
 		camera.transform.rotation = Math.PI * 0.5;
 		activeCamera = camera;
 		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), playerImage, camera });

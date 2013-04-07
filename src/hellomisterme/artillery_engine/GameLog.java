@@ -2,10 +2,10 @@ package hellomisterme.artillery_engine;
 
 public class GameLog {
 
-	private String log = "Artillery Engine Game\n";
+	private String log = "Artillery Engine Game Log\n\n";
 
 	public void log(String message) {
-		log += '\n' + message + '\n';
+		log += message + "\n";
 	}
 
 	public String getLog() {

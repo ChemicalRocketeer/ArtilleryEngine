@@ -1,8 +1,8 @@
 package hellomisterme.artillery_engine.components.scripts;
 
 import hellomisterme.artillery_engine.components.physics.FreeBody;
-import hellomisterme.artillery_engine.graphics.Render;
-import hellomisterme.artillery_engine.graphics.Renderable;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 
 import java.awt.Color;
 
@@ -21,12 +21,13 @@ public class Planet extends Script implements Renderable {
 	}
 
 	@Override
-	public void render(Render r) {
-		Color savedColor = r.graphics.getColor();
-		r.graphics.setColor(color);
+	public void render(Render render) {
+		Color savedColor = render.graphics.getColor();
+		render.graphics.setColor(color);
 		double width = freeBody.mass * entity.transform.scale.x;
 		double height = freeBody.mass * entity.transform.scale.y;
-		r.graphics.fillOval((int) (entity.transform.position.x - width * 0.5), (int) (entity.transform.position.y - height * 0.5), (int) width, (int) height);
-		r.graphics.setColor(savedColor);
+		render.setCameraMode(Render.FOLLOW_CAMERA_MODE);
+		render.graphics.fillOval((int) (entity.transform.position.x - width * 0.5), (int) (entity.transform.position.y - height * 0.5), (int) width, (int) height);
+		render.graphics.setColor(savedColor);
 	}
 }

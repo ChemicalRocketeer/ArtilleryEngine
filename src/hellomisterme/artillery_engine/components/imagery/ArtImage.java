@@ -1,7 +1,7 @@
-package hellomisterme.artillery_engine.components.sprites;
+package hellomisterme.artillery_engine.components.imagery;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.util.Vector2;
 
 import java.awt.image.BufferedImage;
@@ -29,7 +29,7 @@ public class ArtImage extends ImageShell {
 			double rotation = globalRotation();
 			Vector2 center = entity.globalPosition();
 			// img, center, offset, rotation, scale
-			render.render(sprite, center, transform.position, rotation, scale);
+			render.render(sprite, center, transform.position, rotation, scale, Render.FOLLOW_CAMERA_MODE);
 		}
 	}
 

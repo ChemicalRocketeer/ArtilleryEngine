@@ -1,8 +1,8 @@
-package hellomisterme.artillery_engine.components.sprites;
+package hellomisterme.artillery_engine.components.imagery;
 
 import hellomisterme.artillery_engine.components.IngameComponent;
-import hellomisterme.artillery_engine.graphics.Render;
-import hellomisterme.artillery_engine.graphics.Renderable;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 
 /**
  * A class dealing with image data.
@@ -17,7 +17,7 @@ public abstract class ImageShell extends IngameComponent implements Renderable {
 	@Override
 	public void render(Render render) {
 		if (visible) {
-			render.render(this, globalPosition());
+			render.render(this, globalPosition(), Render.FOLLOW_CAMERA_MODE);
 		}
 	}
 

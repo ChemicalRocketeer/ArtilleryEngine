@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.graphics;
+package hellomisterme.artillery_engine.rendering;
 
 /**
  * Renderable objects can render themselves using a Render object.
@@ -8,5 +8,5 @@ package hellomisterme.artillery_engine.graphics;
  */
 public interface Renderable {
 
-	public void render(Render r);
+	public void render(Render render);
 }

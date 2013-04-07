@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.components.sprites;
+package hellomisterme.artillery_engine.components.imagery;
 
 import hellomisterme.artillery_engine.Err;
 

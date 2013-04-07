@@ -1,11 +1,11 @@
 package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.Component;
+import hellomisterme.artillery_engine.components.imagery.ImageShell;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
-import hellomisterme.artillery_engine.components.sprites.ImageShell;
-import hellomisterme.artillery_engine.graphics.Render;
-import hellomisterme.artillery_engine.graphics.Renderable;
 import hellomisterme.artillery_engine.io.Savable;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.util.Transform;
 import hellomisterme.util.Vector2;
 

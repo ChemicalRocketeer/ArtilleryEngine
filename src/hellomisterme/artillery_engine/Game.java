@@ -1,9 +1,9 @@
 package hellomisterme.artillery_engine;
 
-import hellomisterme.artillery_engine.graphics.Render;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savegame;
 import hellomisterme.artillery_engine.io.Screenshot;
+import hellomisterme.artillery_engine.rendering.Render;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -23,35 +23,26 @@ import javax.swing.JFrame;
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
 
-	/**
-	 * This game's title
-	 */
 	private final String title = "Space Game Alpha.0.1.2";
 
 	/**
-	 * A random number that can be used by objects in the game
+	 * A random number generator that can be used by objects in the game
 	 */
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 
 	private static double aspectRatio = 9.0 / 16.0;
 	private static int width = 1920;
-
-	/**
-	 * The game's tick frequency, determining how quickly ingame actions happen
-	 */
 	public static final int TICKS_PER_SECOND = 60;
-
 	private boolean running = false;
 	private boolean paused = false;
 
 	private JFrame frame;
-
 	private static Render render;
-
 	private static World world;
-
-	private DevInfo devInfo;
 	private static GameLog log;
+
+	private boolean devMode = false;
+	private DevInfo devInfo;
 
 	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devModeOrdered = false;
@@ -59,7 +50,7 @@ public class Game extends Canvas implements Runnable {
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
 	private boolean fullscreen = true;
-	private boolean fullscreenOrdered = false;
+	private boolean fullscreenOrdered = true;
 
 	public Game() {
 		frame = new JFrame();
@@ -143,18 +134,16 @@ public class Game extends Canvas implements Runnable {
 	 * Draws the current frame
 	 */
 	private void render() {
-		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
-		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-
 		render.clear();
-
 		world.render(render);
 
-		if (render.devMode) {
+		if (devMode) {
 			// world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
 			devInfo.render(render);
 		}
 
+		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
+		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		g.drawImage(render.image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
@@ -210,8 +199,8 @@ public class Game extends Canvas implements Runnable {
 
 		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
-				render.devMode = !render.devMode;
-				render.simpleRendering = render.devMode;
+				devMode = !devMode;
+				render.simpleRendering = devMode;
 				devModeOrdered = true;
 			}
 		} else {
@@ -219,7 +208,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		// TODO fix bug where key is still thought to be pressed on transition from fullscreen to windowed
-		if (Keyboard.Controls.FULLSCREEN.pressed()) {
+		if (!Keyboard.Controls.FULLSCREEN.pressed()) {
 			if (!fullscreenOrdered) {
 				fullscreen = !fullscreen; // toggle
 				fullscreenOrdered = true;
@@ -251,6 +240,7 @@ public class Game extends Canvas implements Runnable {
 
 		createBufferStrategy(3);
 
+		if (render != null) render.dispose();
 		render = new Render(getWidth(), getHeight());
 	}
 
@@ -273,12 +263,9 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	public void pause() {
-
+		paused = true;
 	}
 
-	/**
-	 * Stops running the game
-	 */
 	public synchronized void stop() {
 		running = false;
 	}

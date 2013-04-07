@@ -1,7 +1,8 @@
 package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.physics.FreeBody;
-import hellomisterme.artillery_engine.graphics.Render;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -13,7 +14,7 @@ import java.awt.Graphics;
  * @since 1-9-12
  * @author David Aaron Suddjian
  */
-public class DevInfo {
+public class DevInfo implements Renderable {
 
 	/**
 	 * The on-screen coordinates at which the info will be displayed
@@ -43,16 +44,18 @@ public class DevInfo {
 	/**
 	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
 	 */
-	public void render(Render r) {
-		Font savedFont = r.graphics.getFont();
-		Color savedColor = r.graphics.getColor();
-		r.graphics.setFont(font);
-		r.graphics.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
-		render(r.graphics, 0, 1);
-		r.graphics.setColor(new Color(0, 0xBB, 0)); // render the primary color
-		render(r.graphics, 0, 0);
-		r.graphics.setFont(savedFont);
-		r.graphics.setColor(savedColor);
+	@Override
+	public void render(Render render) {
+		render.setCameraMode(Render.GUI_OVERLAY_MODE);
+		Font savedFont = render.graphics.getFont();
+		Color savedColor = render.graphics.getColor();
+		render.graphics.setFont(font);
+		render.graphics.setColor(new Color(0, 0, 0, 0xB0)); // render the darker shadow part
+		render(render.graphics, 0, 1);
+		render.graphics.setColor(new Color(0, 0xBB, 0)); // render the primary color
+		render(render.graphics, 0, 0);
+		render.graphics.setFont(savedFont);
+		render.graphics.setColor(savedColor);
 	}
 
 	private void render(Graphics g, int xOff, int yOff) {

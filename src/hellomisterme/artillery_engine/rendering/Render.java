@@ -1,8 +1,8 @@
-package hellomisterme.artillery_engine.graphics;
+package hellomisterme.artillery_engine.rendering;
 
 import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.components.Camera;
-import hellomisterme.artillery_engine.components.sprites.ImageShell;
+import hellomisterme.artillery_engine.components.imagery.ImageShell;
 import hellomisterme.util.Vector2;
 
 import java.awt.Color;
@@ -27,12 +27,14 @@ public class Render {
 	/**
 	 * Flag to tell objects how they should render themselves
 	 */
-	public boolean simpleRendering = false, devMode = false;
+	public boolean simpleRendering = false;
 	public RenderingHints renderHints;
 
 	public int[] pixels;
 	public BufferedImage image;
 	public Graphics2D graphics;
+
+	public static final int GUI_OVERLAY_MODE = 0, FOLLOW_CAMERA_MODE = 1;
 
 	public Render(int width, int height) {
 		this.width = width;
@@ -65,13 +67,16 @@ public class Render {
 	 * @param rotation
 	 * @param scale
 	 */
-	public void render(BufferedImage img, Vector2 center, Vector2 offset, double rotation, Vector2 scale) {
-		graphics.setTransform(new AffineTransform(getActiveCamera().view));
+	public void render(BufferedImage img, Vector2 center, Vector2 offset, double rotation, Vector2 scale, int cameraMode) {
+		setCameraMode(cameraMode);
 		graphics.rotate(rotation, center.x, center.y);
 		graphics.scale(scale.x, scale.y);
 		graphics.translate(center.x / scale.x + offset.x, center.y / scale.y + offset.y);
 		graphics.drawImage(img, null, 0, 0);
-		graphics.setTransform(getActiveCamera().view);
+	}
+
+	public void render(ImageShell img, Vector2 pos, int cameraMode) {
+		render(img, (int) pos.x, (int) pos.y, cameraMode);
 	}
 
 	/**
@@ -81,7 +86,8 @@ public class Render {
 	 * @param xPos the xLocation coordinate of the top-left corner of the Sprite
 	 * @param yPos the yLocation coordinate of the top-left corner of the Sprite
 	 */
-	public void render(ImageShell img, int xPos, int yPos) {
+	public void render(ImageShell img, int xPos, int yPos, int cameraMode) {
+		setCameraMode(cameraMode);
 		// check if img is completely off-screen
 		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
 			return;
@@ -174,8 +180,12 @@ public class Render {
 		return (int) (((src >> 16 & 0xFF) - r) * alpha + r) << 16 | (int) (((src >> 8 & 0xFF) - g) * alpha + g) << 8 | (int) (((src & 0xFF) - b) * alpha + b);
 	}
 
-	public void render(ImageShell img, Vector2 pos) {
-		render(img, (int) pos.x, (int) pos.y);
+	public void setCameraMode(int cameraMode) {
+		if (cameraMode == FOLLOW_CAMERA_MODE) {
+			graphics.setTransform(new AffineTransform(getActiveCamera().view));
+		} else {
+			graphics.setTransform(new AffineTransform());
+		}
 	}
 
 	public Camera getActiveCamera() {
@@ -189,6 +199,10 @@ public class Render {
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 0;
 		}
+	}
+
+	public void dispose() {
+		graphics.dispose();
 	}
 
 	public int getHeight() {
