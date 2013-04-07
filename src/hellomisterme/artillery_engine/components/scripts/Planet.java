@@ -26,7 +26,7 @@ public class Planet extends Script implements Renderable {
 		render.graphics.setColor(color);
 		double width = freeBody.mass * entity.transform.scale.x;
 		double height = freeBody.mass * entity.transform.scale.y;
-		render.setCameraMode(Render.FOLLOW_CAMERA_MODE);
+		render.setCameraMode(Render.INGAME_CAMERA);
 		render.graphics.fillOval((int) (entity.transform.position.x - width * 0.5), (int) (entity.transform.position.y - height * 0.5), (int) width, (int) height);
 		render.graphics.setColor(savedColor);
 	}

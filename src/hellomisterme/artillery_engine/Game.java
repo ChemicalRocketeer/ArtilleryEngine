@@ -25,9 +25,7 @@ public class Game extends Canvas implements Runnable {
 
 	private final String title = "Space Game Alpha.0.1.2";
 
-	/**
-	 * A random number generator that can be used by objects in the game
-	 */
+	/** A random number generator that can be used by objects in the game */
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 
 	private static double aspectRatio = 9.0 / 16.0;
@@ -44,7 +42,6 @@ public class Game extends Canvas implements Runnable {
 	private boolean devMode = false;
 	private DevInfo devInfo;
 
-	// control booleans TODO put these in a different class or something, I don't think they really belong here...
 	private boolean devModeOrdered = false;
 	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
@@ -72,8 +69,6 @@ public class Game extends Canvas implements Runnable {
 	 * This is it. The game loop. If something happens in the game, it begins here.
 	 * 
 	 * TODO make all the extra frames actually do something useful (so, tweening)
-	 * 
-	 * Called by this Game's Thread thread.
 	 */
 	@Override
 	public void run() {
@@ -182,8 +177,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		// these if statements are organized to prevent save/load operations in the same tick
-		// if an io key is pressed
-		if (Keyboard.Controls.SAVE.pressed()) {
+		if (Keyboard.Controls.SAVE.pressed()) { // if an io key is pressed
 			if (!ioOrdered) { // if an io key was up before
 				new Savegame().saveData(world, "quicksave");
 				ioOrdered = true; // remember that io was ordered
@@ -207,7 +201,6 @@ public class Game extends Canvas implements Runnable {
 			devModeOrdered = false;
 		}
 
-		// TODO fix bug where key is still thought to be pressed on transition from fullscreen to windowed
 		if (!Keyboard.Controls.FULLSCREEN.pressed()) {
 			if (!fullscreenOrdered) {
 				fullscreen = !fullscreen; // toggle
@@ -240,8 +233,11 @@ public class Game extends Canvas implements Runnable {
 
 		createBufferStrategy(3);
 
-		if (render != null) render.dispose();
-		render = new Render(getWidth(), getHeight());
+		if (render == null) {
+			render = new Render(getWidth(), getHeight());
+		} else {
+			render.setSize(getWidth(), getHeight());
+		}
 	}
 
 	@Override

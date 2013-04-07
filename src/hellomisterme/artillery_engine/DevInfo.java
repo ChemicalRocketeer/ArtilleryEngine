@@ -16,24 +16,16 @@ import java.awt.Graphics;
  */
 public class DevInfo implements Renderable {
 
-	/**
-	 * The on-screen coordinates at which the info will be displayed
-	 */
+	/** The on-screen coordinates at which the info will be displayed */
 	public int xLocation = 10, yLocation = 20;
 
-	/**
-	 * Total memory available
-	 */
+	/** Total memory available */
 	public long maxMem = 0;
 
-	/**
-	 * Memory currently being used by the program
-	 */
+	/** Memory currently being used by the program */
 	public long usedMem = 0;
 
-	/**
-	 * Game status variable
-	 */
+	/** Game status variable */
 	public int fps = 0, avg = 0, tps = 0, sec = 0;
 
 	private static final int MB = 1048576; // bytes in a megabyte
@@ -42,11 +34,12 @@ public class DevInfo implements Renderable {
 	public static Font font = new Font("Courier New", Font.BOLD, fontSize);
 
 	/**
-	 * Renders the dev info onto the Graphics object by first rendering a darker shadow and then the default text color on top of that.
+	 * Renders the dev info onto the Graphics object.
+	 * This is done by first rendering a darker shadow and then the default text color on top of that.
 	 */
 	@Override
 	public void render(Render render) {
-		render.setCameraMode(Render.GUI_OVERLAY_MODE);
+		render.setCameraMode(Render.GUI_OVERLAY_CAMERA);
 		Font savedFont = render.graphics.getFont();
 		Color savedColor = render.graphics.getColor();
 		render.graphics.setFont(font);

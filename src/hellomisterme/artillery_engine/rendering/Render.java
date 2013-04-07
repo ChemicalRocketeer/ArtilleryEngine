@@ -7,6 +7,7 @@ import hellomisterme.util.Vector2;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -24,36 +25,41 @@ public class Render {
 	private int width;
 	private int height;
 
-	/**
-	 * Flag to tell objects how they should render themselves
-	 */
+	/** Flag to tell objects how they should render themselves */
 	public boolean simpleRendering = false;
 	public RenderingHints renderHints;
+	private RenderingHints speedHints;
+	private RenderingHints qualityHints;
+	/** Render mode setting to change image quality/speed tradeoffs */
+	public static final int RENDER_FOR_SPEED = 0, RENDER_FOR_QUALITY = 1;
 
 	public int[] pixels;
 	public BufferedImage image;
 	public Graphics2D graphics;
 
-	public static final int GUI_OVERLAY_MODE = 0, FOLLOW_CAMERA_MODE = 1;
+	/** Camera mode setting to change where images are rendered */
+	public static final int GUI_OVERLAY_CAMERA = 0, INGAME_CAMERA = 1;
 
 	public Render(int width, int height) {
-		this.width = width;
-		this.height = height;
+		speedHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+		speedHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+		speedHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		speedHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		speedHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+		speedHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+		speedHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
-		// TODO read rendering hints from settings file and make them customizable
-		renderHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		renderHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		renderHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		qualityHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		qualityHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		qualityHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		qualityHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 
-		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		graphics = image.createGraphics();
-		graphics.addRenderingHints(renderHints);
-		graphics.setColor(Color.BLACK);
-		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data to the pixels array
+		renderHints = qualityHints;
+
+		setSize(width, height);
 	}
 
 	/**
@@ -88,6 +94,11 @@ public class Render {
 	 */
 	public void render(ImageShell img, int xPos, int yPos, int cameraMode) {
 		setCameraMode(cameraMode);
+		Point trans = new Point(xPos, yPos);
+		getActiveCamera().view.transform(trans, trans);
+		xPos = trans.x;
+		yPos = trans.y;
+
 		// check if img is completely off-screen
 		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
 			return;
@@ -181,10 +192,18 @@ public class Render {
 	}
 
 	public void setCameraMode(int cameraMode) {
-		if (cameraMode == FOLLOW_CAMERA_MODE) {
+		if (cameraMode == INGAME_CAMERA) {
 			graphics.setTransform(new AffineTransform(getActiveCamera().view));
-		} else {
+		} else if (cameraMode == GUI_OVERLAY_CAMERA) {
 			graphics.setTransform(new AffineTransform());
+		}
+	}
+
+	public void setRenderMode(int renderMode) {
+		if (renderMode == RENDER_FOR_QUALITY) {
+			renderHints = qualityHints;
+		} else if (renderMode == RENDER_FOR_SPEED) {
+			renderHints = speedHints;
 		}
 	}
 
@@ -213,15 +232,13 @@ public class Render {
 		return width;
 	}
 
-	/**
-	 * If pixels[] was linked to something else, this will break the link. Be careful!
-	 * 
-	 * @param w
-	 * @param h
-	 */
-	protected void setSize(int w, int h) {
+	public void setSize(int w, int h) {
 		width = w;
 		height = h;
-		pixels = new int[width * height];
+		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		graphics = image.createGraphics();
+		graphics.addRenderingHints(renderHints);
+		graphics.setColor(Color.BLACK);
+		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data to the pixels array
 	}
 }

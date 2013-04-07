@@ -3,6 +3,7 @@ package hellomisterme.artillery_engine;
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.components.imagery.ArtImage;
+import hellomisterme.artillery_engine.components.imagery.Sprite;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
 import hellomisterme.artillery_engine.components.scripts.Planet;
 import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
@@ -53,7 +54,7 @@ public class World implements Tick, Savable, Renderable {
 		playerImage.transform.rotation = Math.PI * 0.5;
 		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
 		playerImage.transform.scale = new Vector2(1, 1);
-		Camera camera = new Camera(true, true, true);
+		Camera camera = new Camera(true, false, true);
 		// camera.transform.scale = new Vector2(0.5, 0.5);
 		camera.transform.rotation = Math.PI * 0.5;
 		activeCamera = camera;
@@ -66,6 +67,10 @@ public class World implements Tick, Savable, Renderable {
 		Entity planet = new Entity(new Component[] { new Planet(), planetBody });
 		planet.transform.position = new Vector2(getWidth() * 0.8, getHeight() * 0.8);
 		addEntity("planet", planet);
+
+		Entity spritely = new Entity(new Component[] { new Sprite("graphics/sprites/baddie/0.png") });
+		spritely.transform.position = new Vector2(100, 300);
+		addEntity("spritely", spritely);
 	}
 
 	@Override

@@ -17,7 +17,7 @@ public abstract class ImageShell extends IngameComponent implements Renderable {
 	@Override
 	public void render(Render render) {
 		if (visible) {
-			render.render(this, globalPosition(), Render.FOLLOW_CAMERA_MODE);
+			render.render(this, globalPosition(), Render.INGAME_CAMERA);
 		}
 	}
 

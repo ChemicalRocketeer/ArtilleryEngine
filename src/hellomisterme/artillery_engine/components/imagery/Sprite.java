@@ -21,15 +21,6 @@ public class Sprite extends ImageShell {
 	protected int[] pixels;
 
 	/**
-	 * Creates a default Sprite by calling useDefaultImage
-	 * 
-	 * @see #useDefaultImage()
-	 */
-	public Sprite() { // has to be here so the LightwightImage can be initialized and then manipulated without wasting system resources.
-		useDefaultImage();
-	}
-
-	/**
 	 * Creates a new Sprite from the specified path
 	 * 
 	 * @param path the path to load the image from

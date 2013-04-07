@@ -29,7 +29,7 @@ public class ArtImage extends ImageShell {
 			double rotation = globalRotation();
 			Vector2 center = entity.globalPosition();
 			// img, center, offset, rotation, scale
-			render.render(sprite, center, transform.position, rotation, scale, Render.FOLLOW_CAMERA_MODE);
+			render.render(sprite, center, transform.position, rotation, scale, Render.INGAME_CAMERA);
 		}
 	}
 
