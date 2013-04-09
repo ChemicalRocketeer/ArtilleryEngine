@@ -18,7 +18,6 @@ screenshot: F1
 toggle fullscreen: F11
     (I'm not sure how/if fullscreen works with screen sizes other than 1920x1080)
 toggle dev info: F3
-
 ---------------
 
 There really isn't any sort of game right now. All the work is going into engine design and not game design.
