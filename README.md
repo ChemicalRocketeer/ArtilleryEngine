@@ -1,9 +1,11 @@
 Artillery Engine
 ===============
 A 2D Java Game Engine
+
 ---------------
 
 Controls:
+---------------
 
 - rotate counter-clockwise: Q
 - rotate clockwise: E
