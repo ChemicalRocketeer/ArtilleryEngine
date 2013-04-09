@@ -21,6 +21,7 @@ Controls:
     (I'm not sure how/if fullscreen works with screen sizes other than 1920x1080)
 - toggle dev info: F3
 
+Playing the Game
 ---------------
 There really isn't any sort of game right now. All the work is going into engine design and not game design.
 Hopefully I'll be able to make a game soon, but there are so many more features to add first!!
