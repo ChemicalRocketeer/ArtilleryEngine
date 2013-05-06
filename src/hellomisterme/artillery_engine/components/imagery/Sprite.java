@@ -20,13 +20,10 @@ public class Sprite extends ImageShell {
 	protected int width;
 	protected int[] pixels;
 
-	/**
-	 * Creates a new Sprite from the specified path
-	 * 
-	 * @param path the path to load the image from
-	 */
-	public Sprite(String path) {
-		loadImage(path);
+	public static Sprite create(String path) {
+		Sprite sprite = new Sprite();
+		sprite.setImage(path);
+		return sprite;
 	}
 
 	/**
@@ -35,7 +32,8 @@ public class Sprite extends ImageShell {
 	 * @param path
 	 *            the path to the image file
 	 */
-	public void loadImage(String path) {
+	@Override
+	public void setImage(String path) {
 		BufferedImage src;
 		try {
 			src = ImageIO.read(new File(path)); // read image file from disk

@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  */
 public class Screenshot implements Runnable {
 
-	private static int number = 0;
+	private static int number = readScreenshotNumber();
 	public static final String PREFIX = "screen ";
 	private final BufferedImage image;
 
@@ -57,12 +57,16 @@ public class Screenshot implements Runnable {
 	/**
 	 * Reads the number of the latest screenshot from the screenshots folder, and sets it as the number to start at when writing future screenshots.
 	 */
-	public static void readScreenshotNumber() {
+	public static void resetScreenshotNumber() {
+		number = readScreenshotNumber();
+	}
+
+	private static int readScreenshotNumber() {
 		File[] shots = new File("screenshots").listFiles();
 		if (shots == null) {
-			number = 0;
-			return;
+			return 0;
 		}
+		int n = 0;
 		for (int i = 0; i < shots.length; i++) {
 			String name = shots[i].getName();
 			int index = name.indexOf(PREFIX); // find the PREFIX in file
@@ -74,11 +78,12 @@ public class Screenshot implements Runnable {
 					name = name.substring(0, index);
 					BigInteger num = new BigInteger(name);
 					if (num.intValue() > number) {
-						number = num.intValue();
+						n = num.intValue();
 					}
 				}
 			}
 		}
+		return n;
 	}
 
 	@Override

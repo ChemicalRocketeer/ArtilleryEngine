@@ -29,7 +29,7 @@ public class Game extends Canvas implements Runnable {
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 
 	private static double aspectRatio = 9.0 / 16.0;
-	private static int width = 1920;
+	private static int width = 800;
 	public static final int TICKS_PER_SECOND = 60;
 	private boolean running = false;
 	private boolean paused = false;
@@ -46,7 +46,7 @@ public class Game extends Canvas implements Runnable {
 	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
-	private boolean fullscreen = true;
+	private boolean fullscreen = false;
 	private boolean fullscreenOrdered = true;
 
 	public Game() {
@@ -60,7 +60,6 @@ public class Game extends Canvas implements Runnable {
 		addKeyListener(new Keyboard());
 		devInfo = new DevInfo();
 		DevInfo.setup(render.graphics);
-		Screenshot.readScreenshotNumber();
 
 		run();
 	}
@@ -72,7 +71,7 @@ public class Game extends Canvas implements Runnable {
 	 */
 	@Override
 	public void run() {
-		world = new World(getWidth(), getHeight());
+		world = new World(5000, 5000);
 		world.init();
 
 		running = true;

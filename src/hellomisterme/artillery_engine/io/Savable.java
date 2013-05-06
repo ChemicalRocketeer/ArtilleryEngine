@@ -18,5 +18,4 @@ public interface Savable {
 	public void read(DataInputStream in);
 
 	public void readOncePerClass(DataInputStream in);
-
 }

@@ -176,6 +176,7 @@ public class Entity implements Renderable, Savable, Tick {
 		try {
 			out.writeInt(components.size());
 			for (Component c : components) {
+				out.writeUTF(c.getClass().getCanonicalName());
 				c.write(out);
 			}
 		} catch (IOException e) {

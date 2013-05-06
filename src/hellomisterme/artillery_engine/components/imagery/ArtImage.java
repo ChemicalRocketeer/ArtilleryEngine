@@ -14,12 +14,11 @@ public class ArtImage extends ImageShell {
 
 	private BufferedImage sprite;
 
-	public ArtImage(String imageFile) {
-		try {
-			sprite = ImageIO.read(new File(imageFile));
-		} catch (IOException e) {
-			Err.error("Can't read heavy sprite!", e);
-		}
+	public static ArtImage create(String path) {
+		ArtImage img = new ArtImage();
+		img.setImage(path);
+		img.visible = true;
+		return img;
 	}
 
 	@Override
@@ -30,6 +29,15 @@ public class ArtImage extends ImageShell {
 			Vector2 center = entity.globalPosition();
 			// img, center, offset, rotation, scale
 			render.render(sprite, center, transform.position, rotation, scale, Render.INGAME_CAMERA);
+		}
+	}
+
+	@Override
+	public void setImage(String path) {
+		try {
+			sprite = ImageIO.read(new File(path));
+		} catch (IOException e) {
+			Err.error("Can't read ArtImage!", e);
 		}
 	}
 

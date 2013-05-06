@@ -1,6 +1,6 @@
 package hellomisterme.util;
 
-public class CartesianMath {
+public class MathUtils {
 
 	/**
 	 * Calculates the distance between 2 points.

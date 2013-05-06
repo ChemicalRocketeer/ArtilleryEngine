@@ -22,14 +22,12 @@ public class FreeBody extends Component implements Tick {
 	public double mass = 1.0;
 	public double spin = 0.0;
 
-	public FreeBody() {
-		this(new Vector2(0, 0), 1, 0);
-	}
-
-	public FreeBody(Vector2 velocity, double mass, double spin) {
-		this.velocity = velocity;
-		this.mass = mass;
-		this.spin = spin;
+	public static FreeBody create(Vector2 velocity, double mass, double spin) {
+		FreeBody body = new FreeBody();
+		body.velocity = velocity;
+		body.mass = mass;
+		body.spin = spin;
+		return body;
 	}
 
 	@Override
@@ -40,7 +38,7 @@ public class FreeBody extends Component implements Tick {
 	}
 
 	public void applyForce(Vector2 force) {
-		velocity.add(force.DIV(mass));
+		if (mass != 0.0) velocity.add(force.DIV(mass));
 	}
 
 	public Vector2 gravity(Collection<FreeBody> bodies) {

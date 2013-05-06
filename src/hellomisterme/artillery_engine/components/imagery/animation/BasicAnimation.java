@@ -18,24 +18,13 @@ import javax.imageio.ImageIO;
  */
 public class BasicAnimation implements Animation {
 
-	private int width, height;
-	protected int[][] frames;
+	private int width = 0, height = 0;
+	protected int[][] frames = new int[0][0];
 
-	/**
-	 * Uses the default encoded image.
-	 */
-	public BasicAnimation() {
-		useDefaultImage();
-	}
-
-	/**
-	 * This BasicAnimation will use the frames found at the specified path.
-	 * 
-	 * @param path The path of the directory where the images are located
-	 * @see #setImage(String)
-	 */
-	public BasicAnimation(String path) {
-		setImage(path);
+	public static BasicAnimation create(String path) {
+		BasicAnimation anim = new BasicAnimation();
+		anim.setImage(path);
+		return anim;
 	}
 
 	/**

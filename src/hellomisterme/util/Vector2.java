@@ -249,7 +249,45 @@ public class Vector2 implements Savable {
 		return new Vector2(newX, newY);
 	}
 
-	public void norm() {
+	/**
+	 * @param a the first vector to use to get the dot product
+	 * @param b the first vector to use to get the dot product
+	 * @return the dot product of two vectors
+	 */
+	public static double dot(Vector2 a, Vector2 b) {
+		return a.x * b.x + a.y * b.y;
+	}
+
+	/**
+	 * Projects this vector along the given other vector
+	 * 
+	 * @param other the vector to project along
+	 */
+	public void project(Vector2 other) {
+		double dot = dot(this, other) / dot(other, other);
+		x = dot * other.x;
+		y = dot * other.y;
+	}
+
+	/**
+	 * @param a the vector to project
+	 * @param b the vector to be projected onto
+	 * @return a projection of vector a onto vector b
+	 */
+	public static Vector2 projection(Vector2 a, Vector2 b) {
+		double dot = dot(a, b) / dot(b, b);
+		return new Vector2(dot * b.x, dot * b.y);
+	}
+
+	public Vector2 rightNorm() {
+		return new Vector2(-y, x);
+	}
+
+	public Vector2 leftNorm() {
+		return new Vector2(y, -x);
+	}
+
+	public void normalize() {
 		div(mag());
 	}
 
@@ -305,16 +343,13 @@ public class Vector2 implements Savable {
 	/**
 	 * Rotates this Vector2 around its origin by the given amount.
 	 * 
-	 * The angle should be given in radians.The method will still work if it isn't, but you won't get the intended result. It is important to note that if your coordinate system has y increasing from
-	 * top to bottom, then the effect will be a clockwise rotation. Trigonometrically, however, the rotation is counter-clockwise.
+	 * The angle should be given in radians. It is important to note that if the coordinate system has y increasing from
+	 * top to bottom as is typical in Java, then the effect will be a clockwise rotation. In standard maths, however, the rotation is counter-clockwise.
 	 * 
 	 * @param amount the amount to rotate
 	 */
 	public void rotate(double amount) {
-		double m = mag();
-		amount += angle();
-		x = m * Math.cos(amount);
-		y = m * Math.sin(amount);
+		setAngle(amount + angle());
 	}
 
 	/**

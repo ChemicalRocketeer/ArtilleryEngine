@@ -3,7 +3,6 @@ package hellomisterme.artillery_engine;
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.components.imagery.ArtImage;
-import hellomisterme.artillery_engine.components.imagery.Sprite;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
 import hellomisterme.artillery_engine.components.scripts.Planet;
 import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
@@ -50,7 +49,7 @@ public class World implements Tick, Savable, Renderable {
 	}
 
 	public void init() {
-		ArtImage playerImage = new ArtImage("graphics/sprites/player.png");
+		ArtImage playerImage = ArtImage.create("graphics/sprites/player.png");
 		playerImage.transform.rotation = Math.PI * 0.5;
 		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
 		playerImage.transform.scale = new Vector2(1, 1);
@@ -58,17 +57,17 @@ public class World implements Tick, Savable, Renderable {
 		// camera.transform.scale = new Vector2(0.5, 0.5);
 		camera.transform.rotation = Math.PI * 0.5;
 		activeCamera = camera;
-		Entity player = new Entity(new Component[] { new PlayerMovement(), new FreeBody(), playerImage, camera });
-		player.transform.position = new Vector2(getWidth() * 0.2, getHeight() * 0.2);
+		Entity player = new Entity(new Component[] { new PlayerMovement(), playerImage, camera });
+		player.transform.position = new Vector2(0, 0);
 		player.transform.rotation = -Math.PI * 0.5;
 		addEntity("player", player);
 
-		FreeBody planetBody = new FreeBody(new Vector2(0, 0), 1000, 0);
+		FreeBody planetBody = FreeBody.create(new Vector2(0, 0), 1000, 0);
 		Entity planet = new Entity(new Component[] { new Planet(), planetBody });
-		planet.transform.position = new Vector2(getWidth() * 0.8, getHeight() * 0.8);
+		planet.transform.position = new Vector2(1200, 700);
 		addEntity("planet", planet);
 
-		Entity spritely = new Entity(new Component[] { new Sprite("graphics/sprites/baddie/0.png") });
+		Entity spritely = new Entity(new Component[] { ArtImage.create("graphics/sprites/player.png") });
 		spritely.transform.position = new Vector2(100, 300);
 		addEntity("spritely", spritely);
 	}
