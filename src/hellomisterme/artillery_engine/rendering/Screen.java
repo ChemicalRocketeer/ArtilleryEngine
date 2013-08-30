@@ -1,32 +1,20 @@
 package hellomisterme.artillery_engine.rendering;
 
-import hellomisterme.artillery_engine.Game;
-import hellomisterme.artillery_engine.components.Camera;
-import hellomisterme.artillery_engine.components.images.BasicImage;
-import hellomisterme.util.Vector2;
+import hellomisterme.artillery_engine.components.images.PixelData;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 
-/**
- * Render handles computation and combination of the pixels that go onto the screen.
- * Also handles methods to do with the visual contents of the entire screen, like screenshots.
- * 
- * @since 10-14-12
- * @author David Aaron Suddjian
- */
-public class Render {
+public class Screen {
 
 	private int width;
 	private int height;
 
 	/** Flag to tell objects how they should render themselves */
 	public boolean simpleRendering = false;
+
 	public static final RenderingHints speedHints = getSpeedHints();
 
 	private static RenderingHints getSpeedHints() {
@@ -59,40 +47,14 @@ public class Render {
 	public BufferedImage image;
 	public Graphics2D graphics;
 
-	/** Camera mode setting to change where images are rendered */
-	public static final int GUI_OVERLAY_CAMERA = 0, INGAME_CAMERA = 1;
-
-	public Render(int width, int height) {
-		setSize(width, height);
-	}
-
-	/**
-	 * Renders the given BufferedImage.
-	 * 
-	 * This method does not change the current AffineTransform before drawing the image, but it sets it to the defaultTransform after it is done.
-	 * 
-	 * @param img
-	 * @param center
-	 * @param offset
-	 * @param rotation
-	 * @param scale
-	 */
-	public void render(BufferedImage img, Vector2 center, Vector2 offset, double rotation, Vector2 scale, int cameraMode) {
-		setCameraMode(cameraMode);
-		graphics.rotate(rotation, center.x, center.y);
-		graphics.scale(scale.x, scale.y);
-		graphics.translate(center.x / scale.x + offset.x, center.y / scale.y + offset.y);
-		graphics.drawImage(img, null, 0, 0);
-	}
-
 	/**
 	 * Draws image data at the indicated point on screen
 	 * 
 	 * @param img the ImageShell to be drawn
-	 * @param xPos the xLocation coordinate of the top-left corner of the PixelData
-	 * @param yPos the yLocation coordinate of the top-left corner of the PixelData
+	 * @param xPos the x coordinate of the top-left corner of the PixelData
+	 * @param yPos the y coordinate of the top-left corner of the PixelData
 	 */
-	public void render(BasicImage img, int xPos, int yPos, int cameraMode) {
+	public void render(PixelData img, int xPos, int yPos, int cameraMode) {
 		setCameraMode(cameraMode);
 		Point trans = new Point(xPos, yPos);
 		getActiveCamera().view.transform(trans, trans);
@@ -174,63 +136,20 @@ public class Render {
 
 		int a = src >> 24 & 0xFF; // alpha value of src
 
-			// no sameness edge case because that will basically never happen
-			if (a == 0xFF) { // src is 100% opaque
-				return src & 0xFFFFFF; // return rgb-only value of src
-			} else if (a == 0x00000000) { // src is transparent
-				return dest;
-			}
+		// no sameness edge case because that will basically never happen
+		if (a == 0xFF) { // src is 100% opaque
+			return src & 0xFFFFFF; // return rgb-only value of src
+		} else if (a == 0x00000000) { // src is transparent
+			return dest;
+		}
 
-			float alpha = (float) (a / 255.0); // alpha value of src between 0 and 1, has to be a float or it will only be 0 or 1!
-			// individual rgb sub-pixel values
-			int r = dest >> 16 & 0xFF;
+		float alpha = (float) (a / 255.0); // alpha value of src between 0 and 1, has to be a float or it will only be 0 or 1!
+		// individual rgb sub-pixel values
+		int r = dest >> 16 & 0xFF;
 		int g = dest >> 8 & 0xFF;
 		int b = dest & 0xFF;
 		// (src >> hex & 0xFF) is the sub-pixel value of src.
 		// return hex color made of the calculated RGB values: R << 16 OR G << 8 OR B
 		return (int) (((src >> 16 & 0xFF) - r) * alpha + r) << 16 | (int) (((src >> 8 & 0xFF) - g) * alpha + g) << 8 | (int) (((src & 0xFF) - b) * alpha + b);
-	}
-
-	public void setCameraMode(int cameraMode) {
-		if (cameraMode == INGAME_CAMERA) {
-			graphics.setTransform(new AffineTransform(getActiveCamera().view));
-		} else if (cameraMode == GUI_OVERLAY_CAMERA) {
-			graphics.setTransform(new AffineTransform());
-		}
-	}
-
-	public Camera getActiveCamera() {
-		return Game.getWorld().activeCamera;
-	}
-
-	/**
-	 * Clears pixels so they can be filled later
-	 */
-	public void clear() {
-		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0;
-		}
-	}
-
-	public void dispose() {
-		graphics.dispose();
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setSize(int w, int h) {
-		width = w;
-		height = h;
-		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		graphics = image.createGraphics();
-		graphics.addRenderingHints(renderHints);
-		graphics.setColor(Color.BLACK);
-		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the image's pixel data to the pixels array
 	}
 }

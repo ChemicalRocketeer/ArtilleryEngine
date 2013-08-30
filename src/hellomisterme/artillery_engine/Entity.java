@@ -1,16 +1,14 @@
 package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.Component;
-import hellomisterme.artillery_engine.components.imagery.ImageShell;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
+import hellomisterme.artillery_engine.io.ArteReader;
+import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.util.Transform;
-import hellomisterme.util.Vector2;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -25,7 +23,6 @@ public class Entity implements Renderable, Savable, Tick {
 
 	private Collection<Component> components = new LinkedList<Component>();
 	public Transform transform = new Transform();
-	public Entity parent;
 
 	public Entity(Component[] components) {
 		for (Component c : components) {
@@ -37,15 +34,6 @@ public class Entity implements Renderable, Savable, Tick {
 	}
 
 	public Entity() {
-	}
-
-	/**
-	 * Returns the ImageShell. Can return null.
-	 * 
-	 * @return the ImageShell associated with this Entity
-	 */
-	public ImageShell getImageShell() {
-		return (ImageShell) getComponent(ImageShell.class);
 	}
 
 	public FreeBody getFreeBody() {
@@ -129,96 +117,29 @@ public class Entity implements Renderable, Savable, Tick {
 		}
 	}
 
-	/**
-	 * @return a clone of all the position vectors affecting this Entity. Don't worry about modifying their values.
-	 */
-	public Vector2 globalPosition() {
-		if (parent == null) return transform.position.clone();
-
-		Vector2 pos = parent.globalPosition();
-		pos.add(transform.position);
-		return pos;
-	}
-
-	/**
-	 * @return a clone of all the scale vectors affecting this Entity. Don't worry about modifying their values.
-	 */
-	public Vector2 globalScale() {
-		if (parent == null) return transform.scale.clone();
-
-		Vector2 scale = parent.globalScale();
-		scale.mul(transform.scale);
-		return scale;
-	}
-
-	/**
-	 * @return the combined value of all rotation values affecting this Entity.
-	 */
-	public double globalRotation() {
-		if (parent == null) return transform.rotation;
-		return parent.globalRotation() + transform.rotation;
-	}
-
-	/**
-	 * @return a clone of all the Transforms affecting this Entity. Don't worry about modifying their values.
-	 */
-	public Transform globalTransform() {
-		if (parent == null) return transform.clone();
-
-		Transform trans = parent.globalTransform();
-		trans.add(transform);
-		return trans;
-	}
-
-	@Override
-	public void write(DataOutputStream out) {
-		transform.write(out);
-		try {
-			out.writeInt(components.size());
-			for (Component c : components) {
-				out.writeUTF(c.getClass().getCanonicalName());
-				c.write(out);
-			}
-		} catch (IOException e) {
-			Err.error("Can't save entity data!", e);
-		}
-	}
-
-	@Override
-	public void read(DataInputStream in) {
-		transform.read(in);
-		int compCount = 0;
-		components.clear();
-		try {
-			compCount = in.readInt();
-			for (int i = 0; i < compCount; i++) {
-				Component c = (Component) Class.forName(in.readUTF()).newInstance(); // create an object based on the class name read
-				components.add(c);
-				c.read(in);
-			}
-		} catch (IOException e) {
-			Err.error("Can't read entity data!", e);
-		} catch (ClassNotFoundException e) {
-			Err.error("Can't read entity data! Class not found!", e);
-		} catch (IllegalAccessException e) {
-			Err.error("Can't read entity data! Illegal Access!", e);
-		} catch (InstantiationException e) {
-			Err.error("Can't read entity data! Class cannot be instantiated!", e);
-		}
-		for (Component c : components) {
-			c.init();
-		}
-	}
-
-	@Override
-	public void writeOncePerClass(DataOutputStream out) {
-	}
-
-	@Override
-	public void readOncePerClass(DataInputStream in) {
-	}
-
 	public static World getWorld() {
 		return Game.getWorld();
+	}
+
+	@Override
+	public void write(ArteWriter out) {
+		try {
+			out.write(transform);
+			out.write((Savable[]) components.toArray());
+		} catch (IOException e) {
+			Err.error("Can't write entity data!", e);
+		}
+	}
+
+	@Override
+	public void writeOncePerClass(ArteWriter out) {
+	}
+
+	@Override
+	public void read(ArteReader in) {
+	}
+
+	@Override
+	public void readOncePerClass(ArteReader in) {
 	}
 }

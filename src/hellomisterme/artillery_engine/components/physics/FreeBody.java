@@ -1,13 +1,9 @@
 package hellomisterme.artillery_engine.components.physics;
 
-import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.util.Vector2;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -69,33 +65,5 @@ public class FreeBody extends Component implements Tick {
 			gravity.setMagnitude(mass * body.mass / (xDist * xDist + yDist * yDist));
 		}
 		return gravity;
-	}
-
-	@Override
-	public void read(DataInputStream in) {
-		velocity.read(in);
-		try {
-			mass = in.readDouble();
-		} catch (IOException e) {
-			Err.error("Can't write FreeBody data!", e);
-		}
-	}
-
-	@Override
-	public void write(DataOutputStream out) {
-		velocity.write(out);
-		try {
-			out.writeDouble(mass);
-		} catch (IOException e) {
-			Err.error("Can't write FreeBody data!", e);
-		}
-	}
-
-	@Override
-	public void readOncePerClass(DataInputStream in) {
-	}
-
-	@Override
-	public void writeOncePerClass(DataOutputStream out) {
 	}
 }

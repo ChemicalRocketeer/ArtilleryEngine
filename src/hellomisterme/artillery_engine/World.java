@@ -2,10 +2,12 @@ package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.Component;
-import hellomisterme.artillery_engine.components.imagery.ArtImage;
+import hellomisterme.artillery_engine.components.images.AdvancedImage;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
 import hellomisterme.artillery_engine.components.scripts.Planet;
 import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
+import hellomisterme.artillery_engine.io.ArteReader;
+import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.rendering.Render;
@@ -13,9 +15,6 @@ import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.util.Vector2;
 
 import java.awt.Dimension;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,12 +43,8 @@ public class World implements Tick, Savable, Renderable {
 		bounds = new Dimension(w, h);
 	}
 
-	public World(DataInputStream in) {
-		read(in);
-	}
-
 	public void init() {
-		ArtImage playerImage = ArtImage.create("graphics/sprites/player.png");
+		AdvancedImage playerImage = new AdvancedImage("graphics/sprites/player.png");
 		playerImage.transform.rotation = Math.PI * 0.5;
 		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
 		playerImage.transform.scale = new Vector2(1, 1);
@@ -62,14 +57,10 @@ public class World implements Tick, Savable, Renderable {
 		player.transform.rotation = -Math.PI * 0.5;
 		addEntity("player", player);
 
-		FreeBody planetBody = FreeBody.create(new Vector2(0, 0), 1000, 0);
-		Entity planet = new Entity(new Component[] { new Planet(), planetBody });
-		planet.transform.position = new Vector2(1200, 700);
+		Entity planet = new Entity(new Component[] { new Planet() });
 		addEntity("planet", planet);
-
-		Entity spritely = new Entity(new Component[] { ArtImage.create("graphics/sprites/player.png") });
-		spritely.transform.position = new Vector2(100, 300);
-		addEntity("spritely", spritely);
+		planet.transform.position = new Vector2(500, 500);
+		planet.getFreeBody().mass = 200;
 	}
 
 	@Override
@@ -154,55 +145,22 @@ public class World implements Tick, Savable, Renderable {
 	}
 
 	@Override
-	public void write(DataOutputStream out) {
-		try {
-			out.writeUTF(name);
-			// the first int saved is width, second is height
-			out.writeInt(bounds.width);
-			out.writeInt(bounds.height);
-			out.writeInt(entities.size()); // write how many savables there are
-		} catch (IOException e) {
-			Err.error("World can't write data!");
-		}
+	public void read(ArteReader in) {
 
-		// save all the entity data
-		for (Map.Entry<String, Entity> entry : entities.entrySet()) {
-			try {
-				out.writeUTF(entry.getKey()); // write the key, then write the entity data
-			} catch (IOException e) {
-				Err.error("Can't save entity name " + entry.getKey() + "!");
-				e.printStackTrace();
-			}
-			entry.getValue().write(out);
-		}
 	}
 
 	@Override
-	public void read(DataInputStream in) {
-		entities.clear();
-		freebodies.clear();
-		try {
-			name = in.readUTF();
-			bounds.width = in.readInt();
-			bounds.height = in.readInt();
+	public void write(ArteWriter out) {
 
-			for (int i = in.readInt(); i > 0; i--) {
-				String key = in.readUTF(); // read the key, then read the entity
-				Entity e = new Entity();
-				e.read(in);
-				addEntity(key, e);
-			}
-		} catch (Exception e) {
-			Err.error("World can't load saved data! Please send the world save in a bug report, or something. Make yourself useful.");
-			e.printStackTrace();
-		}
 	}
 
 	@Override
-	public void writeOncePerClass(DataOutputStream out) {
+	public void readOncePerClass(ArteReader in) {
+
 	}
 
 	@Override
-	public void readOncePerClass(DataInputStream in) {
+	public void writeOncePerClass(ArteWriter out) {
+
 	}
 }

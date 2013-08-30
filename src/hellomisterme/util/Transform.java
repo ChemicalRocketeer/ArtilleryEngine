@@ -1,13 +1,7 @@
 package hellomisterme.util;
 
-import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.io.Savable;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class Transform implements Savable {
+public class Transform {
 	public Vector2 position = new Vector2(0, 0);
 	public double rotation = 0.0;
 	public Vector2 scale = new Vector2(1, 1);
@@ -98,36 +92,5 @@ public class Transform implements Savable {
 	@Override
 	public Transform clone() {
 		return new Transform(position.clone(), rotation, scale.clone());
-	}
-
-	@Override
-	public void write(DataOutputStream out) {
-		position.write(out);
-		scale.write(out);
-		try {
-			out.writeDouble(rotation);
-		} catch (IOException e) {
-			Err.error("Can't save transform data!", e);
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void read(DataInputStream in) {
-		position.read(in);
-		scale.read(in);
-		try {
-			rotation = in.readDouble();
-		} catch (IOException e) {
-			Err.error("Can't read transform data!", e);
-		}
-	}
-
-	@Override
-	public void writeOncePerClass(DataOutputStream out) {
-	}
-
-	@Override
-	public void readOncePerClass(DataInputStream in) {
 	}
 }

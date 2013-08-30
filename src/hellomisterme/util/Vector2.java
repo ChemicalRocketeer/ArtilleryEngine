@@ -1,14 +1,9 @@
 package hellomisterme.util;
 
-import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.rendering.Render;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 /**
  * Describes a vector that can be used for velocity or freeBody or whatever else.
@@ -22,7 +17,7 @@ import java.io.IOException;
  * @since 1-27-13
  * @author David Aaron Suddjian
  */
-public class Vector2 implements Savable {
+public class Vector2 {
 
 	/**
 	 * Useful constant to set vector angles
@@ -36,8 +31,12 @@ public class Vector2 implements Savable {
 
 	public double x, y;
 
+	public Vector2() {
+		this(0, 0);
+	}
+
 	/**
-	 * Creates a Vector2 that has the given length along the X and Y cartesian coordinates.
+	 * Creates a Vector2 that has the given X and Y length.
 	 * 
 	 * @param x
 	 * @param y
@@ -153,7 +152,11 @@ public class Vector2 implements Savable {
 			} else {
 				x = Double.NEGATIVE_INFINITY;
 			}
-			y = Double.MAX_VALUE;
+			if (y >= 0) {
+				y = Double.POSITIVE_INFINITY;
+			} else {
+				y = Double.NEGATIVE_INFINITY;
+			}
 		} else {
 			x /= scalar;
 			y /= scalar;
@@ -279,11 +282,11 @@ public class Vector2 implements Savable {
 		return new Vector2(dot * b.x, dot * b.y);
 	}
 
-	public Vector2 rightNorm() {
+	public Vector2 rightNormal() {
 		return new Vector2(-y, x);
 	}
 
-	public Vector2 leftNorm() {
+	public Vector2 leftNormal() {
 		return new Vector2(y, -x);
 	}
 
@@ -299,7 +302,7 @@ public class Vector2 implements Savable {
 	public void setMagnitude(double m) {
 		double mag = mag();
 		if (mag == 0.0) {
-			x = m;
+			x = m; // there is no current angle, so just set x to the m length
 		} else {
 			mul(m / mag);
 		}
@@ -412,33 +415,4 @@ public class Vector2 implements Savable {
 		return "x: " + x + " y: " + y;
 	}
 
-	@Override
-	public void write(DataOutputStream out) {
-		try {
-			out.writeDouble(x);
-			out.writeDouble(y);
-		} catch (IOException e) {
-			Err.error("Can't write Vector2 data!");
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void read(DataInputStream in) {
-		try {
-			x = in.readDouble();
-			y = in.readDouble();
-		} catch (IOException e) {
-			Err.error("Can't read Vector2 data!");
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void writeOncePerClass(DataOutputStream out) {
-	}
-
-	@Override
-	public void readOncePerClass(DataInputStream in) {
-	}
 }

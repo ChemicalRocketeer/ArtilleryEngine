@@ -1,7 +1,5 @@
 package hellomisterme.artillery_engine.io;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 /**
  * An object implementing Savable will have save and load methods in order to save and load its data from a location.
@@ -11,11 +9,31 @@ import java.io.DataOutputStream;
  */
 public interface Savable {
 
-	public void write(DataOutputStream out);
+	/**
+	 * Reads this Savable's data from the given ArteReader.
+	 * 
+	 * @param in the ArteReader to read from
+	 */
+	public void read(ArteReader in);
 
-	public void writeOncePerClass(DataOutputStream out);
+	/**
+	 * Writes this Savable's data to the given ArteWriter.
+	 * 
+	 * @param out the ArteWriter that will write the data
+	 */
+	public void write(ArteWriter out);
 
-	public void read(DataInputStream in);
+	/**
+	 * Reads class variables that have only been written once. This method should only write static variables.
+	 * 
+	 * @param in the ArteReader to read from
+	 */
+	public void readOncePerClass(ArteReader in);
 
-	public void readOncePerClass(DataInputStream in);
+	/**
+	 * Writes static class variables that only need to be written once.
+	 * 
+	 * @param out the ArteWriter that will write the data
+	 */
+	public void writeOncePerClass(ArteWriter out);
 }

@@ -2,9 +2,8 @@ package hellomisterme.artillery_engine.components.scripts;
 
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.components.Component;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import hellomisterme.artillery_engine.io.ArteReader;
+import hellomisterme.artillery_engine.io.ArteWriter;
 
 /**
  * A script dictates Entity behavior
@@ -19,18 +18,18 @@ public abstract class Script extends Component implements Tick {
 	}
 
 	@Override
-	public void write(DataOutputStream out) {
+	public void write(ArteWriter out) {
 	}
 
 	@Override
-	public void writeOncePerClass(DataOutputStream out) {
+	public void writeOncePerClass(ArteWriter out) {
 	}
 
 	@Override
-	public void read(DataInputStream in) {
+	public void read(ArteReader in) {
 	}
 
 	@Override
-	public void readOncePerClass(DataInputStream in) {
+	public void readOncePerClass(ArteReader in) {
 	}
 }

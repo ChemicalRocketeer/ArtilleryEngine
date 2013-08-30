@@ -1,9 +1,10 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Keyboard;
-import hellomisterme.artillery_engine.io.Savegame;
 import hellomisterme.artillery_engine.io.Screenshot;
 import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.SpriteSheet;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -23,23 +24,25 @@ import javax.swing.JFrame;
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
 
-	private final String title = "Space Game Alpha.0.1.2";
+	public static final String version = "Alpha.0.1.2";
+	private String title = "Space Game " + version;
 
 	/** A random number generator that can be used by objects in the game */
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 
-	private static double aspectRatio = 9.0 / 16.0;
-	private static int width = 800;
+	private double aspectRatio = 9.0 / 16.0;
+	private int width = 800;
 	public static final int TICKS_PER_SECOND = 60;
 	private boolean running = false;
 	private boolean paused = false;
 
 	private JFrame frame;
 	private static Render render;
+	private static SpriteSheet spritesheet;
 	private static World world;
 	private static GameLog log;
 
-	private boolean devMode = false;
+	private boolean devModeEnabled = false;
 	private DevInfo devInfo;
 
 	private boolean devModeOrdered = false;
@@ -71,6 +74,7 @@ public class Game extends Canvas implements Runnable {
 	 */
 	@Override
 	public void run() {
+		spritesheet = new SpriteSheet();
 		world = new World(5000, 5000);
 		world.init();
 
@@ -131,7 +135,7 @@ public class Game extends Canvas implements Runnable {
 		render.clear();
 		world.render(render);
 
-		if (devMode) {
+		if (isDevModeEnabled()) {
 			// world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
 			devInfo.render(render);
 		}
@@ -178,12 +182,12 @@ public class Game extends Canvas implements Runnable {
 		// these if statements are organized to prevent save/load operations in the same tick
 		if (Keyboard.Controls.SAVE.pressed()) { // if an io key is pressed
 			if (!ioOrdered) { // if an io key was up before
-				new Savegame().saveData(world, "quicksave");
+				// new ArteWriter("saves/quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else if (Keyboard.Controls.LOAD.pressed()) {
 			if (!ioOrdered) { // if an io key was up before
-				new Savegame().loadData(world, "quicksave");
+				// new ArteWriter("quicksave.arte");
 				ioOrdered = true; // remember that io was ordered
 			}
 		} else { // io keys not pressed
@@ -192,8 +196,8 @@ public class Game extends Canvas implements Runnable {
 
 		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
-				devMode = !devMode;
-				render.simpleRendering = devMode;
+				setDevModeEnabled(!isDevModeEnabled());
+				render.simpleRendering = isDevModeEnabled();
 				devModeOrdered = true;
 			}
 		} else {
@@ -239,6 +243,10 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 
+	public void save(ArteWriter aw) {
+
+	}
+
 	@Override
 	public int getWidth() {
 		return width;
@@ -269,7 +277,19 @@ public class Game extends Canvas implements Runnable {
 		return world;
 	}
 
+	public static SpriteSheet getSpriteSheet() {
+		return spritesheet;
+	}
+
 	public static GameLog getLog() {
 		return log;
+	}
+
+	public boolean isDevModeEnabled() {
+		return devModeEnabled;
+	}
+
+	public void setDevModeEnabled(boolean devModeEnabled) {
+		this.devModeEnabled = devModeEnabled;
 	}
 }
