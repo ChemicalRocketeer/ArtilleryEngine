@@ -2,11 +2,13 @@ package hellomisterme.artillery_engine.components.images;
 
 import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.components.IngameComponent;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.util.Transform;
 
 import java.awt.image.BufferedImage;
 
-public class AdvancedImage extends IngameComponent {
+public class AdvancedImage extends IngameComponent implements Renderable {
 
 	private BufferedImage image;
 	public boolean visible = true;
@@ -48,6 +50,12 @@ public class AdvancedImage extends IngameComponent {
 
 	public int getHeight() {
 		return image.getHeight();
+	}
+
+	@Override
+	public void render(Render render) {
+		if (visible)
+			render.render(image, globalTransform());
 	}
 
 }

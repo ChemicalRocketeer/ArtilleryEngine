@@ -5,6 +5,7 @@ import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 
 public class Planet extends Script implements Renderable {
 
@@ -21,13 +22,16 @@ public class Planet extends Script implements Renderable {
 	}
 
 	@Override
+	public void tick() {
+		// entity.transform.position.add(new Vector2(0.1, 0.1));
+	}
+
+	@Override
 	public void render(Render render) {
-		Color savedColor = render.graphics.getColor();
-		render.graphics.setColor(color);
-		double width = freeBody.mass * entity.transform.scale.x;
-		double height = freeBody.mass * entity.transform.scale.y;
-		render.setCameraMode(Render.INGAME_CAMERA);
-		render.graphics.fillOval((int) (entity.transform.position.x - width * 0.5), (int) (entity.transform.position.y - height * 0.5), (int) width, (int) height);
-		render.graphics.setColor(savedColor);
+		double size = freeBody.mass;
+		Graphics2D graphics = render.getCameraGraphics();
+		graphics.setColor(color);
+		graphics.fillOval((int) (entity.transform.position.x - size * 0.5), (int) (entity.transform.position.y - size * 0.5), (int) size, (int) size);
+		graphics.dispose();
 	}
 }

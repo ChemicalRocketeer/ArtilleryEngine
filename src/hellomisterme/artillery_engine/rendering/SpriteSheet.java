@@ -1,38 +1,33 @@
 package hellomisterme.artillery_engine.rendering;
 
 import hellomisterme.artillery_engine.Err;
-import hellomisterme.artillery_engine.components.images.PixelData;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 public class SpriteSheet {
 
 	private class ImageWrapper {
-		public String path;
-		public BufferedImage bufferedImage;
-		public PixelData pixelData;
+		public final String PATH;
+		public final BufferedImage IMAGE;
+		public final PixelData PIXEL_DATA;
 
 		public ImageWrapper(String path, BufferedImage img, PixelData pixelData) {
-			this.path = path;
-			bufferedImage = img;
-			this.pixelData = pixelData;
+			this.PATH = path;
+			this.IMAGE = img;
+			this.PIXEL_DATA = pixelData;
 		}
 	}
 
 	private List<ImageWrapper> images;
-	private Map<String, ImageWrapper> pathMap;
 
 	public SpriteSheet() {
 		images = new ArrayList<ImageWrapper>();
-		pathMap = new HashMap<String, ImageWrapper>();
 	}
 
 	/**
@@ -47,7 +42,6 @@ public class SpriteSheet {
 			BufferedImage img = ImageIO.read(new File(path));
 			ImageWrapper wrapper = new ImageWrapper(path, img, new PixelData(img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth()), img.getWidth()));
 			images.add(wrapper);
-			pathMap.put(path, wrapper);
 		} catch (IOException e) {
 			Err.error("Can't read image from file " + path + "!", e);
 		}
@@ -55,7 +49,8 @@ public class SpriteSheet {
 
 	public void remove(String path) {
 		for (ImageWrapper i : images) {
-			if (i.path.equals(path)) images.remove(i);
+			if (i.PATH.equals(path))
+				images.remove(i);
 		}
 	}
 
@@ -64,16 +59,17 @@ public class SpriteSheet {
 	}
 
 	public BufferedImage getBufferedImage(int index) {
-		return images.get(index).bufferedImage;
+		return images.get(index).IMAGE;
 	}
 
 	public PixelData getPixelData(int index) {
-		return images.get(index).pixelData;
+		return images.get(index).PIXEL_DATA;
 	}
 
 	public int getIndex(String path, boolean addImageIfNotFound) {
 		for (int i = 0; i < images.size(); i++) {
-			if (images.get(i).path.equals(path)) return i;
+			if (images.get(i).PATH.equals(path))
+				return i;
 		}
 		// nothing found, so create add the image
 		if (addImageIfNotFound) {
@@ -93,16 +89,16 @@ public class SpriteSheet {
 	 * @return the BufferedImage located at the given path
 	 */
 	public BufferedImage getBufferedImage(String path, boolean addImageIfNotFound) {
-		ImageWrapper wrapper = pathMap.get(path);
-		if (wrapper == null) {
-			if (addImageIfNotFound) {
-				addImage(path);
-				return getBufferedImage(path, false);
-			} else {
-				return null;
-			}
+		for (ImageWrapper w : images) {
+			if (w.PATH.equals(path))
+				return w.IMAGE;
 		}
-		return wrapper.bufferedImage;
+		if (addImageIfNotFound) {
+			addImage(path);
+			return images.get(images.size() - 1).IMAGE;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -114,15 +110,15 @@ public class SpriteSheet {
 	 * @return the BufferedImage located at the given path
 	 */
 	public PixelData getPixelData(String path, boolean addImageIfNotFound) {
-		ImageWrapper wrapper = pathMap.get(path);
-		if (wrapper == null) {
-			if (addImageIfNotFound) {
-				addImage(path);
-				return getPixelData(path, false);
-			} else {
-				return null;
-			}
+		for (ImageWrapper w : images) {
+			if (w.PATH.equals(path))
+				return w.PIXEL_DATA;
 		}
-		return wrapper.pixelData;
+		if (addImageIfNotFound) {
+			addImage(path);
+			return images.get(images.size() - 1).PIXEL_DATA;
+		} else {
+			return null;
+		}
 	}
 }

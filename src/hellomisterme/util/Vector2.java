@@ -2,7 +2,6 @@ package hellomisterme.util;
 
 import hellomisterme.artillery_engine.rendering.Render;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 
 /**
@@ -394,20 +393,11 @@ public class Vector2 {
 	 * 
 	 * @param g the Graphics2D object to draw to
 	 * @param exaggeration the amount to exaggerate (the length will be multiplied by this amount)
-	 * @param xPos the x coordinate of the vector origin
-	 * @param yPos the y coordinate of the vector origin
+	 * @param Pos the in-world location of this vector
 	 */
-	public void draw(Render r, double exaggeration, int xPos, int yPos) {
-		int endX = (int) (x * exaggeration) + xPos;
-		int endY = (int) (y * exaggeration) + yPos;
-		int dotX = (int) (x * 0.9 * exaggeration) + xPos;
-		int dotY = (int) (y * 0.9 * exaggeration) + yPos;
-		r.graphics.setColor(Color.BLACK);
-		r.graphics.setStroke(new BasicStroke(1f));
-		r.graphics.drawLine(xPos, yPos, endX, endY);
-		r.graphics.setColor(Color.RED);
-		r.graphics.setStroke(new BasicStroke(1.5f));
-		r.graphics.drawLine(endX, endY, dotX, dotY);
+	public void draw(Render render, double exaggeration, Vector2 pos) {
+		Vector2 exag = this.MUL(exaggeration);
+		render.drawArrow(pos, pos.ADD(exag), Color.MAGENTA);
 	}
 
 	@Override

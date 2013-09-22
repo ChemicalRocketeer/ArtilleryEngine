@@ -1,6 +1,7 @@
 package hellomisterme.artillery_engine.components.images;
 
 import hellomisterme.artillery_engine.Game;
+import hellomisterme.artillery_engine.rendering.PixelData;
 import hellomisterme.util.Vector2;
 
 public class BasicImage {
