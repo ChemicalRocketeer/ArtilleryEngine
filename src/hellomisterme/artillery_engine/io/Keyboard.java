@@ -20,42 +20,44 @@ import java.util.Scanner;
  * @author David Aaron Suddjian
  */
 public class Keyboard implements KeyListener {
-
+	
 	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
-	private static boolean[] keys = new boolean[255];
-
+	private static boolean[] keys = new boolean[KeyEvent.KEY_LAST];
+	
 	public static final String SETTINGS_FILE = "settings.txt";
-
+	
 	public static enum Controls {
-		UP				(new byte[] {KeyEvent.VK_W}),
-		DOWN			(new byte[] {KeyEvent.VK_S}),
-		LEFT			(new byte[] {KeyEvent.VK_A}),
-		RIGHT			(new byte[] {KeyEvent.VK_D}),
-		ROTLEFT			(new byte[] {KeyEvent.VK_Q}),
-		ROTRIGHT		(new byte[] {KeyEvent.VK_E}),
-		THROTTLEUP		(new byte[] {KeyEvent.VK_SHIFT}),
-		THROTTLEDOWN	(new byte[] {KeyEvent.VK_CONTROL}),
-		THROTTLECUT		(new byte[] {KeyEvent.VK_X}),
-		ADDBADDIE		(new byte[] {KeyEvent.VK_G}),
-		SCREENSHOT		(new byte[] {KeyEvent.VK_F1}),
-		SAVE			(new byte[] {KeyEvent.VK_F5}),
-		LOAD			(new byte[] {KeyEvent.VK_F9}),
-		DEVMODE			(new byte[] {KeyEvent.VK_F3}),
-		FULLSCREEN		(new byte[] {KeyEvent.VK_F11}),
-		PAUSE			(new byte[] {KeyEvent.VK_ESCAPE});
-
-		private final byte[] defaultCodes;
-		private byte[] codes;
-
-		Controls(byte[] codes) {
+		UP				(new int[] {KeyEvent.VK_W}),
+		DOWN			(new int[] {KeyEvent.VK_S}),
+		LEFT			(new int[] {KeyEvent.VK_A}),
+		RIGHT			(new int[] {KeyEvent.VK_D}),
+		ROTLEFT			(new int[] {KeyEvent.VK_Q}),
+		ROTRIGHT		(new int[] {KeyEvent.VK_E}),
+		CAMROTLEFT		(new int[] {KeyEvent.VK_OPEN_BRACKET}),
+		CAMROTRIGHT		(new int[] {KeyEvent.VK_CLOSE_BRACKET}),
+		THROTTLEUP		(new int[] {KeyEvent.VK_SHIFT}),
+		THROTTLEDOWN	(new int[] {KeyEvent.VK_CONTROL}),
+		THROTTLECUT		(new int[] {KeyEvent.VK_X}),
+		ADDBADDIE		(new int[] {KeyEvent.VK_G}),
+		SCREENSHOT		(new int[] {KeyEvent.VK_F1}),
+		SAVE			(new int[] {KeyEvent.VK_F5}),
+		LOAD			(new int[] {KeyEvent.VK_F9}),
+		DEVMODE			(new int[] {KeyEvent.VK_F3}),
+		FULLSCREEN		(new int[] {KeyEvent.VK_F11}),
+		PAUSE			(new int[] {KeyEvent.VK_ESCAPE});
+		
+		private final int[] defaultCodes;
+		private int[] codes;
+		
+		Controls(int[] codes) {
 			this.defaultCodes = codes;
 			this.codes = defaultCodes;
 		}
-
+		
 		public boolean pressed() {
 			return Keyboard.pressed(codes);
 		}
-
+		
 		public void setKeyCodes(String settings) {
 			int index = settings.indexOf(name());
 			if (index != -1) { // if the name is found in the settings string
@@ -69,7 +71,7 @@ public class Keyboard implements KeyListener {
 						newCodes.add(new Byte(code));
 					}
 				}
-				codes = new byte[newCodes.size()];
+				codes = new int[newCodes.size()];
 				for (int i = 0; i < codes.length; i++) {
 					codes[i] = newCodes.get(i).byteValue();
 				}
@@ -77,11 +79,11 @@ public class Keyboard implements KeyListener {
 			}
 		}
 	}
-
+	
 	public Keyboard() {
 		readSettingsFile();
 	}
-
+	
 	/**
 	 * Looks for SETTINGS_FILE in the working directory and uses any keyCodes found instead of the defaults. If there are no keyCodes found, the default codes are used.
 	 * 
@@ -121,11 +123,11 @@ public class Keyboard implements KeyListener {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public static boolean pressed(Controls c) {
 		return c.pressed();
 	}
-
+	
 	/**
 	 * Returns whether any key in an array of keys is pressed or not.
 	 * 
@@ -134,13 +136,13 @@ public class Keyboard implements KeyListener {
 	 * @param keyCodes
 	 *        the array of codes to check
 	 */
-	public static boolean pressed(byte[] keyCodes) {
+	public static boolean pressed(int[] keyCodes) {
 		for (int keyCode : keyCodes) {
 			if (keys[keyCode]) return true;
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Returns whether a key is pressed or not.
 	 * 
@@ -151,7 +153,7 @@ public class Keyboard implements KeyListener {
 	public static boolean pressed(byte keyCode) {
 		return keys[keyCode];
 	}
-
+	
 	/**
 	 * Called by JVM when a key is pressed. Do not call this method unless you are making a robot.
 	 */
@@ -163,7 +165,7 @@ public class Keyboard implements KeyListener {
 		}
 		keys[e.getKeyCode()] = true;
 	}
-
+	
 	/**
 	 * Called by JVM when a key is released. Do not call this method unless you are making a robot.
 	 */
@@ -175,9 +177,9 @@ public class Keyboard implements KeyListener {
 		}
 		keys[e.getKeyCode()] = false;
 	}
-
+	
 	@Override
 	public void keyTyped(KeyEvent e) {
-
+		
 	}
 }

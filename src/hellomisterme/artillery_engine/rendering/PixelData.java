@@ -11,16 +11,14 @@ import javax.imageio.ImageIO;
 /**
  * A PixelData efficiently stores data for pixels of an image.
  * 
- * There is no height variable. Height is calculated using the width variable and the length of the pixel array.
- * 
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class PixelData {
-
+	
 	private final int width;
 	private final int[] pixels;
-
+	
 	public PixelData(String path) {
 		BufferedImage src;
 		int w = 0; // using temporary variables to make sure width and pixels get initialized whether the try block works or not
@@ -37,7 +35,7 @@ public class PixelData {
 		width = w;
 		pixels = p;
 	}
-
+	
 	/**
 	 * Creates a PixelData object using the given pixels and width.
 	 * Does not copy the pixels to a new array, do that before using this constructor.
@@ -49,7 +47,7 @@ public class PixelData {
 		this.pixels = pixels;
 		this.width = width;
 	}
-
+	
 	/**
 	 * Caution: this method allows the original pixels to be edited!
 	 * 
@@ -60,11 +58,11 @@ public class PixelData {
 	public int[] getPixels() {
 		return pixels;
 	}
-
+	
 	public int getWidth() {
 		return width;
 	}
-
+	
 	public int getHeight() {
 		return pixels.length / width;
 	}

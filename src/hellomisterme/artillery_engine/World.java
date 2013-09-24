@@ -40,14 +40,6 @@ public class World implements Tick, Savable, Renderable {
 	
 	private Camera camera = new Camera();
 	
-	public Camera getCamera() {
-		return camera;
-	}
-	
-	public void setCamera(Camera camera) {
-		this.camera = camera;
-	}
-	
 	public World(int w, int h) {
 		bounds = new Dimension(w, h);
 	}
@@ -57,19 +49,18 @@ public class World implements Tick, Savable, Renderable {
 		playerImage.transform.rotation = Math.PI * 0.5;
 		playerImage.transform.position = new Vector2(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
 		playerImage.transform.scale = new Vector2(1, 1);
-		Camera cam = new Camera(true, false, true);
+		Camera cam = new Camera();
 		// camera.transform.scale = new Vector2(0.5, 0.5);
-		cam.transform.rotation = 0;
 		camera = cam;
 		Entity player = new Entity(new Component[] { new PlayerMovement(), playerImage, cam });
-		player.transform.position = new Vector2(0, 100);
-		player.transform.rotation = -Math.PI * 0.5;
+		player.transform.position = new Vector2(0, 0);
+		// player.transform.rotation = -Math.PI * 0.5;
 		addEntity("player", player);
 		
 		Entity planet = new Entity(new Component[] { new Planet() });
 		addEntity("planet", planet);
 		planet.transform.position = new Vector2(500, 0);
-		planet.getFreeBody().mass = 200;
+		planet.getFreeBody().mass = 20;
 		/*
 		Entity planet2 = new Entity(new Component[] { new Planet() });
 		addEntity("planet2", planet2);
@@ -109,7 +100,7 @@ public class World implements Tick, Savable, Renderable {
 		for (Map.Entry<String, Entity> e : entities.entrySet()) {
 			e.getValue().render(render);
 		}
-		Vector2 camPos = camera.globalPosition();
+		Vector2 camPos = camera.globalTransform().position;
 		render.drawArrow(camPos, camPos.ADD(new Vector2(0, 50)), Color.RED);
 		render.drawArrow(camPos, camPos.ADD(new Vector2(50, 0)), Color.BLUE);
 	}
@@ -136,6 +127,14 @@ public class World implements Tick, Savable, Renderable {
 	
 	public int entityCount() {
 		return entities.size();
+	}
+	
+	public Camera getCamera() {
+		return camera;
+	}
+	
+	public void setCamera(Camera camera) {
+		this.camera = camera;
 	}
 	
 	public int getWidth() {

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 /**
  * Render provides methods to render objects onto the screen using world-space coordinates instead of screen-space.
  * All transformation and position arguments are expected to be given in world-space.
+ * No methods in the Render class change values of arguments passed to them unless explicitly stated otherwise.
  * 
  * @since 10-14-12
  * @author David Aaron Suddjian
@@ -19,6 +20,7 @@ public class Render {
 	
 	/** Flag to tell objects how they should render themselves */
 	public boolean simpleRendering = false;
+	
 	public Screen screen;
 	
 	// Used to avoid calculating the camera's global position every time anything is rendered.
@@ -38,10 +40,10 @@ public class Render {
 	 * @param rotation
 	 * @param scale
 	 */
-	public void render(BufferedImage img, Transform transform) {
+	public void render(BufferedImage img, Transform transform, Vector2 center) {
 		// rotation += camera.transform.rotation;
 		// scale.mul(camera.transform.scale);
-		screen.render(img, toScreenSpace(transform));
+		screen.render(img, toScreenSpace(transform), center);
 	}
 	
 	/**
@@ -62,25 +64,28 @@ public class Render {
 	
 	/**
 	 * Creates a Graphics2D object aligned with the ingame camera.
-	 * Objects with custom render methods can simply draw on this graphics object using their ingame coordinates.
+	 * Objects with custom render methods can simply draw on this graphics object using world-space coordinates.
 	 */
 	public Graphics2D getCameraGraphics() {
 		Graphics2D g = screen.image.createGraphics();
-		// TODO rotation/scaling support
-		g.translate(-camera.position.x + screen.getWidth() * 0.5, -camera.position.y + screen.getHeight() * 0.5);
+		// these have to be done in reverse order from toScreenSpace
+		g.translate(screen.centerX, screen.centerY);
+		g.rotate(-camera.rotation);
+		g.translate(-camera.position.x, -camera.position.y);
 		return g;
 	}
 	
 	public Vector2 toScreenSpace(Vector2 point) {
-		// TODO add rotation/scale support to this and transform version
 		Vector2 result = point.SUB(camera.position);
-		result.add(new Vector2(screen.getWidth() / 2, screen.getHeight() / 2));
+		result.rotate(-camera.rotation);
+		result.add(new Vector2(screen.centerX, screen.centerY));
 		return result;
 	}
 	
 	public Vector2 toWorldSpace(Vector2 point) {
 		Vector2 result = point.ADD(camera.position);
-		result.sub(new Vector2(screen.getWidth() / 2, screen.getHeight() / 2));
+		result.rotate(camera.rotation);
+		result.sub(new Vector2(screen.centerX, screen.centerY));
 		return result;
 	}
 	
@@ -91,7 +96,7 @@ public class Render {
 	 */
 	public Transform toScreenSpace(Transform transform) {
 		Transform result = transform.SUB(camera);
-		result.position.add(new Vector2(screen.getWidth() / 2, screen.getHeight() / 2));
+		result.position.add(new Vector2(screen.centerX, screen.centerY));
 		return result;
 	}
 	
@@ -102,12 +107,12 @@ public class Render {
 	 */
 	public Transform toWorldSpace(Transform transform) {
 		Transform result = transform.ADD(camera);
-		result.position.sub(new Vector2(screen.getWidth() / 2, screen.getHeight() / 2));
+		result.position.sub(new Vector2(screen.centerX, screen.centerY));
 		return result;
 	}
 	
 	/**
-	 * Gets the global transform of the given camera and uses that to transform anything rendered in the future.
+	 * Gets the transform state of the given camera and uses that to transform anything rendered in the future.
 	 * Call this method before every frame.
 	 */
 	public void setCamera(Camera activeCamera) {

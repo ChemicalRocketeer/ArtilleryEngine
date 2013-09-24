@@ -5,43 +5,50 @@ public class Transform {
 	public Vector2 position = new Vector2(0, 0);
 	public double rotation = 0.0;
 	public Vector2 scale = new Vector2(1, 1);
-
+	
 	public Transform() {
 		// everything is already set to the default!
 	}
-
+	
 	public Transform(Vector2 position, double rotation, Vector2 scale) {
 		this.position = position;
 		this.rotation = rotation;
 		this.scale = scale;
 	}
-
+	
 	public Transform(double posX, double posY, double rotation, double scaleX, double scaleY) {
 		position = new Vector2(posX, posY);
 		this.rotation = rotation;
 		scale = new Vector2(scaleX, scaleY);
 	}
-
+	
 	public void add(Transform other) {
 		position.add(other.position);
+		position.rotate(other.rotation);
 		rotation += other.rotation;
 		scale.mul(other.scale);
 	}
-
+	
 	public Transform ADD(Transform other) {
-		return new Transform(position.ADD(other.position), rotation + other.rotation, scale.MUL(other.scale));
+		Vector2 pos = position.ADD(other.position);
+		pos.rotate(other.rotation);
+		return new Transform(pos, rotation + other.rotation, scale.MUL(other.scale));
 	}
-
+	
 	public void sub(Transform other) {
 		position.sub(other.position);
+		position.rotate(-other.rotation);
 		rotation -= other.rotation;
 		scale.div(other.scale);
 	}
-
+	
 	public Transform SUB(Transform other) {
-		return new Transform(position.SUB(other.position), rotation - other.rotation, scale.DIV(other.scale));
+		Vector2 pos = position.SUB(other.position);
+		pos.rotate(-other.rotation);
+		double rot = rotation - other.rotation;
+		return new Transform(pos, rot, scale.DIV(other.scale));
 	}
-
+	
 	/**
 	 * Adds a vector of angle <code>rotation</code> and magnitude <code>amount</code> to the position vector.
 	 * 
@@ -52,7 +59,7 @@ public class Transform {
 	public void forward(double amount) {
 		position.add(Vector2.fromAngle(rotation, amount));
 	}
-
+	
 	/**
 	 * Creates a vector of angle <code>rotation</code> and magnitude <code>amount</code>, effectively making a vector pointed "forward" relative to this transformation.
 	 * 
@@ -64,7 +71,7 @@ public class Transform {
 	public Vector2 FORWARD(double amount) {
 		return Vector2.fromAngle(rotation, amount);
 	}
-
+	
 	/**
 	 * Applies this transformation to the given vector in scale, rotation, position order
 	 * 
@@ -75,7 +82,7 @@ public class Transform {
 		vector.rotate(rotation);
 		vector.add(position);
 	}
-
+	
 	/**
 	 * Calculates the result of the given vector with this transformation applied in scale, rotation, position order. Does not change the given vector.
 	 * 
@@ -88,7 +95,7 @@ public class Transform {
 		vect.add(position);
 		return vect;
 	}
-
+	
 	@Override
 	public Transform clone() {
 		return new Transform(position.clone(), rotation, scale.clone());

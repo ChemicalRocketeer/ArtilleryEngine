@@ -17,7 +17,7 @@ import java.awt.image.DataBufferInt;
 
 public class Screen {
 	
-	private int width, height;
+	public final int width, height, centerX, centerY;
 	
 	public static final RenderingHints speedHints = getSpeedHints();
 	
@@ -53,15 +53,17 @@ public class Screen {
 	public Screen(int width, int height) {
 		this.width = width;
 		this.height = height;
+		centerX = width / 2;
+		centerY = height / 2;
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the 'pixels' array to image's pixel data
 	}
 	
-	public void render(BufferedImage img, Transform t) {
+	public void render(BufferedImage img, Transform t, Vector2 center) {
 		Graphics2D graphics = image.createGraphics();
-		// graphics.rotate(rotation, center.x, center.y);
 		// graphics.scale(scale.x, scale.y);
 		graphics.translate(t.position.x, t.position.y);
+		graphics.rotate(t.rotation, -center.x, -center.y);
 		graphics.drawImage(img, null, 0, 0);
 		graphics.dispose();
 	}
@@ -86,13 +88,13 @@ public class Screen {
 	/**
 	 * Draws image data at the indicated point on screen
 	 * 
-	 * @param img the ImageShell to be drawn
+	 * @param img the PixelData to be drawn
 	 * @param xPos the x coordinate of the top-left corner of the PixelData
 	 * @param yPos the y coordinate of the top-left corner of the PixelData
 	 */
 	public void render(PixelData img, int xPos, int yPos) {
 		// check if img is completely off-screen
-		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= getWidth() || yPos >= getHeight()) {
+		if (xPos + img.getWidth() < 0 || yPos + img.getHeight() < 0 || xPos >= width || yPos >= height) {
 			return;
 		}
 		
@@ -155,40 +157,30 @@ public class Screen {
 	}
 	
 	/**
-	 * Blends two rgb colors (provided src has an alpha channel) using the src alpha value. Alpha values closer to 255 will make the returned color closer to src, while alpha values closer to 0 will
-	 * make it closer to dest.
+	 * Blends two rgb colors using the src alpha value. Alpha values closer to 255 will make the returned color closer to src,
+	 * while alpha values closer to 0 will make it closer to dest.
 	 * 
 	 * @param dest the rgb color to be blended (the "bottom" color)
 	 * @param src the argb color to be blended (the "top" color)
 	 * @return the two colors blended together
 	 */
 	public static int blendRGB(int src, int dest) {
-		
 		int a = src >> 24 & 0xFF; // alpha value of src
 			
-			// no sameness edge case because that will basically never happen
 			if (a == 0xFF) { // src is 100% opaque
 				return src & 0xFFFFFF; // return rgb-only value of src
 			} else if (a == 0x00000000) { // src is transparent
 				return dest;
 			}
-			
 			float alpha = (float) (a / 255.0); // alpha value of src between 0 and 1, has to be a float or it will only be 0 or 1!
 			// individual rgb sub-pixel values
+			
 			int r = dest >> 16 & 0xFF;
 		int g = dest >> 8 & 0xFF;
 		int b = dest & 0xFF;
 		// (src >> hex & 0xFF) is the sub-pixel value of src.
 		// return hex color made of the calculated RGB values: R << 16 OR G << 8 OR B
 		return (int) (((src >> 16 & 0xFF) - r) * alpha + r) << 16 | (int) (((src >> 8 & 0xFF) - g) * alpha + g) << 8 | (int) (((src & 0xFF) - b) * alpha + b);
-	}
-	
-	public int getHeight() {
-		return height;
-	}
-	
-	public int getWidth() {
-		return width;
 	}
 	
 	/**

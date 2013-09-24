@@ -257,14 +257,6 @@ public class Game extends Canvas implements Runnable {
 		return (int) (width * aspectRatio);
 	}
 	
-	public static int getScreenWidth() {
-		return screen.getWidth();
-	}
-	
-	public static int getScreenHeight() {
-		return screen.getHeight();
-	}
-	
 	public void pause() {
 		paused = true;
 	}
