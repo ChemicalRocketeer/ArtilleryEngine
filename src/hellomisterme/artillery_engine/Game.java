@@ -2,7 +2,6 @@ package hellomisterme.artillery_engine;
 
 import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Keyboard;
-import hellomisterme.artillery_engine.io.Screenshot;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Screen;
 import hellomisterme.artillery_engine.rendering.SpriteSheet;
@@ -64,7 +63,7 @@ public class Game extends Canvas implements Runnable {
 		
 		addKeyListener(new Keyboard());
 		devInfo = new DevInfo();
-		DevInfo.setup(screen.image.createGraphics());
+		DevInfo.setup(screen.getGraphics());
 		
 		run();
 	}
@@ -114,13 +113,11 @@ public class Game extends Canvas implements Runnable {
 				totalSeconds++;
 				
 				// keep dev info updated
-				devInfo.maxMem = Runtime.getRuntime().maxMemory();
-				devInfo.usedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 				devInfo.fps = frameCount;
-				System.out.println(devInfo.fps);
 				devInfo.avg = (int) (totalFrames / totalSeconds);
 				devInfo.tps = tickCount;
 				devInfo.sec = totalSeconds;
+				// System.out.println(devInfo.fps);
 				
 				// reset variables
 				frameCount = 0;
@@ -145,7 +142,7 @@ public class Game extends Canvas implements Runnable {
 		
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-		g.drawImage(screen.image, 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		g.drawImage(screen.getImage(), 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
@@ -166,7 +163,7 @@ public class Game extends Canvas implements Runnable {
 	private void checkStatus() {
 		if (Keyboard.Controls.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
-				new Screenshot(screen.image);
+				screen.screenshot();
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
 		} else { // screenshot key not pressed

@@ -3,12 +3,8 @@ package hellomisterme.artillery_engine.components;
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Keyboard.Controls;
-import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.util.Transform;
-import hellomisterme.util.Vector2;
-
-import java.awt.Color;
-import java.awt.Graphics2D;
+import hellomisterme.util.Vector;
 
 /**
  * @since 2013-3-3
@@ -32,7 +28,7 @@ public class Camera extends IngameComponent implements Tick {
 	
 	@Override
 	public Transform globalTransform() {
-		Vector2 pos;
+		Vector pos;
 		if (followWithPosition)
 			pos = super.globalPosition();
 		else
@@ -42,7 +38,7 @@ public class Camera extends IngameComponent implements Tick {
 			rot = super.globalRotation();
 		else
 			rot = transform.rotation;
-		Vector2 scale;
+		Vector scale;
 		if (followWithScale)
 			scale = super.globalScale();
 		else
@@ -65,11 +61,5 @@ public class Camera extends IngameComponent implements Tick {
 		if (Keyboard.pressed(Controls.CAMROTRIGHT))
 			transform.rotation += 0.005;
 		// transform.rotation += 0.05;
-	}
-	
-	public void render(Render render) {
-		Graphics2D g = render.screen.image.createGraphics();
-		g.setColor(Color.cyan);
-		g.fillOval(50, 50, 5, 5);
 	}
 }

@@ -1,7 +1,8 @@
 package hellomisterme.artillery_engine.rendering;
 
+import hellomisterme.artillery_engine.io.Screenshot;
 import hellomisterme.util.Transform;
-import hellomisterme.util.Vector2;
+import hellomisterme.util.Vector;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -48,7 +49,7 @@ public class Screen {
 	public RenderingHints renderHints = qualityHints;
 	
 	public int[] pixels;
-	public BufferedImage image;
+	private BufferedImage image;
 	
 	public Screen(int width, int height) {
 		this.width = width;
@@ -59,7 +60,7 @@ public class Screen {
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the 'pixels' array to image's pixel data
 	}
 	
-	public void render(BufferedImage img, Transform t, Vector2 center) {
+	public void render(BufferedImage img, Transform t, Vector center) {
 		Graphics2D graphics = image.createGraphics();
 		// graphics.scale(scale.x, scale.y);
 		graphics.translate(t.position.x, t.position.y);
@@ -68,7 +69,7 @@ public class Screen {
 		graphics.dispose();
 	}
 	
-	public void drawArrow(Vector2 start, Vector2 end, Color c) {
+	public void drawArrow(Vector start, Vector end, Color c) {
 		int endx = (int) end.x;
 		int endy = (int) end.y;
 		Graphics2D g = image.createGraphics();
@@ -76,8 +77,8 @@ public class Screen {
 		g.drawLine((int) start.x, (int) start.y, endx, endy);
 		// to draw the arrow tip we can just rotate and scale this
 		// It's reversed from the direction the arrow will actually point to make that easier
-		Vector2 arrow = start.SUB(end);
-		arrow.mul(0.2);
+		Vector arrow = start.SUB(end);
+		arrow.setMagnitude(5);
 		arrow.rotate(0.5); // ~30 degrees
 		g.drawLine(endx, endy, (int) (end.x + arrow.x), (int) (end.y + arrow.y));
 		arrow.rotate(-1.0); // ~-60 degrees
@@ -188,7 +189,21 @@ public class Screen {
 	 */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0;
+			pixels[i] = 1;
 		}
+	}
+	
+	public Graphics2D getGraphics() {
+		Graphics2D g = image.createGraphics();
+		g.setRenderingHints(renderHints);
+		return g;
+	}
+	
+	public BufferedImage getImage() {
+		return image;
+	}
+	
+	public void screenshot() {
+		new Screenshot(image).go();
 	}
 }

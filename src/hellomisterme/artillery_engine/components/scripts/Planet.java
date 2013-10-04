@@ -23,7 +23,7 @@ public class Planet extends Script implements Renderable {
 
 	@Override
 	public void tick() {
-		// entity.transform.position.add(new Vector2(0.1, 0.1));
+		// entity.transform.position.add(new Vector(0.1, 0.1));
 	}
 
 	@Override

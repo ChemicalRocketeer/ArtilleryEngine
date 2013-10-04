@@ -15,11 +15,11 @@ import javax.imageio.ImageIO;
  * @author David Aaron Suddjian
  */
 public class Screenshot implements Runnable {
-
+	
 	private static int number = readScreenshotNumber();
 	public static final String PREFIX = "screen ";
 	private final BufferedImage image;
-
+	
 	/**
 	 * Creates a new Screenshot using the provided BufferedImage
 	 * 
@@ -27,17 +27,25 @@ public class Screenshot implements Runnable {
 	 */
 	public Screenshot(BufferedImage img) {
 		image = new BufferedImage(img.getColorModel(), img.copyData(null), img.getColorModel().isAlphaPremultiplied(), null);
+	}
+	
+	public void go() {
 		Thread shot = new Thread(this);
 		shot.start();
+		try {
+			shot.join();
+		} catch (InterruptedException e) {
+			Err.error("Can't take screenshot " + number + "!", e);
+		}
 	}
-
+	
 	/**
 	 * Saves a picture of whatever's currently on the screen to screenshots/default-generated-filename in PNG format.
 	 */
 	private static void screenshot(BufferedImage image) {
 		number++;
 		String fileName = "";
-
+		
 		// put date and time in the filename
 		{
 			Calendar c = Calendar.getInstance();
@@ -53,14 +61,14 @@ public class Screenshot implements Runnable {
 		}
 		System.out.println("Screenshot saved as " + fileName); // TODO put text on screen instead
 	}
-
+	
 	/**
 	 * Reads the number of the latest screenshot from the screenshots folder, and sets it as the number to start at when writing future screenshots.
 	 */
 	public static void resetScreenshotNumber() {
 		number = readScreenshotNumber();
 	}
-
+	
 	private static int readScreenshotNumber() {
 		File[] shots = new File("screenshots").listFiles();
 		if (shots == null) {
@@ -85,7 +93,7 @@ public class Screenshot implements Runnable {
 		}
 		return n;
 	}
-
+	
 	@Override
 	public void run() {
 		screenshot(image);

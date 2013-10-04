@@ -20,9 +20,12 @@ import java.util.LinkedList;
  * @author David Aaron Suddjian
  */
 public class Entity implements Renderable, Savable, Tick {
-
+	
 	private Collection<Component> components = new LinkedList<Component>();
 	public Transform transform = new Transform();
+	
+	public Entity() {
+	}
 
 	public Entity(Component[] components) {
 		for (Component c : components) {
@@ -32,32 +35,32 @@ public class Entity implements Renderable, Savable, Tick {
 			c.init();
 		}
 	}
-
-	public Entity() {
-	}
-
+	
 	public FreeBody getFreeBody() {
 		return (FreeBody) getComponent(FreeBody.class);
 	}
-
+	
+	/**
+	 * Tests whether this Entity contains the exact Component c
+	 */
 	public boolean hasComponent(Component c) {
 		return components.contains(c);
 	}
-
+	
 	public boolean hasComponent(Class<? extends Component> c) {
 		for (Component comp : components) {
 			if (c.isInstance(comp)) return true;
 		}
 		return false;
 	}
-
+	
 	public Component getComponent(Class<? extends Component> c) {
 		for (Component comp : components) {
 			if (c.isInstance(comp)) return comp;
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Returns a Collection of all components of class c
 	 * 
@@ -71,17 +74,17 @@ public class Entity implements Renderable, Savable, Tick {
 		}
 		return list;
 	}
-
+	
 	public void addComponent(Component c) {
 		components.add(c);
 		c.entity = this;
 	}
-
+	
 	public void removeComponent(Component c) {
 		components.remove(c);
 		c.entity = null;
 	}
-
+	
 	public void addComponent(Class<? extends Component> c) {
 		try {
 			addComponent(c.newInstance());
@@ -89,13 +92,13 @@ public class Entity implements Renderable, Savable, Tick {
 			Err.error("Can't add component to entity by class name", e);
 		}
 	}
-
+	
 	protected void init() {
 		for (Component c : components) {
 			c.init();
 		}
 	}
-
+	
 	@Override
 	public void tick() {
 		for (Component c : components) {
@@ -104,7 +107,7 @@ public class Entity implements Renderable, Savable, Tick {
 			}
 		}
 	}
-
+	
 	/**
 	 * Renders all of this Entity's basicImages
 	 */
@@ -116,11 +119,11 @@ public class Entity implements Renderable, Savable, Tick {
 			}
 		}
 	}
-
+	
 	public static World getWorld() {
 		return Game.getWorld();
 	}
-
+	
 	@Override
 	public void write(ArteWriter out) {
 		try {
@@ -130,15 +133,15 @@ public class Entity implements Renderable, Savable, Tick {
 			Err.error("Can't write entity data!", e);
 		}
 	}
-
+	
 	@Override
 	public void writeOncePerClass(ArteWriter out) {
 	}
-
+	
 	@Override
 	public void read(ArteReader in) {
 	}
-
+	
 	@Override
 	public void readOncePerClass(ArteReader in) {
 	}

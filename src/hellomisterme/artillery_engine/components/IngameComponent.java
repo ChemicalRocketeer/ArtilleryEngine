@@ -1,7 +1,7 @@
 package hellomisterme.artillery_engine.components;
 
 import hellomisterme.util.Transform;
-import hellomisterme.util.Vector2;
+import hellomisterme.util.Vector;
 
 public abstract class IngameComponent extends Component {
 	
@@ -10,18 +10,18 @@ public abstract class IngameComponent extends Component {
 	/**
 	 * @return a clone of the global position. Don't worry about changing values.
 	 */
-	public Vector2 globalPosition() {
+	public Vector globalPosition() {
 		if (entity == null)
 			return transform.position.clone();
-		Vector2 pos = entity.transform.position.clone();
+		Vector pos = entity.transform.position.clone();
 		pos.add(transform.position);
 		return pos;
 	}
 	
-	public Vector2 globalScale() {
+	public Vector globalScale() {
 		if (entity == null)
 			return transform.scale.clone();
-		Vector2 scale = entity.transform.scale.clone();
+		Vector scale = entity.transform.scale.clone();
 		scale.mul(transform.scale);
 		return scale;
 	}

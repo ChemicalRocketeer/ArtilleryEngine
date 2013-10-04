@@ -3,6 +3,7 @@ package hellomisterme.util;
 import hellomisterme.artillery_engine.rendering.Render;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 
 /**
  * Describes a vector that can be used for velocity or freeBody or whatever else.
@@ -16,53 +17,58 @@ import java.awt.Color;
  * @since 1-27-13
  * @author David Aaron Suddjian
  */
-public class Vector2 {
-
+public class Vector {
+	
 	/**
 	 * Useful constant to set vector angles
 	 */
 	public static final double LEFT = Math.PI, DOWN = Math.PI * 0.5, UP = -DOWN, RIGHT = 0.0;
-
+	
 	/**
 	 * Useful constant to rotate vector angles. A positive rotation will occur in the clockwise direction. These values can be divided and multiplied for the desired effect.
 	 */
 	public static final double QUARTER_TURN = Math.PI * 0.5, EIGHTH_TURN = QUARTER_TURN * 0.5, THIRD_TURN = 1.5 * Math.PI, SIXTH_TURN = THIRD_TURN * 0.5;
-
+	
 	public double x, y;
-
-	public Vector2() {
+	
+	public Vector() {
 		this(0, 0);
 	}
-
+	
 	/**
-	 * Creates a Vector2 that has the given X and Y length.
+	 * Creates a Vector that has the given X and Y length.
 	 * 
 	 * @param x
 	 * @param y
 	 */
-	public Vector2(double xLength, double yLength) {
+	public Vector(double xLength, double yLength) {
 		this.x = xLength;
 		this.y = yLength;
 	}
-
+	
+	public Vector(Vector copy) {
+		x = copy.x;
+		y = copy.y;
+	}
+	
 	/**
-	 * Creates a new Vector2 using the given angle and length. If getLength() or getAngle() are called later, the returned numbers will be close, but not exactly the same as provided because of
+	 * Creates a new Vector using the given angle and length. If getLength() or getAngle() are called later, the returned numbers will be close, but not exactly the same as provided because of
 	 * floating-point arithmetic. This method is not as fast as using a constructor.
 	 * 
 	 * The angle variable is assumed to be in radians, not degrees.
 	 * 
 	 * @param angle the angle, in radians
 	 * @param magnitude the length of the vector
-	 * @return a new Vector2 with the given properties
+	 * @return a new Vector with the given properties
 	 */
-	public static Vector2 fromAngle(double angle, double magnitude) {
-		return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+	public static Vector fromAngle(double angle, double magnitude) {
+		return new Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
 	}
-
+	
 	/**
 	 * Creates a vector running from point A to point B.
 	 * 
-	 * While Vector2 does not store coordinate variables, the returned vector will have the correct x and y to get from A to B. This method is not as fast as using a constructor.
+	 * While Vector does not store coordinate variables, the returned vector will have the correct x and y to get from A to B. This method is not as fast as using a constructor.
 	 * 
 	 * @param xA the X value of point A
 	 * @param yA the Y value of point A
@@ -70,58 +76,58 @@ public class Vector2 {
 	 * @param yB the Y value of point B
 	 * @return A new Vector running from point A to point B
 	 */
-	public static Vector2 fromAtoB(double xA, double yA, double xB, double yB) {
-		return new Vector2(xB - xA, yB - yA);
+	public static Vector fromAtoB(double xA, double yA, double xB, double yB) {
+		return new Vector(xB - xA, yB - yA);
 	}
-
+	
 	/**
-	 * Returns a new Vector2 with the same values as this Vector2
+	 * Returns a new Vector with the same values as this Vector
 	 */
 	@Override
-	public Vector2 clone() {
-		return new Vector2(x, y);
+	public Vector clone() {
+		return new Vector(x, y);
 	}
-
+	
 	/**
-	 * Adds another Vector2 to this one
+	 * Adds another Vector to this one
 	 * 
-	 * @param other the Vector2 to add
+	 * @param other the Vector to add
 	 */
-	public void add(Vector2 other) {
+	public void add(Vector other) {
 		x += other.x;
 		y += other.y;
 	}
-
+	
 	/**
-	 * Adds another Vector2 to this one
+	 * Adds another Vector to this one
 	 * 
-	 * @param other the Vector2 to add
+	 * @param other the Vector to add
 	 */
-	public Vector2 ADD(Vector2 other) {
-		return new Vector2(x + other.x, y + other.y);
+	public Vector ADD(Vector other) {
+		return new Vector(x + other.x, y + other.y);
 	}
-
+	
 	/**
-	 * Subtracts another Vector2 from this one
+	 * Subtracts another Vector from this one
 	 * 
-	 * @param other the Vector2 to subtract
+	 * @param other the Vector to subtract
 	 */
-	public void sub(Vector2 other) {
+	public void sub(Vector other) {
 		x -= other.x;
 		y -= other.y;
 	}
-
+	
 	/**
-	 * Subtracts another Vector2 from this one
+	 * Subtracts another Vector from this one
 	 * 
-	 * @param other the Vector2 to subtract
+	 * @param other the Vector to subtract
 	 */
-	public Vector2 SUB(Vector2 other) {
-		return new Vector2(x - other.x, y - other.y);
+	public Vector SUB(Vector other) {
+		return new Vector(x - other.x, y - other.y);
 	}
-
+	
 	/**
-	 * Multiplies this Vector2 by the given scalar
+	 * Multiplies this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
@@ -129,18 +135,18 @@ public class Vector2 {
 		x *= scalar;
 		y *= scalar;
 	}
-
+	
 	/**
-	 * Multiplies this Vector2 by the given scalar
+	 * Multiplies this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
-	public Vector2 MUL(double scalar) {
-		return new Vector2(x * scalar, y * scalar);
+	public Vector MUL(double scalar) {
+		return new Vector(x * scalar, y * scalar);
 	}
-
+	
 	/**
-	 * Divides this Vector2 by the given scalar
+	 * Divides this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
 	 */
@@ -161,45 +167,45 @@ public class Vector2 {
 			y /= scalar;
 		}
 	}
-
+	
 	/**
-	 * Divides this Vector2 by the given scalar
+	 * Divides this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
 	 */
-	public Vector2 DIV(double scalar) {
+	public Vector DIV(double scalar) {
 		if (scalar == 0) {
 			// test condition ? true result : false result
-			return new Vector2(x >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY, y >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+			return new Vector(x >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY, y >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
 		}
-		return new Vector2(x / scalar, y / scalar);
+		return new Vector(x / scalar, y / scalar);
 	}
-
+	
 	/**
-	 * Multiplies this Vector2 by the given scalar
+	 * Multiplies this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
-	public void mul(Vector2 other) {
+	public void mul(Vector other) {
 		x *= other.x;
 		y *= other.y;
 	}
-
+	
 	/**
-	 * Multiplies this Vector2 by the given scalar
+	 * Multiplies this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
 	 */
-	public Vector2 MUL(Vector2 other) {
-		return new Vector2(x * other.x, y * other.y);
+	public Vector MUL(Vector other) {
+		return new Vector(x * other.x, y * other.y);
 	}
-
+	
 	/**
-	 * Divides this Vector2 by the given scalar
+	 * Divides this Vector by the given scalar
 	 * 
 	 * @param other the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
 	 */
-	public void div(Vector2 other) {
+	public void div(Vector other) {
 		if (other.x == 0) {
 			if (x >= 0) {
 				x = Double.POSITIVE_INFINITY;
@@ -209,7 +215,7 @@ public class Vector2 {
 		} else {
 			x /= other.x;
 		}
-
+		
 		if (other.y == 0) {
 			if (y >= 0) {
 				y = Double.POSITIVE_INFINITY;
@@ -220,13 +226,13 @@ public class Vector2 {
 			y /= other.y;
 		}
 	}
-
+	
 	/**
-	 * Divides this Vector2 by the given scalar
+	 * Divides this Vector by the given scalar
 	 * 
 	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
 	 */
-	public Vector2 DIV(Vector2 other) {
+	public Vector DIV(Vector other) {
 		double newX;
 		double newY;
 		if (other.x == 0) {
@@ -238,7 +244,7 @@ public class Vector2 {
 		} else {
 			newX = x / other.x;
 		}
-
+		
 		if (other.y == 0) {
 			if (y >= 0) {
 				newY = Double.POSITIVE_INFINITY;
@@ -248,53 +254,53 @@ public class Vector2 {
 		} else {
 			newY = y / other.y;
 		}
-		return new Vector2(newX, newY);
+		return new Vector(newX, newY);
 	}
-
+	
 	/**
 	 * @param a the first vector to use to get the dot product
 	 * @param b the first vector to use to get the dot product
 	 * @return the dot product of two vectors
 	 */
-	public static double dot(Vector2 a, Vector2 b) {
+	public static double dot(Vector a, Vector b) {
 		return a.x * b.x + a.y * b.y;
 	}
-
+	
 	/**
 	 * Projects this vector along the given other vector
 	 * 
 	 * @param other the vector to project along
 	 */
-	public void project(Vector2 other) {
+	public void project(Vector other) {
 		double dot = dot(this, other) / dot(other, other);
 		x = dot * other.x;
 		y = dot * other.y;
 	}
-
+	
 	/**
 	 * @param a the vector to project
 	 * @param b the vector to be projected onto
 	 * @return a projection of vector a onto vector b
 	 */
-	public static Vector2 projection(Vector2 a, Vector2 b) {
+	public static Vector projection(Vector a, Vector b) {
 		double dot = dot(a, b) / dot(b, b);
-		return new Vector2(dot * b.x, dot * b.y);
+		return new Vector(dot * b.x, dot * b.y);
 	}
-
-	public Vector2 rightNormal() {
-		return new Vector2(-y, x);
+	
+	public Vector rightNormal() {
+		return new Vector(-y, x);
 	}
-
-	public Vector2 leftNormal() {
-		return new Vector2(y, -x);
+	
+	public Vector leftNormal() {
+		return new Vector(y, -x);
 	}
-
+	
 	public void normalize() {
-		div(mag());
+		setMagnitude(1.0);
 	}
-
+	
 	/**
-	 * Sets the length, or magnitude, of this Vector2 to the given amount. If the current magnitude is zero, sets x to the value of m.
+	 * Sets the length, or magnitude, of this Vector to the given amount. If the current magnitude is zero, sets x to the value of m.
 	 * 
 	 * @param m the new magnitude
 	 */
@@ -306,44 +312,57 @@ public class Vector2 {
 			mul(m / mag);
 		}
 	}
-
+	
 	/**
-	 * Sets the angle of this Vector2 to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
+	 * Sets the magnitude of this vector to the given amount. If the current magnitude is zero, sets x to the value of mag.
+	 * This method can be used when the current magnitude of this vector is already known, to avoid a redundant mag() calculation.
+	 * 
+	 * @param mag the new magnitude
+	 * @param currentMag the current magnitude
+	 */
+	public void setMagnitude(double mag, double currentMag) {
+		if (currentMag == 0.0)
+			x = mag;
+		else
+			mul(mag / currentMag);
+	}
+	
+	/**
+	 * Sets the angle of this Vector to the given angle in radians. This angle will only be used to set the underlying data of the vector and will not itself be stored in memory, so a call to the
 	 * getAngle() method will return an equivalent angle, but not necessarily the same number given here. For example, after a call to setAngle(3*pi), getAngle() will return pi.
 	 * 
 	 * @param angle the new angle, in radians
 	 */
 	public void setAngle(double angle) {
-		// magnitude can be thought of as the radius, so to get x and y to the right lengths, you just multiply the sin and cos by m
 		double m = mag();
 		x = m * Math.cos(angle);
 		y = m * Math.sin(angle);
 	}
-
+	
 	/**
-	 * @return the angle of this Vector2 in radians
+	 * @return the angle of this Vector in radians
 	 */
 	public double angle() {
 		return Math.atan2(y, x);
 	}
-
+	
 	/**
-	 * @return the magnitude of this Vector2
+	 * @return the magnitude of this Vector
 	 */
 	public double mag() {
 		// pythagorean theorem at work, bitches!
 		return Math.sqrt(mag2());
 	}
-
+	
 	/**
-	 * @return the magnitude squared of this Vector2. This method is faster than mag() because it doesn't perform a sqrt operation.
+	 * @return the magnitude squared of this Vector. This method is faster than mag() because it doesn't perform a sqrt operation.
 	 */
 	public double mag2() {
 		return x * x + y * y;
 	}
-
+	
 	/**
-	 * Rotates this Vector2 around its origin by the given amount.
+	 * Rotates this Vector around its origin by the given amount.
 	 * 
 	 * The angle should be given in radians. It is important to note that if the coordinate system has y increasing from
 	 * top to bottom as is typical in Java, then the effect will be a clockwise rotation. In standard maths, however, the rotation is counter-clockwise.
@@ -353,7 +372,7 @@ public class Vector2 {
 	public void rotate(double amount) {
 		setAngle(amount + angle());
 	}
-
+	
 	/**
 	 * Returns true if the values of the given vector equal those of this one. If the two vectors are not literally the same object, this is unlikely to happen because of floating point arithmetic.
 	 * Use approximatelyEquals to detect when 2 vectors are about the same.
@@ -361,21 +380,21 @@ public class Vector2 {
 	 * @param other the vector to compare with this one
 	 * @return whether the x and y variables of the two vectors are equal
 	 */
-	public boolean equals(Vector2 other) {
+	public boolean equals(Vector other) {
 		return this.x == other.x && this.y == other.y;
 	}
-
+	
 	/**
 	 * Returns whether this vector is approximately equal to another using integer arithmetic instead of double precision.
 	 * 
-	 * @see #approximatelyEquals(Vector2, double)
+	 * @see #approximatelyEquals(Vector, double)
 	 * @param other the vector to test
-	 * @return true if the given Vector2 can be considered "equal" to this one
+	 * @return true if the given Vector can be considered "equal" to this one
 	 */
-	public boolean approximatelyEquals(Vector2 other) {
+	public boolean approximatelyEquals(Vector other) {
 		return (int) this.x == (int) other.x && (int) this.y == (int) other.y;
 	}
-
+	
 	/**
 	 * Returns true if the given vector's values are within plus or minus the precision value, else returns false.
 	 * 
@@ -383,26 +402,40 @@ public class Vector2 {
 	 * @param precision how close equal is (in both the positive and negative direction)
 	 * @return true if the vectors are close enough to be considered equal
 	 */
-	public boolean approximatelyEquals(Vector2 other, double precision) {
+	public boolean approximatelyEquals(Vector other, double precision) {
 		return x >= other.x - precision && x <= other.x + precision && y >= other.y - precision && y <= other.y + precision;
 	}
-
+	
 	/**
-	 * Visualizes this Vector2 on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
+	 * Visualizes this Vector on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
 	 * only the way it is displayed. For a one-to-one representation of the vector length, use an exaggeration of 1.0
 	 * 
 	 * @param g the Graphics2D object to draw to
 	 * @param exaggeration the amount to exaggerate (the length will be multiplied by this amount)
 	 * @param Pos the in-world location of this vector
 	 */
-	public void draw(Render render, double exaggeration, Vector2 pos) {
-		Vector2 exag = this.MUL(exaggeration);
+	public void draw(Render render, double exaggeration, Vector pos) {
+		Vector exag = this.MUL(exaggeration);
 		render.drawArrow(pos, pos.ADD(exag), Color.MAGENTA);
 	}
-
+	
+	public void render(Graphics2D g, Vector pos) {
+		// go to pos
+		g.translate(pos.x, pos.y);
+		g.drawLine(0, 0, (int) x, (int) y);
+		// go to end of arrow
+		g.translate(x, y);
+		Vector tip = new Vector(-x, -y);
+		tip.setMagnitude(5);
+		tip.rotate(0.5); // ~30 degrees
+		g.drawLine(0, 0, (int) tip.x, (int) tip.y);
+		tip.rotate(-1); // ~-60 degrees
+		g.drawLine(0, 0, (int) tip.x, (int) tip.y);
+	}
+	
 	@Override
 	public String toString() {
 		return "x: " + x + " y: " + y;
 	}
-
+	
 }

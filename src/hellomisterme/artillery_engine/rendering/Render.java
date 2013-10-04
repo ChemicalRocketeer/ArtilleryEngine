@@ -2,7 +2,7 @@ package hellomisterme.artillery_engine.rendering;
 
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.util.Transform;
-import hellomisterme.util.Vector2;
+import hellomisterme.util.Vector;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -40,7 +40,7 @@ public class Render {
 	 * @param rotation
 	 * @param scale
 	 */
-	public void render(BufferedImage img, Transform transform, Vector2 center) {
+	public void render(BufferedImage img, Transform transform, Vector center) {
 		// rotation += camera.transform.rotation;
 		// scale.mul(camera.transform.scale);
 		screen.render(img, toScreenSpace(transform), center);
@@ -54,11 +54,11 @@ public class Render {
 	 * @param yPos the yLocation coordinate of the top-left corner of the PixelData
 	 */
 	public void render(PixelData img, int xPos, int yPos) {
-		Vector2 pos = toScreenSpace(new Vector2(xPos, yPos));
+		Vector pos = toScreenSpace(new Vector(xPos, yPos));
 		screen.render(img, (int) pos.x, (int) pos.y);
 	}
 	
-	public void drawArrow(Vector2 start, Vector2 end, Color c) {
+	public void drawArrow(Vector start, Vector end, Color c) {
 		screen.drawArrow(toScreenSpace(start), toScreenSpace(end), c);
 	}
 	
@@ -67,7 +67,7 @@ public class Render {
 	 * Objects with custom render methods can simply draw on this graphics object using world-space coordinates.
 	 */
 	public Graphics2D getCameraGraphics() {
-		Graphics2D g = screen.image.createGraphics();
+		Graphics2D g = screen.getGraphics();
 		// these have to be done in reverse order from toScreenSpace
 		g.translate(screen.centerX, screen.centerY);
 		g.rotate(-camera.rotation);
@@ -75,17 +75,17 @@ public class Render {
 		return g;
 	}
 	
-	public Vector2 toScreenSpace(Vector2 point) {
-		Vector2 result = point.SUB(camera.position);
+	public Vector toScreenSpace(Vector point) {
+		Vector result = point.SUB(camera.position);
 		result.rotate(-camera.rotation);
-		result.add(new Vector2(screen.centerX, screen.centerY));
+		result.add(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
 	
-	public Vector2 toWorldSpace(Vector2 point) {
-		Vector2 result = point.ADD(camera.position);
+	public Vector toWorldSpace(Vector point) {
+		Vector result = point.ADD(camera.position);
 		result.rotate(camera.rotation);
-		result.sub(new Vector2(screen.centerX, screen.centerY));
+		result.sub(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
 	
@@ -96,7 +96,7 @@ public class Render {
 	 */
 	public Transform toScreenSpace(Transform transform) {
 		Transform result = transform.SUB(camera);
-		result.position.add(new Vector2(screen.centerX, screen.centerY));
+		result.position.add(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
 	
@@ -107,7 +107,7 @@ public class Render {
 	 */
 	public Transform toWorldSpace(Transform transform) {
 		Transform result = transform.ADD(camera);
-		result.position.sub(new Vector2(screen.centerX, screen.centerY));
+		result.position.sub(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
 	
@@ -117,5 +117,9 @@ public class Render {
 	 */
 	public void setCamera(Camera activeCamera) {
 		camera = activeCamera.globalTransform();
+	}
+	
+	public Transform getCameraView() {
+		return camera;
 	}
 }
