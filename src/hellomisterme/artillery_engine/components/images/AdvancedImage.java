@@ -4,7 +4,8 @@ import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.components.IngameComponent;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
-import hellomisterme.util.Transform;
+import hellomisterme.artillery_engine.util.Transform;
+import hellomisterme.artillery_engine.util.Vector;
 
 import java.awt.image.BufferedImage;
 
@@ -32,10 +33,6 @@ public class AdvancedImage extends IngameComponent implements Renderable {
 		this.visible = visible;
 	}
 	
-	public void setImage(BufferedImage image) {
-		this.image = image;
-	}
-	
 	public BufferedImage getImage() {
 		return image;
 	}
@@ -55,8 +52,15 @@ public class AdvancedImage extends IngameComponent implements Renderable {
 	@Override
 	public void render(Render render) {
 		if (visible) {
-			render.render(image, globalTransform(), transform.position);
+			double rotation = globalRotation();
+			Vector scale = globalScale();
+			Vector pos = entity.transform.position.ADD(transform.position);
+			render.render(image, new Transform(pos, rotation, scale), transform.position);
 		}
+	}
+	
+	@Override
+	public void devmodeRender(Render render) {
 	}
 	
 }

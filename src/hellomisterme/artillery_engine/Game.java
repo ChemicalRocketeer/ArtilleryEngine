@@ -8,7 +8,8 @@ import hellomisterme.artillery_engine.rendering.SpriteSheet;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.DisplayMode;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
@@ -21,64 +22,64 @@ import javax.swing.JFrame;
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
-@SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
+	private static final long serialVersionUID = 1L;
 	
-	public static final String version = "Alpha.0.1.2";
-	private String title = "Space Game " + version;
+	public static final String VERSION = "Alpha.0.1.2";
+	public String title = "Space Game " + VERSION;
 	
 	/** A random number generator that can be used by objects in the game */
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
 	
 	private double aspectRatio = 9.0 / 16.0;
-	private int width = 800;
+	private int defaultWidth = 800;
+	private int width = defaultWidth;
+	private int height = (int) (width * aspectRatio);
+	
 	public static final int TICKS_PER_SECOND = 60;
-	private boolean running = false;
-	private boolean paused = false;
 	
 	private JFrame frame;
-	private static Screen screen;
 	private static Render render;
 	private static SpriteSheet spritesheet;
 	private static World world;
 	private static GameLog log;
-	
-	private boolean devModeEnabled = false;
 	private DevInfo devInfo;
+	
+	private boolean running = false;
+	private boolean paused = false;
+	private boolean fullscreen = false;
+	private boolean devModeEnabled = true;
 	
 	private boolean devModeOrdered = false;
 	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
-	private boolean fullscreen = false;
 	private boolean fullscreenOrdered = true;
 	
 	public Game() {
 		frame = new JFrame();
-		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setTitle(title);
-		setupGraphics();
+		frame.add(this);
+		setupGraphics(); // screen and render are now initialized
 		
 		addKeyListener(new Keyboard());
 		devInfo = new DevInfo();
-		DevInfo.setup(screen.getGraphics());
-		
-		run();
-	}
-	
-	/**
-	 * This is it. The game loop. If something happens in the game, it begins here.
-	 * 
-	 * TODO make all the extra frames actually do something useful (so, tweening)
-	 */
-	@Override
-	public void run() {
 		spritesheet = new SpriteSheet();
 		world = new World(5000, 5000);
 		world.init();
 		
+		world.devmodeRender(render);
+		devInfo.devmodeRender(render);
+		render.screen.clear();
+	}
+
+	/**
+	 * This is it. The game loop. If something happens in the game, it begins here.
+	 */
+	@Override
+	public void run() {
 		running = true;
 		
 		long totalFrames = 0; // the total number of frames generated (never gets decremented, so it's a long)
@@ -107,7 +108,7 @@ public class Game extends Canvas implements Runnable {
 			render();
 			frameCount++;
 			
-			// keep track of stats every second and send to titlebar if devmode is on
+			// every second
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
@@ -117,8 +118,10 @@ public class Game extends Canvas implements Runnable {
 				devInfo.avg = (int) (totalFrames / totalSeconds);
 				devInfo.tps = tickCount;
 				devInfo.sec = totalSeconds;
+				devInfo.totalMemory = Runtime.getRuntime().totalMemory() / 1048576; // 1048576 bytes in a MB
+				devInfo.usedMemory = devInfo.totalMemory - Runtime.getRuntime().freeMemory() / 1048576;
 				// System.out.println(devInfo.fps);
-				
+
 				// reset variables
 				frameCount = 0;
 				tickCount = 0;
@@ -126,23 +129,27 @@ public class Game extends Canvas implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Draws the current frame
 	 */
 	private void render() {
-		screen.clear();
+		render.screen.clear();
 		render.setCamera(world.getCamera());
 		world.render(render);
-		
 		if (isDevModeEnabled()) {
-			// world.player.getVelocity().draw(render, 8, world.player.getIntX(), world.player.getIntY());
-			devInfo.render(render);
+			world.devmodeRender(render);
+			devInfo.devmodeRender(render);
+			if (paused) {
+				Graphics2D g = render.screen.getGraphics();
+				g.drawString("paused", width - 50, 15);
+				g.dispose();
+			}
 		}
-		
+
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
-		Graphics g = strategy.getDrawGraphics(); // get the next Graphics object from the strategy
-		g.drawImage(screen.getImage(), 0, 0, getWidth(), getHeight(), null); // draw the rendered image onto the Graphics object
+		Graphics2D g = (Graphics2D) strategy.getDrawGraphics(); // get the next Graphics object from the strategy
+		render.screen.drawScreen(g); // draw the rendered image onto the Graphics object
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
@@ -163,7 +170,7 @@ public class Game extends Canvas implements Runnable {
 	private void checkStatus() {
 		if (Keyboard.Controls.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
-				screen.screenshot();
+				render.screen.screenshot();
 				screenshotOrdered = true; // remember that screenshot was pressed
 			}
 		} else { // screenshot key not pressed
@@ -196,8 +203,8 @@ public class Game extends Canvas implements Runnable {
 		
 		if (Keyboard.Controls.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
-				setDevModeEnabled(!isDevModeEnabled());
-				render.simpleRendering = isDevModeEnabled();
+				setDevMode(!isDevModeEnabled());
+				render.screen.simpleRendering = isDevModeEnabled();
 				devModeOrdered = true;
 			}
 		} else {
@@ -217,11 +224,14 @@ public class Game extends Canvas implements Runnable {
 	
 	private void setupGraphics() {
 		if (fullscreen) {
-			width = 1920;
+			DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+			width = dm.getWidth();
+			height = dm.getHeight();
 		} else {
-			width = 800;
+			width = defaultWidth;
+			height = (int) (width * aspectRatio);
 		}
-		setPreferredSize(new Dimension(getWidth(), getHeight()));
+		setPreferredSize(new Dimension(width, height));
 		frame.dispose();
 		if (fullscreen) {
 			frame.setUndecorated(true);
@@ -233,33 +243,37 @@ public class Game extends Canvas implements Runnable {
 			frame.setVisible(true);
 		}
 		requestFocus();
+		this.createBufferStrategy(3);
 		
-		createBufferStrategy(3);
-		
-		screen = new Screen(getWidth(), getHeight());
-		render = new Render(screen);
+		render = new Render(new Screen(width, height));
 	}
 	
 	public void save(ArteWriter aw) {
 		
 	}
 	
-	@Override
-	public int getWidth() {
-		return width;
-	}
-	
-	@Override
-	public int getHeight() {
-		return (int) (width * aspectRatio);
-	}
-	
 	public void pause() {
 		paused = true;
 	}
 	
+	public void unpause() {
+		paused = false;
+	}
+	
+	public boolean isRunning() {
+		return running;
+	}
+	
 	public synchronized void stop() {
 		running = false;
+	}
+	
+	public boolean isDevModeEnabled() {
+		return devModeEnabled;
+	}
+	
+	public void setDevMode(boolean devMode) {
+		this.devModeEnabled = devMode;
 	}
 	
 	public static World getWorld() {
@@ -272,13 +286,5 @@ public class Game extends Canvas implements Runnable {
 	
 	public static GameLog getLog() {
 		return log;
-	}
-	
-	public boolean isDevModeEnabled() {
-		return devModeEnabled;
-	}
-	
-	public void setDevModeEnabled(boolean devModeEnabled) {
-		this.devModeEnabled = devModeEnabled;
 	}
 }

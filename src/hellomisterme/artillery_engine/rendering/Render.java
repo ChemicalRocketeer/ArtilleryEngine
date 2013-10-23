@@ -1,11 +1,12 @@
 package hellomisterme.artillery_engine.rendering;
 
 import hellomisterme.artillery_engine.components.Camera;
-import hellomisterme.util.Transform;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.Transform;
+import hellomisterme.artillery_engine.util.Vector;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 /**
@@ -18,32 +19,16 @@ import java.awt.image.BufferedImage;
  */
 public class Render {
 	
-	/** Flag to tell objects how they should render themselves */
-	public boolean simpleRendering = false;
-	
 	public Screen screen;
 	
 	// Used to avoid calculating the camera's global position every time anything is rendered.
 	// Must be updated each render cycle.
 	private Transform camera = new Transform();
+	// a copy of the camera transform, which can be used to quickly set up a Graphics object.
+	private AffineTransform graphicsTransform = new AffineTransform();
 	
 	public Render(Screen screen) {
 		this.screen = screen;
-	}
-	
-	/**
-	 * Renders the given BufferedImage.
-	 * 
-	 * @param img
-	 * @param center
-	 * @param position
-	 * @param rotation
-	 * @param scale
-	 */
-	public void render(BufferedImage img, Transform transform, Vector center) {
-		// rotation += camera.transform.rotation;
-		// scale.mul(camera.transform.scale);
-		screen.render(img, toScreenSpace(transform), center);
 	}
 	
 	/**
@@ -63,16 +48,33 @@ public class Render {
 	}
 	
 	/**
+	 * Renders the given BufferedImage.
+	 * 
+	 * @param img
+	 * @param center
+	 * @param position
+	 * @param rotation
+	 * @param scale
+	 */
+	public void render(BufferedImage img, Transform transform, Vector center) {
+		// rotation += camera.transform.rotation;
+		// scale.mul(camera.transform.scale);
+		screen.render(img, toScreenSpace(transform), center);
+	}
+	
+	/**
 	 * Creates a Graphics2D object aligned with the ingame camera.
 	 * Objects with custom render methods can simply draw on this graphics object using world-space coordinates.
+	 * You should dispose of the Graphics object when you are done.
 	 */
 	public Graphics2D getCameraGraphics() {
 		Graphics2D g = screen.getGraphics();
-		// these have to be done in reverse order from toScreenSpace
-		g.translate(screen.centerX, screen.centerY);
-		g.rotate(-camera.rotation);
-		g.translate(-camera.position.x, -camera.position.y);
+		alignGraphicsToCamera(g);
 		return g;
+	}
+	
+	public void alignGraphicsToCamera(Graphics2D g) {
+		g.setTransform(graphicsTransform);
 	}
 	
 	public Vector toScreenSpace(Vector point) {
@@ -88,7 +90,6 @@ public class Render {
 		result.sub(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
-	
 	/**
 	 * Transforms the given Transform from world-space into screen-space
 	 * 
@@ -117,9 +118,14 @@ public class Render {
 	 */
 	public void setCamera(Camera activeCamera) {
 		camera = activeCamera.globalTransform();
+		graphicsTransform = new AffineTransform();
+		graphicsTransform.translate(screen.centerX, screen.centerY);
+		graphicsTransform.rotate(-camera.rotation);
+		graphicsTransform.translate(-camera.position.x, -camera.position.y);
+		
 	}
 	
 	public Transform getCameraView() {
-		return camera;
+		return camera.clone();
 	}
 }

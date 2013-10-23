@@ -1,21 +1,22 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.behaviors.Collision;
+import hellomisterme.artillery_engine.behaviors.Gravity;
+import hellomisterme.artillery_engine.behaviors.System;
 import hellomisterme.artillery_engine.components.Camera;
-import hellomisterme.artillery_engine.components.Component;
-import hellomisterme.artillery_engine.components.images.AdvancedImage;
-import hellomisterme.artillery_engine.components.scripts.Planet;
-import hellomisterme.artillery_engine.components.scripts.PlayerMovement;
+import hellomisterme.artillery_engine.components.physics.FreeBody;
+import hellomisterme.artillery_engine.geometry.Circle;
 import hellomisterme.artillery_engine.io.ArteReader;
 import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.Vector;
 
 import java.awt.Dimension;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * World keeps track of objects in the game.
@@ -28,34 +29,68 @@ public class World implements Tick, Savable, Renderable {
 	private String name = "New Game";
 	private Dimension bounds;
 	
-	private Map<String, Entity> entities = new Hashtable<String, Entity>();
-	
-	private boolean baddieOrdered = false;
+	private List<Entity> entities = new ArrayList<>();
+	private List<System> systems = new ArrayList<>();
 	
 	private Camera camera = new Camera();
+	private Entity player;
 	
+	private boolean baddieOrdered = false;
+
 	public World(int w, int h) {
 		bounds = new Dimension(w, h);
 	}
 	
 	public void init() {
-		AdvancedImage playerImage = new AdvancedImage("graphics/sprites/player.png");
-		// playerImage.transform.rotation = Math.PI * 0.5;
-		playerImage.transform.position = new Vector(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
-		playerImage.transform.scale = new Vector(0.5, 0.5);
+		/*
+		 * AdvancedImage playerImage = new AdvancedImage("graphics/sprites/player.png");
+		 * playerImage.transform.rotation = Math.PI * 0.5;
+		 * playerImage.transform.position = new Vector(playerImage.getWidth() * -0.5, playerImage.getHeight() * -0.5);
+		 * playerImage.transform.scale = new Vector(0.5, 0.5);
+		 * player = new Entity(new PlayerMovement(), playerImage);
+		 * player.transform.position = new Vector(0, 0);
+		 * player.transform.scale = new Vector(2, 2);
+		 * // player.transform.rotation = -Math.PI * 0.5;
+		 * addEntity(player);
+		 */
+		
 		Camera cam = new Camera();
 		// camera.transform.scale = new Vector(0.5, 0.5);
 		camera = cam;
-		Entity player = new Entity(new Component[] { new PlayerMovement(), playerImage, cam });
-		player.transform.position = new Vector(0, 0);
-		player.transform.scale = new Vector(2, 2);
-		// player.transform.rotation = -Math.PI * 0.5;
-		addEntity("player", player);
+		addEntity(new Entity(cam));
+
+		/*
+		 * Entity planet = new Entity(new Component[] { new Planet() });
+		 * // addEntity("planet", planet);
+		 * planet.transform.position = new Vector(500, 0);
+		 * planet.getFreeBody().mass = 20;
+		 */
 		
-		Entity planet = new Entity(new Component[] { new Planet() });
-		// addEntity("planet", planet);
-		planet.transform.position = new Vector(500, 0);
-		planet.getFreeBody().mass = 20;
+		Entity circle1 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0), 3, 0));
+		circle1.transform.position.x = -300;
+		circle1.transform.position.y = 30;
+		addEntity(circle1);
+		
+		Entity circle2 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0), 3, 0));
+		circle2.transform.position.x = 0;
+		circle2.transform.position.y = 0;
+		addEntity(circle2);
+		
+		/*
+		Entity circle1 = new Entity(new Component[] { CircleHitbox.createFromMass(2.7299), FreeBody.create(new Vector(-0.9842, -0.0256), 2.72999, 0) });
+		circle1.transform.position.x = -39.619;
+		circle1.transform.position.y = -202.71;
+		addEntity(circle1);
+		
+		Entity circle2 = new Entity(new Component[] { CircleHitbox.createFromMass(1.3757), FreeBody.create(new Vector(-1.1006, 0.1969), 1.3757, 0) });
+		circle2.transform.position.x = 102.91;
+		circle2.transform.position.y = -199.04;
+		addEntity(circle2);
+		*/
+		
+		systems.add(new Gravity());
+		systems.add(new Collision());
+		
 		/*
 		Entity planet2 = new Entity(new Component[] { new Planet() });
 		addEntity("planet2", planet2);
@@ -66,20 +101,22 @@ public class World implements Tick, Savable, Renderable {
 	
 	@Override
 	public void tick() {
-		// tick all the registered Tick objects
-		try {
-			for (Map.Entry<String, Entity> e : entities.entrySet()) {
-				e.getValue().tick();
-			}
-		} catch (NullPointerException e) {
-			Err.error("Null Pointer in a tick() method!");
-			e.printStackTrace();
-		}
+		for (Entity e : entities)
+			e.tick();
+		
+		for (System b : systems)
+			b.run(entities);
 		
 		// if the addbaddie key is pressed
 		if (Keyboard.Controls.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
-				// add baddie here
+				
+				double circleMass = Game.RAND.nextDouble() * 3;
+				Entity circle = new Entity(Circle.fromArea(circleMass * 1000), FreeBody.create(new Vector(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1), circleMass, 0));
+				circle.transform.position.x = Game.RAND.nextDouble() * 2000 - 1000 + camera.globalPosition().x;
+				circle.transform.position.y = Game.RAND.nextDouble() * 1000 - 500 + camera.globalPosition().y;
+				addEntity(circle);
+				
 				baddieOrdered = true; // remember that the key was pressed
 			}
 		} else { // key not pressed
@@ -87,34 +124,42 @@ public class World implements Tick, Savable, Renderable {
 		}
 	}
 	
-	/**
-	 * Renders the world
-	 */
 	@Override
 	public void render(Render render) {
-		for (Map.Entry<String, Entity> e : entities.entrySet()) {
-			e.getValue().render(render);
+		for (Entity e : entities) {
+			e.render(render);
 		}
 	}
 	
-	public Entity getEntity(String key) {
-		return entities.get(key);
+	@Override
+	public void devmodeRender(Render render) {
+		for (Entity e : entities) {
+			e.devmodeRender(render);
+		}
 	}
 	
-	public void addEntity(String key, Entity e) {
-		entities.put(key, e);
+	public void addEntity(Entity e) {
+		entities.add(e);
 	}
 	
-	public void removeEntity(String key) {
-		entities.remove(key);
+	public Entity getEntity(int entityID) {
+		for (Entity e : entities) {
+			if (e.getID() == entityID)
+				return e;
+		}
+		return null;
 	}
 	
 	public void removeEntity(Entity e) {
-		entities.values().remove(e.getFreeBody());
+		entities.remove(e);
 	}
 	
 	public int entityCount() {
 		return entities.size();
+	}
+	
+	public Entity getPlayer() {
+		return player;
 	}
 	
 	public Camera getCamera() {

@@ -26,7 +26,7 @@ public class ArteReader {
 		try {
 			infile = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
 			v = infile.readUTF();
-			if (v.equals(Game.version)) {
+			if (v.equals(Game.VERSION)) {
 				savable.read(this);
 			} else {
 				Err.error("Trying to load a save with an invalid version number!");

@@ -3,8 +3,8 @@ package hellomisterme.artillery_engine.components;
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.io.Keyboard.Controls;
-import hellomisterme.util.Transform;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.Transform;
+import hellomisterme.artillery_engine.util.Vector;
 
 /**
  * @since 2013-3-3
@@ -12,7 +12,7 @@ import hellomisterme.util.Vector;
  */
 public class Camera extends IngameComponent implements Tick {
 	
-	public boolean followWithPosition = false;
+	public boolean followWithPosition = true;
 	public boolean followWithRotation = false;
 	public boolean followWithScale = false;
 	
@@ -49,13 +49,13 @@ public class Camera extends IngameComponent implements Tick {
 	@Override
 	public void tick() {
 		if (Keyboard.pressed(Controls.LEFT))
-			transform.position.x -= 1.5;
+			transform.position.x -= 5;
 		if (Keyboard.pressed(Controls.RIGHT))
-			transform.position.x += 1.5;
+			transform.position.x += 5;
 		if (Keyboard.pressed(Controls.UP))
-			transform.position.y -= 1.5;
+			transform.position.y -= 5;
 		if (Keyboard.pressed(Controls.DOWN))
-			transform.position.y += 1.5;
+			transform.position.y += 5;
 		if (Keyboard.pressed(Controls.CAMROTLEFT))
 			transform.rotation -= 0.005;
 		if (Keyboard.pressed(Controls.CAMROTRIGHT))

@@ -1,18 +1,30 @@
 package hellomisterme.artillery_engine.geometry;
 
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.components.IngameComponent;
+import hellomisterme.artillery_engine.components.physics.CollisionResult;
+import hellomisterme.artillery_engine.rendering.Render;
+import hellomisterme.artillery_engine.rendering.Renderable;
+import hellomisterme.artillery_engine.util.MathUtils;
+import hellomisterme.artillery_engine.util.Vector;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
-public class Circle {
+public class Circle extends IngameComponent implements Hitbox, Renderable {
 	
-	public Vector position;
+	public static Color renderingColor = Color.CYAN;
+	
 	private double radius;
 	
-	//
-	public Circle(double radius, Vector pos) {
+	public Circle(double radius) {
 		this.radius = Math.abs(radius);
-		this.position = pos;
+	}
+	
+	/**
+	 * @return a new Circle with the given area
+	 */
+	public static Circle fromArea(double area) {
+		return new Circle(Math.sqrt(area / Math.PI));
 	}
 	
 	public double getRadius() {
@@ -27,30 +39,51 @@ public class Circle {
 		return Math.PI * radius * radius;
 	}
 	
-	/**
-	 * Calculates whether a collision occurs with another Circle, and the resulting data of the collision.
-	 * The <i>collisionData</i> vector should be null if you only want the boolean and will not use the other results,
-	 * because the method will be more efficient.
-	 * 
-	 * @param other the Circle to check for a collision with
-	 * @param collisionData a vector that represents the minimum distance
-	 *        to move this Circle so that it exactly touches the edge of <i>other</i>
-	 * @return whether this Circle is colliding with <i>other</i>
-	 */
-	public boolean collision(Circle other, Vector collisionData) {
-		Vector data = other.position.SUB(position);
+	@Override
+	public CollisionResult getCollisionResult(Circle other) {
+		CollisionResult result = new CollisionResult();
+		result.correction = other.globalPosition();
+		result.correction.sub(globalPosition());
 		double totalRadius = other.radius + radius;
-		double distance = data.mag();
-		if (collisionData != null) {
-			data.setMagnitude(distance - totalRadius, distance);
-			collisionData.x = data.x;
-			collisionData.y = data.y;
-		}
-		return distance <= totalRadius;
+		double distance = result.correction.mag();
+		result.correction.setMagnitude(distance - totalRadius, distance);
+		result.collision = distance < totalRadius;
+		return result;
 	}
 	
-	public void render(Graphics2D g) {
-		g.translate(position.x - radius, position.y - radius);
-		g.drawOval(0, 0, (int) radius * 2, (int) radius * 2);
+	@Override
+	public boolean collides(Circle other) {
+		Vector data = other.globalPosition().SUB(globalPosition());
+		double totalRadius = other.radius + radius;
+		double distance = data.mag2();
+		return distance < totalRadius * totalRadius;
+	}
+	
+	@Override
+	public AABB getAABB() {
+		double diameter = radius * 2;
+		Vector pos = globalPosition();
+		return new AABB(new Vector(pos.x - radius, pos.y - radius), diameter, diameter);
+	}
+
+	public void draw(Graphics2D g, Vector pos) {
+		Color c = g.getColor();
+		g.setColor(renderingColor);
+		double x = radius;
+		double y = radius;
+		g.translate(pos.x - x, pos.y - y);
+		g.drawOval(0, 0, MathUtils.round(x * 2), MathUtils.round(y * 2));
+		g.setColor(c);
+	}
+
+	@Override
+	public void render(Render render) {
+		Graphics2D g = render.getCameraGraphics();
+		draw(g, entity.globalPosition());
+		g.dispose();
+	}
+
+	@Override
+	public void devmodeRender(Render render) {
 	}
 }

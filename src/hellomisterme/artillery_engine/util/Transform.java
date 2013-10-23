@@ -1,4 +1,4 @@
-package hellomisterme.util;
+package hellomisterme.artillery_engine.util;
 
 
 public class Transform {
@@ -83,9 +83,9 @@ public class Transform {
 	 * @param vector the vector to be transformed
 	 */
 	public void apply(Vector vector) {
-		vector.mul(scale);
-		vector.rotate(rotation);
 		vector.add(position);
+		vector.rotate(rotation);
+		vector.mul(scale);
 	}
 	
 	/**

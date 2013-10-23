@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,7 +23,7 @@ import java.util.Scanner;
 public class Keyboard implements KeyListener {
 	
 	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
-	private static boolean[] keys = new boolean[KeyEvent.KEY_LAST];
+	private static BitSet keys = new BitSet(KeyEvent.KEY_LAST);
 	
 	public static final String SETTINGS_FILE = "settings.txt";
 	
@@ -138,7 +139,8 @@ public class Keyboard implements KeyListener {
 	 */
 	public static boolean pressed(int[] keyCodes) {
 		for (int keyCode : keyCodes) {
-			if (keys[keyCode]) return true;
+			if (keys.get(keyCode))
+				return true;
 		}
 		return false;
 	}
@@ -151,7 +153,7 @@ public class Keyboard implements KeyListener {
 	 * @return true if the key is pressed, else false
 	 */
 	public static boolean pressed(byte keyCode) {
-		return keys[keyCode];
+		return keys.get(keyCode);
 	}
 	
 	/**
@@ -159,11 +161,11 @@ public class Keyboard implements KeyListener {
 	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() >= keys.length) {
-			Err.error("Invalid key press!");
-			return;
+		if (e.getKeyCode() < keys.size()) {
+			keys.set(e.getKeyCode(), true);
+		} else {
+			Err.error("Invalid key press: " + e.getKeyCode());
 		}
-		keys[e.getKeyCode()] = true;
 	}
 	
 	/**
@@ -171,11 +173,11 @@ public class Keyboard implements KeyListener {
 	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() >= keys.length) {
-			Err.error("Invalid key release!");
-			return;
+		if (e.getKeyCode() < keys.size()) {
+			keys.set(e.getKeyCode(), false);
+		} else {
+			Err.error("Invalid key release: " + e.getKeyCode());
 		}
-		keys[e.getKeyCode()] = false;
 	}
 	
 	@Override

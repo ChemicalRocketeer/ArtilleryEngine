@@ -1,7 +1,5 @@
 package hellomisterme.artillery_engine;
 
-import java.awt.Dimension;
-
 import javax.swing.JApplet;
 
 /**
@@ -16,27 +14,22 @@ public class Launcher extends JApplet {
 	private Game game;
 	private Thread thread;
 
-	public Launcher() {
-		game = new Game();
-	}
-
-	private void runGame() {
-		game.run();
-	}
-
 	public static void main(String[] args) {
-		new Launcher().runGame();
+		Launcher launcher = new Launcher();
+		launcher.init();
+		launcher.start();
+		// launcher.stop();
 	}
 
 	@Override
 	public void init() {
-		add(game);
-		setSize(new Dimension(game.getWidth(), game.getHeight()));
+		game = new Game();
+		thread = new Thread(game);
+
 	}
 
 	@Override
 	public void start() {
-		thread = new Thread(game);
 		thread.start(); // calls game's run() method
 	}
 

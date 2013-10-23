@@ -1,50 +1,39 @@
 package hellomisterme.artillery_engine.behaviors;
 
 import hellomisterme.artillery_engine.Entity;
-import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
+import hellomisterme.artillery_engine.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class Gravity implements Behavior {
-	
-	private List<FreeBody> pullingBodies = new ArrayList<FreeBody>();
-	private List<FreeBody> pulledBodies = new ArrayList<FreeBody>();
-	
-	public Gravity() {
-	}
+public class Gravity extends System {
 	
 	@Override
-	public void tick() {
-		for (FreeBody body : pulledBodies) {
-			body.applyForce(body.calculateGravity(pullingBodies));
-		}
-	}
-	
-	@Override
-	public void addEntity(Entity e) {
-		Collection<Component> comps = e.getComponents(FreeBody.class);
-		if (comps.size() > 0) {
-			for (Component comp : comps) {
-				FreeBody body = (FreeBody) comp;
-				if (body.pulledByGravity)
-					pulledBodies.add(body);
-				if (body.pullsWithGravity)
-					pullingBodies.add(body);
-			}
-		}
-	}
-	
-	@Override
-	public void removeEntity(Entity e) {
-		Collection<Component> comps = e.getComponents(FreeBody.class);
-		if (comps.size() > 0) {
-			for (Component comp : comps) {
-				FreeBody body = (FreeBody) comp;
-				pulledBodies.remove(body);
-				pullingBodies.remove(body);
+	public void run(List<Entity> entities) {
+		for (Entity e1 : entities) {
+			FreeBody pulled = e1.getFreeBody();
+			if (pulled != null && pulled.pulledByGravity) {
+				for (Entity e2 : entities) {
+					if (e2 != e1) {
+						FreeBody pulling = e2.getFreeBody();
+						if (pulling != null && pulling != pulled && pulling.pullsWithGravity) {
+							Vector gravity = new Vector(0, 0);
+
+							if (pulling.mass != 0 && pulled.mass != 0) {
+								Vector pos = e1.globalPosition();
+								Vector otherpos = e2.globalPosition();
+								double xDist = otherpos.x - pos.x;
+								double yDist = otherpos.y - pos.y;
+								gravity.x = xDist;
+								gravity.y = yDist;
+								// law of gravitation: F = (m1 * m2) / (distance * distance) normally you would also use the
+								// Gravitational constant but that doesn't matter here because units are arbitrary
+								gravity.setMagnitude(pulled.mass * pulling.mass / (xDist * xDist + yDist * yDist));
+							}
+							pulled.applyForce(gravity);
+						}
+					}
+				}
 			}
 		}
 	}

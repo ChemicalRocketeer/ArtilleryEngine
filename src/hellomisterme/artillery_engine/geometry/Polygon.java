@@ -1,7 +1,7 @@
 package hellomisterme.artillery_engine.geometry;
 
-import hellomisterme.util.MathUtils;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.MathUtils;
+import hellomisterme.artillery_engine.util.Vector;
 
 import java.awt.Graphics2D;
 

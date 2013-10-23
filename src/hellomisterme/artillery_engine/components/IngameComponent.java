@@ -1,7 +1,7 @@
 package hellomisterme.artillery_engine.components;
 
-import hellomisterme.util.Transform;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.Transform;
+import hellomisterme.artillery_engine.util.Vector;
 
 public abstract class IngameComponent extends Component {
 	
@@ -13,7 +13,7 @@ public abstract class IngameComponent extends Component {
 	public Vector globalPosition() {
 		if (entity == null)
 			return transform.position.clone();
-		Vector pos = entity.transform.position.clone();
+		Vector pos = entity.globalPosition();
 		pos.add(transform.position);
 		return pos;
 	}
@@ -21,7 +21,7 @@ public abstract class IngameComponent extends Component {
 	public Vector globalScale() {
 		if (entity == null)
 			return transform.scale.clone();
-		Vector scale = entity.transform.scale.clone();
+		Vector scale = entity.globalScale();
 		scale.mul(transform.scale);
 		return scale;
 	}
@@ -29,13 +29,13 @@ public abstract class IngameComponent extends Component {
 	public double globalRotation() {
 		if (entity == null)
 			return transform.rotation;
-		return entity.transform.rotation + transform.rotation;
+		return entity.globalRotation() + transform.rotation;
 	}
 	
 	public Transform globalTransform() {
 		if (entity == null)
 			return transform.clone();
-		Transform trans = entity.transform.clone();
+		Transform trans = entity.globalTransform();
 		trans.add(transform);
 		return trans;
 	}

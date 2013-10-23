@@ -2,7 +2,7 @@ package hellomisterme.artillery_engine.io;
 
 import hellomisterme.artillery_engine.Err;
 import hellomisterme.artillery_engine.Game;
-import hellomisterme.util.Transform;
+import hellomisterme.artillery_engine.util.Transform;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ public class ArteWriter {
 	/** This ArteWriter's full path */
 	public final String path;
 
-	private final List<Class<? extends Savable>> classes = new ArrayList<Class<? extends Savable>>();
+	private final List<Class<? extends Savable>> classes = new ArrayList<>();
 	// the header contains the list of classes used in the save file, along with their one-time save data and any other header data. Do not write to these!
 	private final ByteArrayOutputStream headData = new ByteArrayOutputStream();
 	private final DataOutputStream header = new DataOutputStream(headData);
@@ -52,7 +52,7 @@ public class ArteWriter {
 		out = header;
 		writeGameData(game);
 		out = world;
-		game.getWorld().write(this);
+		Game.getWorld().write(this);
 		out = header;
 		writeClassList();
 		writeOneTimeClassData();
@@ -60,7 +60,7 @@ public class ArteWriter {
 	}
 
 	private void writeGameData(Game game) throws IOException {
-		write(Game.version);
+		write(Game.VERSION);
 		write(game.isDevModeEnabled());
 	}
 
@@ -100,8 +100,13 @@ public class ArteWriter {
 	}
 
 	public void write(int x) throws IOException {
-		writeCode(SavefileTypecode.BYTE);
+		writeCode(SavefileTypecode.INT);
 		out.writeInt(x);
+	}
+
+	public void write(long x) throws IOException {
+		writeCode(SavefileTypecode.LONG);
+		out.writeLong(x);
 	}
 
 	public void write(boolean x) throws IOException {

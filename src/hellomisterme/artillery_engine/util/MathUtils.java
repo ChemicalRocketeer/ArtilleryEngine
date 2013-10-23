@@ -1,6 +1,17 @@
-package hellomisterme.util;
+package hellomisterme.artillery_engine.util;
 
 public class MathUtils {
+	
+	public static int round(double d){
+	    double dAbs = Math.abs(d);
+	    int i = (int) dAbs;
+	    double result = dAbs - (double) i;
+	    if(result<0.5){
+	        return d<0 ? -i : i;            
+	    }else{
+	        return d<0 ? -(i+1) : i+1;          
+	    }
+	}
 	
 	/**
 	 * Calculates a weighted average.
@@ -20,6 +31,34 @@ public class MathUtils {
 	}
 	
 	/**
+	 * Compares the magnitudes of 2 Vectors and returns the one that is shorter.
+	 * Does not copy the Vector before returning it, so the returned Vector will either reference a or b.
+	 * Returns a if the Vectors are the same.
+	 */
+	public static Vector min(Vector a, Vector b) {
+		double amag = a.mag2();
+		double bmag = b.mag2();
+		if (amag <= bmag)
+			return a;
+		else
+			return b;
+	}
+	
+	/**
+	 * Compares the magnitudes of 2 Vectors and returns the one that is longer.
+	 * Does not copy the Vector before returning it, so the returned Vector will either reference a or b.
+	 * Returns a if the Vectors are the same.
+	 */
+	public static Vector max(Vector a, Vector b) {
+		double amag = a.mag2();
+		double bmag = b.mag2();
+		if (amag >= bmag)
+			return a;
+		else
+			return b;
+	}
+	
+	/**
 	 * Calculates the distance between 2 points.
 	 * 
 	 * @param ax the x coordinate of point a
@@ -29,7 +68,7 @@ public class MathUtils {
 	 * @return the distance between the two points
 	 */
 	public static double dist(double ax, double ay, double bx, double by) {
-		return Math.sqrt(dist2(ax, ay, bx, by));
+		return Math.hypot(ax - bx, ay - by);
 	}
 	
 	/**
@@ -42,8 +81,8 @@ public class MathUtils {
 	 * @return the square of the distance between the two points
 	 */
 	public static double dist2(double ax, double ay, double bx, double by) {
-		double x = ax - bx;
-		double y = ay - by;
-		return x * x + y * y;
+		ax = ax - bx;
+		ay = ay - by;
+		return ax * ax + ay * ay;
 	}
 }

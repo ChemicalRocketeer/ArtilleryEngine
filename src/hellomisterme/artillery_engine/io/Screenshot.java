@@ -26,7 +26,7 @@ public class Screenshot implements Runnable {
 	 * @param img the BufferedImage to use
 	 */
 	public Screenshot(BufferedImage img) {
-		image = new BufferedImage(img.getColorModel(), img.copyData(null), img.getColorModel().isAlphaPremultiplied(), null);
+		this.image = img;
 	}
 	
 	public void go() {

@@ -1,5 +1,6 @@
 package hellomisterme.artillery_engine.rendering;
 
+
 /**
  * Renderable objects can render themselves using a Render object.
  * 
@@ -7,6 +8,8 @@ package hellomisterme.artillery_engine.rendering;
  * @author David Aaron Suddjian
  */
 public interface Renderable {
-
+	
 	public void render(Render render);
+	
+	public void devmodeRender(Render render);
 }

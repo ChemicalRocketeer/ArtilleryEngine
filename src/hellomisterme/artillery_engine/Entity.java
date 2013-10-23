@@ -7,11 +7,11 @@ import hellomisterme.artillery_engine.io.ArteWriter;
 import hellomisterme.artillery_engine.io.Savable;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
-import hellomisterme.util.Transform;
+import hellomisterme.artillery_engine.util.Transform;
+import hellomisterme.artillery_engine.util.Vector;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Hashtable;
 
 /**
  * An Entity is an object in the World.
@@ -20,14 +20,19 @@ import java.util.LinkedList;
  * @author David Aaron Suddjian
  */
 public class Entity implements Renderable, Savable, Tick {
-	
-	private Collection<Component> components = new LinkedList<Component>();
+
+	private static long totalIDs = 0;
+	private final long id;
 	public Transform transform = new Transform();
-	
+	private Hashtable<Class<? extends Component>, Component> components = new Hashtable<>();
+
 	public Entity() {
+		id = totalIDs;
+		totalIDs++;
 	}
 
-	public Entity(Component[] components) {
+	public Entity(Component... components) {
+		this();
 		for (Component c : components) {
 			addComponent(c);
 		}
@@ -35,56 +40,36 @@ public class Entity implements Renderable, Savable, Tick {
 			c.init();
 		}
 	}
-	
+
 	public FreeBody getFreeBody() {
 		return (FreeBody) getComponent(FreeBody.class);
 	}
-	
+
 	/**
 	 * Tests whether this Entity contains the exact Component c
 	 */
 	public boolean hasComponent(Component c) {
-		return components.contains(c);
+		return components.containsValue(c);
 	}
-	
+
 	public boolean hasComponent(Class<? extends Component> c) {
-		for (Component comp : components) {
-			if (c.isInstance(comp)) return true;
-		}
-		return false;
+		return components.containsKey(c);
 	}
-	
+
 	public Component getComponent(Class<? extends Component> c) {
-		for (Component comp : components) {
-			if (c.isInstance(comp)) return comp;
-		}
-		return null;
+		return components.get(c);
 	}
-	
-	/**
-	 * Returns a Collection of all components of class c
-	 * 
-	 * @param c the Class which all returned Components will match
-	 * @return a list of Components that all descend from c
-	 */
-	public Collection<Component> getComponents(Class<? extends Component> c) {
-		Collection<Component> list = new LinkedList<Component>();
-		for (Component comp : components) {
-			if (c.isInstance(comp)) list.add(comp);
-		}
-		return list;
-	}
-	
+
 	public void addComponent(Component c) {
-		components.add(c);
+		components.put(c.getClass(), c);
 		c.entity = this;
 	}
-	
+
 	public void removeComponent(Component c) {
-		components.remove(c);
+		components.remove(c.getClass());
 		c.entity = null;
 	}
-	
+
 	public void addComponent(Class<? extends Component> c) {
 		try {
 			addComponent(c.newInstance());
@@ -92,56 +77,92 @@ public class Entity implements Renderable, Savable, Tick {
 			Err.error("Can't add component to entity by class name", e);
 		}
 	}
-	
+
 	protected void init() {
-		for (Component c : components) {
+		for (Component c : components.values()) {
 			c.init();
 		}
 	}
-	
+
+	public Transform globalTransform() {
+		return transform.clone();
+	}
+
+	public Vector globalPosition() {
+		return transform.position.clone();
+	}
+
+	public double globalRotation() {
+		return transform.rotation;
+	}
+
+	public Vector globalScale() {
+		return transform.scale.clone();
+	}
+
 	@Override
 	public void tick() {
-		for (Component c : components) {
+		for (Component c : components.values()) {
 			if (c instanceof Tick) {
 				((Tick) c).tick();
 			}
 		}
 	}
-	
-	/**
-	 * Renders all of this Entity's basicImages
-	 */
+
 	@Override
 	public void render(Render render) {
-		for (Component c : components) {
+		for (Component c : components.values()) {
 			if (c instanceof Renderable) {
 				((Renderable) c).render(render);
 			}
 		}
 	}
-	
+
+	@Override
+	public void devmodeRender(Render render) {
+		for (Component c : components.values()) {
+			if (c instanceof Renderable) {
+				((Renderable) c).devmodeRender(render);
+			}
+		}
+	}
+
+	/** @return the total number of entities created over the course of this game */
+	public static long getTotalEntities() {
+		return totalIDs;
+	}
+
+	public long getID() {
+		return id;
+	}
+
 	public static World getWorld() {
 		return Game.getWorld();
 	}
-	
+
 	@Override
 	public void write(ArteWriter out) {
 		try {
 			out.write(transform);
-			out.write((Savable[]) components.toArray());
+			out.write((Savable[]) components.values().toArray());
 		} catch (IOException e) {
 			Err.error("Can't write entity data!", e);
 		}
 	}
-	
+
 	@Override
 	public void writeOncePerClass(ArteWriter out) {
+		try {
+			out.write(totalIDs);
+		} catch (IOException e) {
+			Err.error("Can't write entity data!", e);
+		}
 	}
-	
+
 	@Override
 	public void read(ArteReader in) {
 	}
-	
+
 	@Override
 	public void readOncePerClass(ArteReader in) {
 	}

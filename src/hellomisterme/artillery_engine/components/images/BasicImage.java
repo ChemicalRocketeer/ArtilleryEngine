@@ -3,7 +3,7 @@ package hellomisterme.artillery_engine.components.images;
 import hellomisterme.artillery_engine.Game;
 import hellomisterme.artillery_engine.components.Component;
 import hellomisterme.artillery_engine.rendering.PixelData;
-import hellomisterme.util.Vector;
+import hellomisterme.artillery_engine.util.Vector;
 
 public class BasicImage extends Component {
 	
