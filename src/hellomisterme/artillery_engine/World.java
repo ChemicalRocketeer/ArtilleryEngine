@@ -1,8 +1,8 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.behaviors.Behavior;
 import hellomisterme.artillery_engine.behaviors.Collision;
 import hellomisterme.artillery_engine.behaviors.Gravity;
-import hellomisterme.artillery_engine.behaviors.System;
 import hellomisterme.artillery_engine.components.Camera;
 import hellomisterme.artillery_engine.components.physics.FreeBody;
 import hellomisterme.artillery_engine.geometry.Circle;
@@ -15,8 +15,8 @@ import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.artillery_engine.util.Vector;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * World keeps track of objects in the game.
@@ -29,8 +29,8 @@ public class World implements Tick, Savable, Renderable {
 	private String name = "New Game";
 	private Dimension bounds;
 	
-	private List<Entity> entities = new ArrayList<>();
-	private List<System> systems = new ArrayList<>();
+	private Set<Entity> entities = new HashSet<>();
+	private Set<Behavior> behaviors = new HashSet<>();
 	
 	private Camera camera = new Camera();
 	private Entity player;
@@ -66,12 +66,12 @@ public class World implements Tick, Savable, Renderable {
 		 * planet.getFreeBody().mass = 20;
 		 */
 		
-		Entity circle1 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0), 3, 0));
-		circle1.transform.position.x = -300;
+		Entity circle1 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0.1), 3, 0));
+		circle1.transform.position.x = -120;
 		circle1.transform.position.y = 30;
 		addEntity(circle1);
 		
-		Entity circle2 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0), 3, 0));
+		Entity circle2 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, -0.1), 3, 0));
 		circle2.transform.position.x = 0;
 		circle2.transform.position.y = 0;
 		addEntity(circle2);
@@ -88,8 +88,8 @@ public class World implements Tick, Savable, Renderable {
 		addEntity(circle2);
 		*/
 		
-		systems.add(new Gravity());
-		systems.add(new Collision());
+		behaviors.add(new Gravity());
+		behaviors.add(new Collision());
 		
 		/*
 		Entity planet2 = new Entity(new Component[] { new Planet() });
@@ -104,19 +104,13 @@ public class World implements Tick, Savable, Renderable {
 		for (Entity e : entities)
 			e.tick();
 		
-		for (System b : systems)
-			b.run(entities);
+		for (Behavior b : behaviors)
+			b.run();
 		
 		// if the addbaddie key is pressed
 		if (Keyboard.Controls.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
-				
-				double circleMass = Game.RAND.nextDouble() * 3;
-				Entity circle = new Entity(Circle.fromArea(circleMass * 1000), FreeBody.create(new Vector(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1), circleMass, 0));
-				circle.transform.position.x = Game.RAND.nextDouble() * 2000 - 1000 + camera.globalPosition().x;
-				circle.transform.position.y = Game.RAND.nextDouble() * 1000 - 500 + camera.globalPosition().y;
-				addEntity(circle);
-				
+				addBaddie();
 				baddieOrdered = true; // remember that the key was pressed
 			}
 		} else { // key not pressed
@@ -124,6 +118,14 @@ public class World implements Tick, Savable, Renderable {
 		}
 	}
 	
+	public void addBaddie() {
+		double circleMass = Game.RAND.nextDouble() * 3;
+		Entity circle = new Entity(Circle.fromArea(circleMass * 1000), FreeBody.create(new Vector(Game.RAND.nextDouble() * 2 - 1, Game.RAND.nextDouble() * 2 - 1), circleMass, 0));
+		circle.transform.position.x = Game.RAND.nextDouble() * 2000 - 1000 + camera.globalPosition().x;
+		circle.transform.position.y = Game.RAND.nextDouble() * 1000 - 500 + camera.globalPosition().y;
+		addEntity(circle);
+	}
+
 	@Override
 	public void render(Render render) {
 		for (Entity e : entities) {
@@ -152,6 +154,9 @@ public class World implements Tick, Savable, Renderable {
 	
 	public void removeEntity(Entity e) {
 		entities.remove(e);
+		for (Behavior s : behaviors) {
+			s.addEntity(e);
+		}
 	}
 	
 	public int entityCount() {

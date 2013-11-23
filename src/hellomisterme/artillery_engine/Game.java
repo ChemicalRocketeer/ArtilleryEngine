@@ -120,7 +120,7 @@ public class Game extends Canvas implements Runnable {
 				devInfo.sec = totalSeconds;
 				devInfo.totalMemory = Runtime.getRuntime().totalMemory() / 1048576; // 1048576 bytes in a MB
 				devInfo.usedMemory = devInfo.totalMemory - Runtime.getRuntime().freeMemory() / 1048576;
-				// System.out.println(devInfo.fps);
+				// Behavior.out.println(devInfo.fps);
 
 				// reset variables
 				frameCount = 0;

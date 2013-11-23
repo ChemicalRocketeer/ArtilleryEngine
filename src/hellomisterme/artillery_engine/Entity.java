@@ -11,10 +11,12 @@ import hellomisterme.artillery_engine.util.Transform;
 import hellomisterme.artillery_engine.util.Vector;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * An Entity is an object in the World.
+ * An Entity is an object in the World, with unique ID, a Transform and Components.
  * 
  * @since 10-16-12
  * @author David Aaron Suddjian
@@ -24,7 +26,7 @@ public class Entity implements Renderable, Savable, Tick {
 	private static long totalIDs = 0;
 	private final long id;
 	public Transform transform = new Transform();
-	private Hashtable<Class<? extends Component>, Component> components = new Hashtable<>();
+	private List<Component> components = new LinkedList<>();
 
 	public Entity() {
 		id = totalIDs;
@@ -49,37 +51,68 @@ public class Entity implements Renderable, Savable, Tick {
 	 * Tests whether this Entity contains the exact Component c
 	 */
 	public boolean hasComponent(Component c) {
-		return components.containsValue(c);
+		for (Component comp : components)
+			if (comp == c)
+				return true;
+		return false;
 	}
 
-	public boolean hasComponent(Class<? extends Component> c) {
-		return components.containsKey(c);
-	}
-
-	public Component getComponent(Class<? extends Component> c) {
-		return components.get(c);
+	public boolean hasComponent(Class<? extends Component> cls) {
+		for (Component comp : components)
+			if (comp.getClass().isAssignableFrom(cls))
+				return true;
+		return false;
 	}
 
 	public void addComponent(Component c) {
-		components.put(c.getClass(), c);
-		c.entity = this;
-	}
+		if (c != null) {
+			if (c.isMutuallyExclusive() && this.hasComponent(c.getClass()))
+				return;
 
-	public void removeComponent(Component c) {
-		components.remove(c.getClass());
-		c.entity = null;
-	}
-
-	public void addComponent(Class<? extends Component> c) {
-		try {
-			addComponent(c.newInstance());
-		} catch (InstantiationException | IllegalAccessException e) {
-			Err.error("Can't add component to entity by class name", e);
+			components.add(c);
+			c.entity = this;
 		}
 	}
 
+	public void addComponent(Class<? extends Component> cls) {
+		if (cls != null) {
+			try {
+				addComponent(cls.newInstance());
+			} catch (Exception e) {
+				Err.error("Can't create new instance of component " + cls.getCanonicalName(), e);
+			}
+		}
+	}
+
+	public void removeComponent(Component c) {
+		components.remove(c);
+		c.entity = null;
+	}
+
+	public void removeComponent(Class<? extends Component> cls) {
+		if (cls != null) {
+			Iterator<Component> it = components.iterator();
+			while (it.hasNext()) {
+				Component comp = it.next();
+				if (cls.isInstance(comp))
+					it.remove();
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Component> T getComponent(Class<T> cls) {
+		if (cls != null) {
+			for (Component comp : components)
+				if (cls.isInstance(comp))
+					return (T) comp;
+		}
+		return null;
+
+	}
+
 	protected void init() {
-		for (Component c : components.values()) {
+		for (Component c : components) {
 			c.init();
 		}
 	}
@@ -102,7 +135,7 @@ public class Entity implements Renderable, Savable, Tick {
 
 	@Override
 	public void tick() {
-		for (Component c : components.values()) {
+		for (Component c : components) {
 			if (c instanceof Tick) {
 				((Tick) c).tick();
 			}
@@ -111,7 +144,7 @@ public class Entity implements Renderable, Savable, Tick {
 
 	@Override
 	public void render(Render render) {
-		for (Component c : components.values()) {
+		for (Component c : components) {
 			if (c instanceof Renderable) {
 				((Renderable) c).render(render);
 			}
@@ -120,7 +153,7 @@ public class Entity implements Renderable, Savable, Tick {
 
 	@Override
 	public void devmodeRender(Render render) {
-		for (Component c : components.values()) {
+		for (Component c : components) {
 			if (c instanceof Renderable) {
 				((Renderable) c).devmodeRender(render);
 			}
@@ -144,7 +177,7 @@ public class Entity implements Renderable, Savable, Tick {
 	public void write(ArteWriter out) {
 		try {
 			out.write(transform);
-			out.write((Savable[]) components.values().toArray());
+			out.write((Savable[]) components.toArray());
 		} catch (IOException e) {
 			Err.error("Can't write entity data!", e);
 		}

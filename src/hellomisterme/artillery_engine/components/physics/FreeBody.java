@@ -11,13 +11,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 /**
- * FreeBody do collision detection
+ * FreeBody allows an Entity to react to physics, with forces acting on it realistically. It also provides various flags for how the Entity should behave.
  * 
  * @since 10-18-12
  * @author David Aaron Suddjian
  */
 public class FreeBody extends Component implements Tick, Renderable {
 	
+	// public Vector acceleration = new Vector(0, 0);
 	public Vector velocity = new Vector(0, 0);
 	public double mass = 1.0;
 	public double spin = 0.0;
@@ -105,7 +106,7 @@ public class FreeBody extends Component implements Tick, Renderable {
 		return gravity;
 	}
 	
-	public static boolean isMutuallyExclusive() {
+	public boolean isMutuallyExclusive() {
 		return true;
 	}
 	

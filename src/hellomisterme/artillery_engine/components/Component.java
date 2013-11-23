@@ -30,7 +30,7 @@ public abstract class Component implements Savable {
 	 * 
 	 * @return false
 	 */
-	public static boolean isMutuallyExclusive() {
+	public boolean isMutuallyExclusive() {
 		return false;
 	}
 
