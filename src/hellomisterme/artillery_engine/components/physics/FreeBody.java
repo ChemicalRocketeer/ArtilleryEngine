@@ -22,7 +22,7 @@ import java.awt.Graphics2D;
  */
 public class FreeBody extends Component implements Tick, Renderable {
 	
-	// public Vector acceleration = new Vector(0, 0);
+	public Vector acceleration = new Vector(0, 0);
 	public Vector velocity = new Vector(0, 0);
 	public double mass = 1.0;
 	public double spin = 0.0;
@@ -51,13 +51,15 @@ public class FreeBody extends Component implements Tick, Renderable {
 	
 	@Override
 	public void tick() {
+		velocity.add(acceleration);
+		acceleration = new Vector();
 		entity.transform.position.add(velocity);
 		entity.transform.rotation += spin;
 	}
 	
 	public void applyForce(Vector force) {
 		if (mass != 0.0)
-			velocity.add(new Vector(force).div(mass));
+			acceleration.add(new Vector(force).div(mass));
 	}
 	
 	/**
@@ -70,7 +72,7 @@ public class FreeBody extends Component implements Tick, Renderable {
 		if (mass != 0.0) {
 			Vector f = new Vector(force).project(position);
 			double t = new Vector(force).sub(f).magnitude();
-			velocity.add(f.div(mass));
+			acceleration.add(f.div(mass));
 			spin += t * position.magnitude();
 		}
 	}

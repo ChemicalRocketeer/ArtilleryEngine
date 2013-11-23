@@ -26,7 +26,7 @@ public class Entity implements Renderable, Savable, Tick {
 	private static long totalIDs = 0;
 	private final long id;
 	public Transform transform = new Transform();
-	private List<Component> components = new LinkedList<>();
+	private List<Component> components = new LinkedList<>(); // has to be a List so Components can require other Components
 
 	public Entity() {
 		id = totalIDs;

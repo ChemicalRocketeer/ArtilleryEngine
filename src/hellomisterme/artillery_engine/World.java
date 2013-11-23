@@ -66,12 +66,12 @@ public class World implements Tick, Savable, Renderable {
 		 * planet.getFreeBody().mass = 20;
 		 */
 		
-		Entity circle1 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, 0.1), 3, 0));
-		circle1.transform.position.x = -120;
-		circle1.transform.position.y = 30;
+		Entity circle1 = new Entity(Circle.fromArea(300), FreeBody.create(new Vector(0, 0), 3, 0));
+		circle1.transform.position.x = 300;
+		circle1.transform.position.y = 0;
 		addEntity(circle1);
 		
-		Entity circle2 = new Entity(Circle.fromArea(3000), FreeBody.create(new Vector(0, -0.1), 3, 0));
+		Entity circle2 = new Entity(Circle.fromArea(30000), FreeBody.create(new Vector(0, 0), 300, 0));
 		circle2.transform.position.x = 0;
 		circle2.transform.position.y = 0;
 		addEntity(circle2);
@@ -91,6 +91,11 @@ public class World implements Tick, Savable, Renderable {
 		behaviors.add(new Gravity());
 		behaviors.add(new Collision());
 		
+		for (Behavior b : behaviors) {
+			b.addEntity(circle1);
+			b.addEntity(circle2);
+		}
+
 		/*
 		Entity planet2 = new Entity(new Component[] { new Planet() });
 		addEntity("planet2", planet2);
