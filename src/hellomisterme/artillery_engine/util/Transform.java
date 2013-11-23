@@ -26,16 +26,15 @@ public class Transform {
 		position.add(other.position);
 		position.rotate(other.rotation);
 		position.mul(other.scale);
-		// TODO figure out how to stretch the position to deal with other.scale. Do it in Render.getCameraGraphics() too.
 		rotation += other.rotation;
 		scale.mul(other.scale);
 	}
 	
 	public Transform ADD(Transform other) {
-		Vector pos = position.ADD(other.position);
+		Vector pos = new Vector(position).add(other.position);
 		pos.rotate(other.rotation);
 		pos.mul(other.scale);
-		return new Transform(pos, rotation + other.rotation, scale.MUL(other.scale));
+		return new Transform(pos, rotation + other.rotation, new Vector(scale).mul(other.scale));
 	}
 	
 	public void sub(Transform other) {
@@ -47,11 +46,11 @@ public class Transform {
 	}
 	
 	public Transform SUB(Transform other) {
-		Vector pos = position.SUB(other.position);
+		Vector pos = new Vector(position).sub(other.position);
 		pos.rotate(-other.rotation);
 		pos.div(other.scale);
 		double rot = rotation - other.rotation;
-		return new Transform(pos, rot, scale.DIV(other.scale));
+		return new Transform(pos, rot, new Vector(scale).div(other.scale));
 	}
 	
 	/**

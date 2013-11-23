@@ -45,34 +45,6 @@ public class Collision extends Behavior {
 			}
 			holder = holder.next;
 		}
-
-		/*
-		 * ListIterator<Holder> i = holders.listIterator();
-		 * while (i.hasNext()) {
-		 * ListIterator<Holder> j = i;
-		 * }
-		 * /*
-		 * for (int i = 0; i < entities.size(); i++) {
-		 * FreeBody iBody = (FreeBody) entities.get(i).getComponent(FreeBody.class);
-		 * if (iBody != null && iBody.collisionOn) {
-		 * Circle iCircle = (Circle) entities.get(i).getComponent(Circle.class);
-		 * if (iCircle != null) {
-		 * // we have established that entities[i] is useful, so now check entities[i] against every other usable entity
-		 * // this loop compares each pair of circles instead of each circle individually
-		 * for (int j = i + 1; j < entities.size(); j++) {
-		 * FreeBody jBody = (FreeBody) entities.get(j).getComponent(FreeBody.class);
-		 * if (jBody != null && jBody.collisionOn) {
-		 * Circle jCircle = (Circle) entities.get(j).getComponent(Circle.class);
-		 * if (jCircle != null) {
-		 * // j is a usable entity, now we can finally check collision
-		 * handleCollisions(iBody, iCircle, jBody, jCircle);
-		 * }
-		 * }
-		 * }
-		 * }
-		 * }
-		 * }
-		 */
 	}
 
 	public static void handleCollisions(FreeBody aBody, Circle aCircle, FreeBody bBody, Circle bCircle) {
@@ -85,7 +57,7 @@ public class Collision extends Behavior {
 				double totalMass = aBody.mass + bBody.mass;
 				double aMassFraction = aBody.mass / totalMass;
 				double bMassFraction = bBody.mass / totalMass;
-				aBody.entity.transform.position.add(collision.correction.MUL(bMassFraction));
+				aBody.entity.transform.position.add(new Vector(collision.correction).mul(bMassFraction));
 				collision.correction.mul(-aMassFraction); // correction now points towards the collision
 				bBody.entity.transform.position.add(collision.correction);
 

@@ -13,6 +13,10 @@ import java.awt.Graphics2D;
 /**
  * FreeBody allows an Entity to react to physics, with forces acting on it realistically. It also provides various flags for how the Entity should behave.
  * 
+ * A freeBody is designed to react to external forces. It does not generate forces or detect them.
+ * Other objects exert forces on a FreeBody, and the FreeBody responds with changes in velocity and spin.
+ * The FreeBody's other use is to calculate things like momentum.
+ * 
  * @since 10-18-12
  * @author David Aaron Suddjian
  */
@@ -52,7 +56,8 @@ public class FreeBody extends Component implements Tick, Renderable {
 	}
 	
 	public void applyForce(Vector force) {
-		if (mass != 0.0) velocity.add(force.DIV(mass));
+		if (mass != 0.0)
+			velocity.add(new Vector(force).div(mass));
 	}
 	
 	/**
@@ -63,23 +68,23 @@ public class FreeBody extends Component implements Tick, Renderable {
 	 */
 	public void applyForce(Vector force, Vector position) {
 		if (mass != 0.0) {
-			Vector f = Vector.projection(force, position);
-			double t = force.SUB(f).mag();
-			velocity.add(f.DIV(mass));
-			spin += t * position.mag();
+			Vector f = new Vector(force).project(position);
+			double t = new Vector(force).sub(f).magnitude();
+			velocity.add(f.div(mass));
+			spin += t * position.magnitude();
 		}
 	}
 	
 	public Vector getMomentum() {
-		return velocity.MUL(mass);
+		return new Vector(velocity).mul(mass);
 	}
 	
 	/**
 	 * @return the momentum (including angular momentum) at a given point from the center
 	 */
 	public Vector getMomentumAt(Vector point) {
-		double dist = point.mag();
-		Vector momentum = point.rightNormal();
+		double dist = point.magnitude();
+		Vector momentum = new Vector(point).rightNormal();
 		momentum.setMagnitude(spin * dist);
 		momentum.add(getMomentum());
 		return momentum;
@@ -120,7 +125,7 @@ public class FreeBody extends Component implements Tick, Renderable {
 		g.setColor(Color.magenta);
 		Vector momentum = getMomentum();
 		Vector pos = entity.globalPosition();
-		momentum.MUL(8).render(g, pos);
+		new Vector(momentum).mul(8).render(g, pos);
 		render.alignGraphicsToCamera(g);
 		g.setColor(Color.WHITE);
 		int roundedX = MathUtils.round(pos.x);
@@ -129,7 +134,7 @@ public class FreeBody extends Component implements Tick, Renderable {
 		//g.drawString("" + velocity.mag(), roundedX, roundedY + 20);
 		g.drawString("" + pos.x, roundedX, roundedY + 40);
 		g.drawString("" + pos.y, roundedX, roundedY + 60);
-		g.drawString("" + momentum.mag(), roundedX, roundedY + 80);
+		g.drawString("" + momentum.magnitude(), roundedX, roundedY + 80);
 		g.dispose();
 	}
 }

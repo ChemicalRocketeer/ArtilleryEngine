@@ -45,7 +45,7 @@ public class Circle extends IngameComponent implements Hitbox, Renderable {
 		result.correction = other.globalPosition();
 		result.correction.sub(globalPosition());
 		double totalRadius = other.radius + radius;
-		double distance = result.correction.mag();
+		double distance = result.correction.magnitude();
 		result.correction.setMagnitude(distance - totalRadius, distance);
 		result.collision = distance < totalRadius;
 		return result;
@@ -53,7 +53,7 @@ public class Circle extends IngameComponent implements Hitbox, Renderable {
 	
 	@Override
 	public boolean collides(Circle other) {
-		Vector data = other.globalPosition().SUB(globalPosition());
+		Vector data = other.globalPosition().sub(globalPosition());
 		double totalRadius = other.radius + radius;
 		double distance = data.mag2();
 		return distance < totalRadius * totalRadius;

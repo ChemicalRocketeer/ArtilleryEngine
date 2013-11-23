@@ -41,8 +41,8 @@ public class DevInfo implements Renderable {
 		render(g, 0, 0);
 		g.dispose();
 		Vector camPos = render.getCameraView().position;
-		render.drawArrow(camPos, camPos.ADD(new Vector(0, 50)), Color.RED);
-		render.drawArrow(camPos, camPos.ADD(new Vector(50, 0)), Color.BLUE);
+		render.drawArrow(camPos, new Vector(camPos).add(new Vector(0, 50)), Color.RED);
+		render.drawArrow(camPos, new Vector(camPos).add(new Vector(50, 0)), Color.BLUE);
 	}
 	
 	private void render(Graphics2D g, int xOff, int yOff) {
@@ -63,7 +63,7 @@ public class DevInfo implements Renderable {
 			g.drawString("y: " + player.transform.position.y, x, y + lineLocation); // player's x coordinate
 			lineLocation += fontSize * 2;
 			FreeBody freebody = player.getFreeBody();
-			g.drawString("v: " + freebody.velocity.mag(), x, y + lineLocation); // player's velocity
+			g.drawString("v: " + freebody.velocity.magnitude(), x, y + lineLocation); // player's velocity
 			lineLocation += fontSize;
 			g.drawString("r: " + player.transform.rotation, x, y + lineLocation); // player's rotation
 			lineLocation += fontSize;

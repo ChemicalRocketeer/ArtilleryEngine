@@ -90,7 +90,7 @@ public class Screen {
 		g.drawLine(MathUtils.round(start.x), MathUtils.round(start.y), endx, endy);
 		// to draw the arrow tip we can just rotate and scale this
 		// It's reversed from the direction the arrow will actually point to make that easier
-		Vector arrow = start.SUB(end);
+		Vector arrow = start.sub(end);
 		arrow.setMagnitude(5);
 		arrow.rotate(0.5); // ~30 degrees
 		g.drawLine(endx, endy, MathUtils.round((end.x + arrow.x)), MathUtils.round((end.y + arrow.y)));

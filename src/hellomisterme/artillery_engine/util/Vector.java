@@ -12,6 +12,9 @@ import java.awt.Graphics2D;
  * polar coordinate system, and there are methods which return and set polar coordinates. The only difference between this implementation and one that might use polar
  * coordinate data storage is a small difference in computation time for different methods.
  * 
+ * All methods return a Vector if appropriate. This allows for easy calculation chaining, e.g. vect.Add(vect2).Mul(5).div(vect2.mag());
+ * Methods that modify a Vector object apply the required operation to the current Vector and then return the current Vector.
+ * 
  * All angle measurements are in radians.
  * 
  * @since 1-27-13
@@ -61,134 +64,24 @@ public class Vector {
 	}
 
 	/**
-	 * Adds another Vector to this one
-	 * 
-	 * @param other the Vector to add
+	 * @return the angle of this Vector in radians
 	 */
-	public void add(Vector other) {
-		x += other.x;
-		y += other.y;
+	public double angle() {
+		return Math.atan2(y, x);
 	}
 
 	/**
-	 * Adds another Vector to this one
-	 * 
-	 * @param other the Vector to add
+	 * @return the magnitude of this Vector
 	 */
-	public Vector ADD(Vector other) {
-		return new Vector(x + other.x, y + other.y);
+	public double magnitude() {
+		return Math.hypot(x, y);
 	}
 
 	/**
-	 * Subtracts another Vector from this one
-	 * 
-	 * @param other the Vector to subtract
+	 * @return the magnitude squared of this Vector. This method is faster than mag() because it doesn't perform a sqrt operation.
 	 */
-	public void sub(Vector other) {
-		x -= other.x;
-		y -= other.y;
-	}
-
-	/**
-	 * Subtracts another Vector from this one
-	 * 
-	 * @param other the Vector to subtract
-	 */
-	public Vector SUB(Vector other) {
-		return new Vector(x - other.x, y - other.y);
-	}
-
-	/**
-	 * Multiplies this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
-	 */
-	public void mul(double scalar) {
-		x *= scalar;
-		y *= scalar;
-	}
-
-	/**
-	 * Multiplies this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
-	 */
-	public Vector MUL(double scalar) {
-		return new Vector(x * scalar, y * scalar);
-	}
-
-	/**
-	 * Divides this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
-	 */
-	public void div(double scalar) {
-		if (scalar == 0) {
-			if (x >= 0) {
-				x = Double.POSITIVE_INFINITY;
-			} else {
-				x = Double.NEGATIVE_INFINITY;
-			}
-			if (y >= 0) {
-				y = Double.POSITIVE_INFINITY;
-			} else {
-				y = Double.NEGATIVE_INFINITY;
-			}
-		} else {
-			x /= scalar;
-			y /= scalar;
-		}
-	}
-
-	/**
-	 * Divides this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
-	 */
-	public Vector DIV(double scalar) {
-		if (scalar == 0) {
-			// test condition ? true result : false result
-			return new Vector(x >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY, y >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
-		}
-		return new Vector(x / scalar, y / scalar);
-	}
-
-	/**
-	 * Multiplies this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
-	 */
-	public void mul(Vector other) {
-		x *= other.x;
-		y *= other.y;
-	}
-
-	/**
-	 * Multiplies this Vector by the given scalar
-	 * 
-	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
-	 */
-	public Vector MUL(Vector other) {
-		return new Vector(x * other.x, y * other.y);
-	}
-
-	/**
-	 * Divides this Vector by the given scalar
-	 * 
-	 * @param other the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
-	 */
-	public void div(Vector other) {
-		x /= other.x;
-		y /= other.y;
-	}
-
-	/**
-	 * Divides this Vector by the given Vector
-	 * 
-	 * @param other the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
-	 */
-	public Vector DIV(Vector other) {
-		return new Vector(x / other.x, y / other.y);
+	public double mag2() {
+		return x * x + y * y;
 	}
 
 	/**
@@ -201,41 +94,81 @@ public class Vector {
 	}
 
 	/**
+	 * Adds another Vector to this one
+	 * 
+	 * @param other the Vector to add
+	 */
+	public Vector add(Vector other) {
+		x += other.x;
+		y += other.y;
+		return this;
+	}
+
+	/**
+	 * Subtracts another Vector from this one
+	 * 
+	 * @param other the Vector to subtract
+	 */
+	public Vector sub(Vector other) {
+		x -= other.x;
+		y -= other.y;
+		return this;
+	}
+
+	/**
+	 * Multiplies this Vector by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
+	 */
+	public Vector mul(double scalar) {
+		x *= scalar;
+		y *= scalar;
+		return this;
+	}
+
+	/**
+	 * Divides this Vector by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 x and y are set to infinity)
+	 */
+	public Vector div(double scalar) {
+		x /= scalar;
+		y /= scalar;
+		return this;
+	}
+
+	/**
+	 * Multiplies this Vector by the given scalar
+	 * 
+	 * @param scalar the amount to scale (if 1 no change, if 2 magnitude is doubled, if 0 magnitude is 0)
+	 */
+	public Vector mul(Vector other) {
+		x *= other.x;
+		y *= other.y;
+		return this;
+	}
+
+	/**
+	 * Divides this Vector by the given scalar
+	 * 
+	 * @param other the amount to scale (if 1 no change, if 2 magnitude is halved, if 0 magnitude is infinity)
+	 */
+	public Vector div(Vector other) {
+		x /= other.x;
+		y /= other.y;
+		return this;
+	}
+
+	/**
 	 * Projects this vector along the given other vector
 	 * 
 	 * @param other the vector to project along
 	 */
-	public void project(Vector other) {
+	public Vector project(Vector other) {
 		double dot = dot(this, other) / dot(other, other);
 		x = dot * other.x;
 		y = dot * other.y;
-	}
-
-	/**
-	 * @param a the vector to project
-	 * @param b the vector to be projected onto
-	 * @return a projection of vector a onto vector b
-	 */
-	public static Vector projection(Vector a, Vector b) {
-		double dot = dot(a, b) / dot(b, b);
-		return new Vector(dot * b.x, dot * b.y);
-	}
-
-	public void normalize() {
-		double x2 = x * x;
-		double y2 = y * y;
-		double mag2 = x2 + y2;
-		x = x2 / mag2;
-		y = y2 / mag2;
-	}
-
-	public void negate() {
-		x = -x;
-		y = -y;
-	}
-
-	public Vector NEGATE() {
-		return new Vector(-x, -y);
+		return this;
 	}
 
 	/**
@@ -243,26 +176,22 @@ public class Vector {
 	 * 
 	 * @param m the new magnitude
 	 */
-	public void setMagnitude(double m) {
-		if (x == 0.0 && y == 0.0) {
-			x = m; // there is no current angle, so just set x to the m length
-		} else {
-			mul(m / mag());
-		}
+	public Vector setMagnitude(double m) {
+		return setMagnitude(m, magnitude());
 	}
 
 	/**
-	 * Sets the magnitude of this vector to the given amount. If the current magnitude is zero, sets x to the value of mag.
-	 * This method can be used when the current magnitude of this vector is already known, to avoid a redundant mag() calculation.
+	 * If you already know the current magnitude of this Vector, you can call this method which should run faster.
 	 * 
 	 * @param mag the new magnitude
 	 * @param currentMag the current magnitude
 	 */
-	public void setMagnitude(double mag, double currentMag) {
+	public Vector setMagnitude(double mag, double currentMag) {
 		if (currentMag == 0.0)
 			x = mag;
 		else
 			mul(mag / currentMag);
+		return this;
 	}
 
 	/**
@@ -271,31 +200,11 @@ public class Vector {
 	 * 
 	 * @param angle the new angle, in radians
 	 */
-	public void setAngle(double angle) {
-		double m = mag();
+	public Vector setAngle(double angle) {
+		double m = magnitude();
 		x = m * Math.cos(angle);
 		y = m * Math.sin(angle);
-	}
-
-	/**
-	 * @return the angle of this Vector in radians
-	 */
-	public double angle() {
-		return Math.atan2(y, x);
-	}
-
-	/**
-	 * @return the magnitude of this Vector
-	 */
-	public double mag() {
-		return Math.hypot(x, y);
-	}
-
-	/**
-	 * @return the magnitude squared of this Vector. This method is faster than mag() because it doesn't perform a sqrt operation.
-	 */
-	public double mag2() {
-		return x * x + y * y;
+		return this;
 	}
 
 	/**
@@ -306,16 +215,35 @@ public class Vector {
 	 * 
 	 * @param amount the amount to rotate
 	 */
-	public void rotate(double amount) {
+	public Vector rotate(double amount) {
 		setAngle(amount + angle());
+		return this;
 	}
 
 	public Vector rightNormal() {
-		return new Vector(-y, x);
+		y = -y;
+		return this;
 	}
 
 	public Vector leftNormal() {
-		return new Vector(y, -x);
+		x = -x;
+		return this;
+	}
+
+	/** Sets this Vector's magnitude to 1. If the current magnitude is 0, sets x to 1 */
+	public Vector normalize() {
+		if (x == 0 && y == 0) {
+			x = 1;
+		} else {
+			div(magnitude());
+		}
+		return this;
+	}
+
+	public Vector negate() {
+		x = -x;
+		y = -y;
+		return this;
 	}
 
 	/**
@@ -360,7 +288,7 @@ public class Vector {
 	}
 
 	/**
-	 * Visualizes this Vector on the given Graphics2D object, represented as a line with a red dot at the head. The exaggeration is a scalar multiplier that does not affect the data of this vector,
+	 * Visualizes this Vector on the given Graphics2D object, represented as an arrow. The exaggeration is a scalar multiplier that does not affect the data of this vector,
 	 * only the way it is displayed. For a one-to-one representation of the vector length, use an exaggeration of 1.0
 	 * 
 	 * @param g the Graphics2D object to draw to
@@ -368,8 +296,8 @@ public class Vector {
 	 * @param Pos the in-world location of this vector
 	 */
 	public void draw(Render render, double exaggeration, Vector pos) {
-		Vector exag = this.MUL(exaggeration);
-		render.drawArrow(pos, pos.ADD(exag), Color.MAGENTA);
+		Vector exag = new Vector(this).mul(exaggeration);
+		render.drawArrow(pos, exag.add(pos), Color.MAGENTA);
 	}
 
 	public void render(Graphics2D g, Vector pos) {
@@ -390,5 +318,4 @@ public class Vector {
 	public String toString() {
 		return "x: " + x + " y: " + y;
 	}
-
 }

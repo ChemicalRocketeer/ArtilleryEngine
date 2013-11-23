@@ -54,7 +54,7 @@ public class AdvancedImage extends IngameComponent implements Renderable {
 		if (visible) {
 			double rotation = globalRotation();
 			Vector scale = globalScale();
-			Vector pos = entity.transform.position.ADD(transform.position);
+			Vector pos = new Vector(entity.transform.position).add(transform.position);
 			render.render(image, new Transform(pos, rotation, scale), transform.position);
 		}
 	}

@@ -78,14 +78,14 @@ public class Render {
 	}
 	
 	public Vector toScreenSpace(Vector point) {
-		Vector result = point.SUB(camera.position);
+		Vector result = new Vector(point).sub(camera.position);
 		result.rotate(-camera.rotation);
 		result.add(new Vector(screen.centerX, screen.centerY));
 		return result;
 	}
 	
 	public Vector toWorldSpace(Vector point) {
-		Vector result = point.ADD(camera.position);
+		Vector result = new Vector(point).add(camera.position);
 		result.rotate(camera.rotation);
 		result.sub(new Vector(screen.centerX, screen.centerY));
 		return result;

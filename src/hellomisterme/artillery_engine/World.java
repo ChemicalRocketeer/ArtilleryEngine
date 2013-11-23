@@ -124,6 +124,8 @@ public class World implements Tick, Savable, Renderable {
 		circle.transform.position.x = Game.RAND.nextDouble() * 2000 - 1000 + camera.globalPosition().x;
 		circle.transform.position.y = Game.RAND.nextDouble() * 1000 - 500 + camera.globalPosition().y;
 		addEntity(circle);
+		for (Behavior b : behaviors)
+			b.addEntity(circle);
 	}
 
 	@Override

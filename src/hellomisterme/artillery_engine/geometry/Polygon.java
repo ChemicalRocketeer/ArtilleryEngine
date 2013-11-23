@@ -31,7 +31,7 @@ public class Polygon {
 			a.sub(points[0]);
 			b.sub(points[0]);
 			// This isn't the actual area of the triangle since it isn't divided by 2, but it still works the same as a weight
-			triangleAreas[i] = Math.sin(a.angle() - b.angle()) * a.mag() * b.mag();
+			triangleAreas[i] = Math.sin(a.angle() - b.angle()) * a.magnitude() * b.magnitude();
 		}
 		// calculating weighted average of all the triangle centers
 		center = new Vector(MathUtils.WeightedAverage(triangleCentersX, triangleAreas), MathUtils.WeightedAverage(triangleCentersY, triangleAreas));
