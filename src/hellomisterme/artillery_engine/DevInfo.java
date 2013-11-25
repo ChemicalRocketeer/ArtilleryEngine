@@ -55,7 +55,7 @@ public class DevInfo implements Renderable {
 		g.drawString("FPS: " + fps, x, y + lineLocation); // fps
 		lineLocation += fontSize * 2;
 		
-		World world = Game.getWorld();
+		World world = Game.currentInstance().getWorld();
 		Entity player = world.getPlayer();
 		if (player != null) {
 			g.drawString("x: " + player.transform.position.x, x, y + lineLocation); // player's x coordinate

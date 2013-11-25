@@ -17,102 +17,97 @@ import java.util.Random;
 import javax.swing.JFrame;
 
 /**
- * The Game handles display and management of the game loop.
+ * The Game handles display and management of the currentGameInstance loop.
  * 
  * @since 10-14-12
  * @author David Aaron Suddjian
  */
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String VERSION = "Alpha.0.1.2";
 	public String title = "Space Game " + VERSION;
-	
-	/** A random number generator that can be used by objects in the game */
+
+	/** A random number generator that can be used by objects in the currentGameInstance */
 	public static final Random RAND = new Random((long) Math.toDegrees(System.currentTimeMillis() << System.nanoTime()));
-	
-	private double aspectRatio = 9.0 / 16.0;
-	private int defaultWidth = 800;
-	private int width = defaultWidth;
-	private int height = (int) (width * aspectRatio);
-	
+
 	public static final int TICKS_PER_SECOND = 60;
-	
-	private JFrame frame;
-	private static Render render;
+
+	private static Game currentGameInstance; // the current Game instance, so objects can find it easily
+	private Render render;
 	private static SpriteSheet spritesheet;
-	private static World world;
-	private static GameLog log;
+	private World world;
+	private GameLog log;
 	private DevInfo devInfo;
-	
+	private ContextManager contextManager;
+
+	// state of game flags
 	private boolean running = false;
 	private boolean paused = false;
-	private boolean fullscreen = false;
 	private boolean devModeEnabled = true;
-	
+
+	// control flags
 	private boolean devModeOrdered = false;
 	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
 	private boolean fullscreenOrdered = true;
-	
-	public Game() {
-		frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setTitle(title);
-		frame.add(this);
-		setupGraphics(); // screen and render are now initialized
-		
+
+	public Game(World w, ContextManager contextManager) {
+		currentGameInstance = this;
+		if (contextManager == null)
+			contextManager = new DefaultContextManager(this);
+		this.contextManager = contextManager;
+		this.world = w;
 		addKeyListener(new Keyboard());
 		devInfo = new DevInfo();
 		spritesheet = new SpriteSheet();
-		world = new World(5000, 5000);
 		world.init();
-		
+
+		setupGraphics(); // screen and render are now initialized
 		world.devmodeRender(render);
 		devInfo.devmodeRender(render);
 		render.screen.clear();
 	}
 
 	/**
-	 * This is it. The game loop. If something happens in the game, it begins here.
+	 * This is it. The currentGameInstance loop. If something happens in the currentGameInstance, it begins here.
 	 */
 	@Override
 	public void run() {
 		running = true;
-		
+
 		long totalFrames = 0; // the total number of frames generated (never gets decremented, so it's a long)
 		int totalSeconds = 0; // the number of times totalFrames has been updated (never gets decremented, so it's a long)
 		int frameCount = 0; // FPS counter variable
 		int tickCount = 0; // TPS counter variable
 		long lastRecord = System.currentTimeMillis(); // the last time frameCount and tickCount were written to console
-		
+
 		// variables to regulate tick frequency
 		double ns = 1000000000.0 / TICKS_PER_SECOND; // time between ticks
 		double delta = 1; // difference between now and the last tick (1 so that it starts immediately)
 		long lastTime = System.nanoTime();
-		
+
 		while (running) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
-			
+
 			// run the tick cycle on time
 			while (delta >= 1) {
 				tick();
 				delta--;
 				tickCount++;
 			}
-			
+
 			render();
 			frameCount++;
-			
+
 			// every second
 			if (System.currentTimeMillis() >= lastRecord + 1000) {
 				totalFrames += frameCount;
 				totalSeconds++;
-				
+
 				// keep dev info updated
 				devInfo.fps = frameCount;
 				devInfo.avg = (int) (totalFrames / totalSeconds);
@@ -142,7 +137,7 @@ public class Game extends Canvas implements Runnable {
 			devInfo.devmodeRender(render);
 			if (paused) {
 				Graphics2D g = render.screen.getGraphics();
-				g.drawString("paused", width - 50, 15);
+				g.drawString("paused", (int) (getWidth() - 50), 15);
 				g.dispose();
 			}
 		}
@@ -153,9 +148,9 @@ public class Game extends Canvas implements Runnable {
 		g.dispose(); // let go of the Graphics object
 		strategy.show(); // have the strategy do its thing
 	}
-	
+
 	/**
-	 * Calls everybody's tick() methods, and checks for over-all game-related events, like screenshot key presses
+	 * Calls everybody's tick() methods, and checks for over-all currentGameInstance-related events, like screenshot key presses
 	 */
 	private void tick() {
 		checkStatus();
@@ -163,12 +158,12 @@ public class Game extends Canvas implements Runnable {
 			world.tick();
 		}
 	}
-	
+
 	/**
 	 * Checks state conditions like screenshots and devmode
 	 */
 	private void checkStatus() {
-		if (Keyboard.Controls.SCREENSHOT.pressed()) {
+		if (Keyboard.Control.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
 				render.screen.screenshot();
 				screenshotOrdered = true; // remember that screenshot was pressed
@@ -176,8 +171,8 @@ public class Game extends Canvas implements Runnable {
 		} else { // screenshot key not pressed
 			screenshotOrdered = false;
 		}
-		
-		if (Keyboard.Controls.PAUSE.pressed()) {
+
+		if (Keyboard.Control.PAUSE.pressed()) {
 			if (!pauseOrdered) { // if the pause key was up before
 				paused = !paused;
 				pauseOrdered = true; // remember that pause was pressed
@@ -185,14 +180,14 @@ public class Game extends Canvas implements Runnable {
 		} else { // screenshot key not pressed
 			pauseOrdered = false;
 		}
-		
+
 		// these if statements are organized to prevent save/load operations in the same tick
-		if (Keyboard.Controls.SAVE.pressed()) { // if an io key is pressed
+		if (Keyboard.Control.SAVE.pressed()) { // if an io key is pressed
 			if (!ioOrdered) { // if an io key was up before
 				// new ArteWriter("saves/quicksave");
 				ioOrdered = true; // remember that io was ordered
 			}
-		} else if (Keyboard.Controls.LOAD.pressed()) {
+		} else if (Keyboard.Control.LOAD.pressed()) {
 			if (!ioOrdered) { // if an io key was up before
 				// new ArteWriter("quicksave.arte");
 				ioOrdered = true; // remember that io was ordered
@@ -200,8 +195,8 @@ public class Game extends Canvas implements Runnable {
 		} else { // io keys not pressed
 			ioOrdered = false;
 		}
-		
-		if (Keyboard.Controls.DEVMODE.pressed()) {
+
+		if (Keyboard.Control.DEVMODE.pressed()) {
 			if (!devModeOrdered) {
 				setDevMode(!isDevModeEnabled());
 				render.screen.simpleRendering = isDevModeEnabled();
@@ -210,10 +205,14 @@ public class Game extends Canvas implements Runnable {
 		} else {
 			devModeOrdered = false;
 		}
-		
-		if (!Keyboard.Controls.FULLSCREEN.pressed()) {
+
+		if (!Keyboard.Control.FULLSCREEN.pressed()) {
 			if (!fullscreenOrdered) {
-				fullscreen = !fullscreen; // toggle
+				if (!contextManager.isFullscreen()) {
+					contextManager.goFullscreen();
+				} else {
+					contextManager.goWindowed();
+				}
 				fullscreenOrdered = true;
 				setupGraphics();
 			}
@@ -221,70 +220,180 @@ public class Game extends Canvas implements Runnable {
 			fullscreenOrdered = false;
 		}
 	}
-	
+
 	private void setupGraphics() {
-		if (fullscreen) {
-			DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
-			width = dm.getWidth();
-			height = dm.getHeight();
-		} else {
-			width = defaultWidth;
-			height = (int) (width * aspectRatio);
+		this.createBufferStrategy(3);
+		render = new Render(new Screen(getWidth(), getHeight()));
+	}
+
+	public void save(ArteWriter aw) {
+
+	}
+
+	public void pause() {
+		paused = true;
+	}
+
+	public void unpause() {
+		paused = false;
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public synchronized void stop() {
+		running = false;
+	}
+
+	public boolean isDevModeEnabled() {
+		return devModeEnabled;
+	}
+
+	public void setDevMode(boolean devMode) {
+		this.devModeEnabled = devMode;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public static SpriteSheet getSpriteSheet() {
+		return spritesheet;
+	}
+
+	public GameLog getLog() {
+		return log;
+	}
+
+	public static Game currentInstance() {
+		return currentGameInstance;
+	}
+
+	/**
+	 * A ContextManager is an interface between the Game and the space where the game is running.
+	 * The game could be running in an Applet or a JFrame or as a part of a whole other program, but the Game doesn't know the difference.
+	 */
+	public static interface ContextManager {
+		public boolean isFullscreen();
+
+		/**
+		 * Switches the context to fullscreen mode.
+		 * 
+		 * @return a Dimension representing the Game's new size on the screen
+		 */
+		public Dimension goFullscreen();
+
+		/**
+		 * Switches the context to windowed mode.
+		 * 
+		 * @return a Dimension representing the Game's new size on the screen
+		 */
+		public Dimension goWindowed();
+
+		public Dimension getSize();
+
+		public int getWidth();
+
+		public int getHeight();
+
+		public void setTitle(String title);
+
+		public String getTitle();
+	}
+
+	/**
+	 * The default ContextManager, used if a Game is made without a ContextManager specified.
+	 * Creates a JFrame and puts the Game in it.
+	 */
+	private static class DefaultContextManager implements ContextManager {
+
+		private Game game;
+		private JFrame frame;
+		public final Dimension DEFAULTSIZE = new Dimension(800, (int) (800 * 9.0 / 16.0));
+		private Dimension size;
+		private boolean fullscreen = true;
+		private String title;
+
+		public DefaultContextManager(Game g) {
+			frame = new JFrame();
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setResizable(false);
+			frame.setTitle(title);
+			frame.add(g);
+			game = g;
+
+			if (fullscreen)
+				goFullscreen();
+			else
+				goWindowed();
 		}
-		setPreferredSize(new Dimension(width, height));
-		frame.dispose();
-		if (fullscreen) {
+
+		@Override
+		public Dimension goFullscreen() {
+			DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+			size = new Dimension(dm.getWidth(), dm.getHeight());
+			game.setPreferredSize(size);
+			frame.dispose();
 			frame.setUndecorated(true);
 			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
-		} else {
+			game.requestFocus();
+			fullscreen = true;
+			return new Dimension(size);
+		}
+
+		@Override
+		public Dimension goWindowed() {
+			size = new Dimension(DEFAULTSIZE);
+			game.setPreferredSize(size);
+			frame.dispose();
 			frame.setUndecorated(false);
 			frame.pack(); // automatically set window size
 			frame.setLocationRelativeTo(null); // center
 			frame.setVisible(true);
+			game.requestFocus();
+			fullscreen = false;
+			return new Dimension(size);
 		}
-		requestFocus();
-		this.createBufferStrategy(3);
-		
-		render = new Render(new Screen(width, height));
+
+		public Dimension getSize() {
+			return new Dimension(size);
+		}
+
+		@Override
+		public void setTitle(String title) {
+			frame.setTitle(title);
+			this.title = title;
+		}
+
+		@Override
+		public String getTitle() {
+			return title;
+		}
+
+		@Override
+		public boolean isFullscreen() {
+			return fullscreen;
+		}
+
+		@Override
+		public int getWidth() {
+			return size.width;
+		}
+
+		@Override
+		public int getHeight() {
+			return size.height;
+		}
 	}
-	
-	public void save(ArteWriter aw) {
-		
-	}
-	
-	public void pause() {
-		paused = true;
-	}
-	
-	public void unpause() {
-		paused = false;
-	}
-	
-	public boolean isRunning() {
-		return running;
-	}
-	
-	public synchronized void stop() {
-		running = false;
-	}
-	
-	public boolean isDevModeEnabled() {
-		return devModeEnabled;
-	}
-	
-	public void setDevMode(boolean devMode) {
-		this.devModeEnabled = devMode;
-	}
-	
-	public static World getWorld() {
-		return world;
-	}
-	
-	public static SpriteSheet getSpriteSheet() {
-		return spritesheet;
-	}
-	
-	public static GameLog getLog() {
-		return log;
+
+	public static void main(String[] args) {
+		Thread thread = new Thread(new Game(new World(), null));
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			Err.error("Can't stop the game thread!", e);
+		}
 	}
 }

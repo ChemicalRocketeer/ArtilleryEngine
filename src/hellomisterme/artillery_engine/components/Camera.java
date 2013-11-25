@@ -2,7 +2,7 @@ package hellomisterme.artillery_engine.components;
 
 import hellomisterme.artillery_engine.Tick;
 import hellomisterme.artillery_engine.io.Keyboard;
-import hellomisterme.artillery_engine.io.Keyboard.Controls;
+import hellomisterme.artillery_engine.io.Keyboard.Control;
 import hellomisterme.artillery_engine.util.Transform;
 import hellomisterme.artillery_engine.util.Vector;
 
@@ -48,17 +48,17 @@ public class Camera extends IngameComponent implements Tick {
 	
 	@Override
 	public void tick() {
-		if (Keyboard.pressed(Controls.LEFT))
+		if (Keyboard.pressed(Control.LEFT))
 			transform.position.x -= 5;
-		if (Keyboard.pressed(Controls.RIGHT))
+		if (Keyboard.pressed(Control.RIGHT))
 			transform.position.x += 5;
-		if (Keyboard.pressed(Controls.UP))
+		if (Keyboard.pressed(Control.UP))
 			transform.position.y -= 5;
-		if (Keyboard.pressed(Controls.DOWN))
+		if (Keyboard.pressed(Control.DOWN))
 			transform.position.y += 5;
-		if (Keyboard.pressed(Controls.CAMROTLEFT))
+		if (Keyboard.pressed(Control.CAMROTLEFT))
 			transform.rotation -= 0.005;
-		if (Keyboard.pressed(Controls.CAMROTRIGHT))
+		if (Keyboard.pressed(Control.CAMROTRIGHT))
 			transform.rotation += 0.005;
 		// transform.rotation += 0.05;
 	}

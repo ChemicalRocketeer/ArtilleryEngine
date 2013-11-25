@@ -170,7 +170,7 @@ public class Entity implements Renderable, Savable, Tick {
 	}
 
 	public static World getWorld() {
-		return Game.getWorld();
+		return Game.currentInstance().getWorld();
 	}
 
 	@Override

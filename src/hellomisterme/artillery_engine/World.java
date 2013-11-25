@@ -14,7 +14,6 @@ import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
 import hellomisterme.artillery_engine.util.Vector;
 
-import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +26,6 @@ import java.util.Set;
 public class World implements Tick, Savable, Renderable {
 	
 	private String name = "New Game";
-	private Dimension bounds;
 	
 	private Set<Entity> entities = new HashSet<>();
 	private Set<Behavior> behaviors = new HashSet<>();
@@ -36,10 +34,6 @@ public class World implements Tick, Savable, Renderable {
 	private Entity player;
 	
 	private boolean baddieOrdered = false;
-
-	public World(int w, int h) {
-		bounds = new Dimension(w, h);
-	}
 	
 	public void init() {
 		/*
@@ -66,12 +60,12 @@ public class World implements Tick, Savable, Renderable {
 		 * planet.getFreeBody().mass = 20;
 		 */
 		
-		Entity circle1 = new Entity(Circle.fromArea(300), FreeBody.create(new Vector(0, 0), 3, 0));
+		Entity circle1 = new Entity(Circle.fromArea(300), FreeBody.create(new Vector(0, 3), 3, 0));
 		circle1.transform.position.x = 300;
 		circle1.transform.position.y = 0;
 		addEntity(circle1);
 		
-		Entity circle2 = new Entity(Circle.fromArea(30000), FreeBody.create(new Vector(0, 0), 300, 0));
+		Entity circle2 = new Entity(Circle.fromArea(30000), FreeBody.create(new Vector(0, 0), 3000, 0));
 		circle2.transform.position.x = 0;
 		circle2.transform.position.y = 0;
 		addEntity(circle2);
@@ -113,7 +107,7 @@ public class World implements Tick, Savable, Renderable {
 			b.run();
 		
 		// if the addbaddie key is pressed
-		if (Keyboard.Controls.ADDBADDIE.pressed()) {
+		if (Keyboard.Control.ADDBADDIE.pressed()) {
 			if (baddieOrdered == false) { // if the key was up before
 				addBaddie();
 				baddieOrdered = true; // remember that the key was pressed
@@ -180,22 +174,6 @@ public class World implements Tick, Savable, Renderable {
 	
 	public void setCamera(Camera camera) {
 		this.camera = camera;
-	}
-	
-	public int getWidth() {
-		return bounds.width;
-	}
-	
-	public void setWidth(int width) {
-		bounds.width = width;
-	}
-	
-	public int getHeight() {
-		return bounds.height;
-	}
-	
-	public void setHeight(int height) {
-		bounds.height = height;
 	}
 	
 	public String getName() {

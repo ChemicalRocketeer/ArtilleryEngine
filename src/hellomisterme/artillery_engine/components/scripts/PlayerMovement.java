@@ -29,16 +29,16 @@ public class PlayerMovement extends Script implements Renderable {
 	
 	@Override
 	public void tick() {
-		if (Keyboard.Controls.ROTLEFT.pressed())
+		if (Keyboard.Control.ROTLEFT.pressed())
 			freeBody.spin -= rotationForce;
-		if (Keyboard.Controls.ROTRIGHT.pressed())
+		if (Keyboard.Control.ROTRIGHT.pressed())
 			freeBody.spin += rotationForce;
 		
-		if (Keyboard.Controls.THROTTLEUP.pressed())
+		if (Keyboard.Control.THROTTLEUP.pressed())
 			throttle += throttleRate;
-		if (Keyboard.Controls.THROTTLEDOWN.pressed())
+		if (Keyboard.Control.THROTTLEDOWN.pressed())
 			throttle -= throttleRate;
-		if (Keyboard.Controls.THROTTLECUT.pressed())
+		if (Keyboard.Control.THROTTLECUT.pressed())
 			throttle = 0;
 		
 		if (throttle < 0)

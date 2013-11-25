@@ -37,7 +37,7 @@ public class ArteWriter {
 	private final ByteArrayOutputStream classData = new ByteArrayOutputStream();
 	private final DataOutputStream classWriter = new DataOutputStream(classData);
 	// data contains world and entity data. Do not write to these! Write to out!
-	private final ByteArrayOutputStream worldData = new ByteArrayOutputStream(Game.getWorld().entityCount() * 100);
+	private final ByteArrayOutputStream worldData = new ByteArrayOutputStream(Game.currentInstance().getWorld().entityCount() * 100);
 	private final DataOutputStream world = new DataOutputStream(worldData);
 	// only write to this one! Switch between header and non-header mode by pointing this variable to one or the other!
 	private DataOutputStream out = header;
@@ -52,7 +52,7 @@ public class ArteWriter {
 		out = header;
 		writeGameData(game);
 		out = world;
-		Game.getWorld().write(this);
+		Game.currentInstance().getWorld().write(this);
 		out = header;
 		writeClassList();
 		writeOneTimeClassData();
