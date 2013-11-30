@@ -1,10 +1,13 @@
 package hellomisterme.artillery_engine;
 
+import hellomisterme.artillery_engine.controls.FunctionController;
+import hellomisterme.artillery_engine.controls.Keyboard;
+import hellomisterme.artillery_engine.geometry.AABB;
 import hellomisterme.artillery_engine.io.ArteWriter;
-import hellomisterme.artillery_engine.io.Keyboard;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Screen;
 import hellomisterme.artillery_engine.rendering.SpriteSheet;
+import hellomisterme.artillery_engine.rendering.Texture;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -12,6 +15,8 @@ import java.awt.DisplayMode;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferStrategy;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -41,17 +46,17 @@ public class Game extends Canvas implements Runnable {
 	private DevInfo devInfo;
 	private ContextManager contextManager;
 
-	// state of game flags
+	// 'state of game' flags
 	private boolean running = false;
 	private boolean paused = false;
 	private boolean devModeEnabled = true;
 
-	// control flags
+	// state controls
+	private List<FunctionController> gameStateControls;
 	private boolean devModeOrdered = false;
 	private boolean pauseOrdered = false;
 	private boolean screenshotOrdered = false;
 	private boolean ioOrdered = false;
-	private boolean fullscreenOrdered = true;
 
 	public Game(World w, ContextManager contextManager) {
 		currentGameInstance = this;
@@ -59,9 +64,43 @@ public class Game extends Canvas implements Runnable {
 			contextManager = new DefaultContextManager(this);
 		this.contextManager = contextManager;
 		this.world = w;
-		addKeyListener(new Keyboard());
-		devInfo = new DevInfo();
 		spritesheet = new SpriteSheet();
+		devInfo = new DevInfo();
+		addKeyListener(new Keyboard());
+
+		gameStateControls = new LinkedList<>();
+		gameStateControls.add(new FunctionController(Keyboard.Control.FULLSCREEN, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				toggleFullscreen();
+			}
+		}));
+		gameStateControls.add(new FunctionController(Keyboard.Control.SCREENSHOT, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				render.screen.screenshot();
+			}
+		}));
+		gameStateControls.add(new FunctionController(Keyboard.Control.PAUSE, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				paused = !paused;
+			}
+		}));
+		gameStateControls.add(new FunctionController(Keyboard.Control.DEVMODE, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				setDevMode(!isDevModeEnabled());
+				render.screen.simpleRendering = isDevModeEnabled();
+			}
+		}));
+		gameStateControls.add(new FunctionController(Keyboard.Control.SAVE, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				// new ArteWriter("saves/quicksave");
+			}
+		}));
+		gameStateControls.add(new FunctionController(Keyboard.Control.LOAD, new FunctionController.ControlResponder() {
+			public void respondToControl(FunctionController controller) {
+				// new ArteWriter("quicksave.arte");
+			}
+		}));
+
 		world.init();
 
 		setupGraphics(); // screen and render are now initialized
@@ -115,7 +154,6 @@ public class Game extends Canvas implements Runnable {
 				devInfo.sec = totalSeconds;
 				devInfo.totalMemory = Runtime.getRuntime().totalMemory() / 1048576; // 1048576 bytes in a MB
 				devInfo.usedMemory = devInfo.totalMemory - Runtime.getRuntime().freeMemory() / 1048576;
-				// Behavior.out.println(devInfo.fps);
 
 				// reset variables
 				frameCount = 0;
@@ -142,6 +180,8 @@ public class Game extends Canvas implements Runnable {
 			}
 		}
 
+		render.textureArea(new Texture("graphics/backgrounds/tree.png", 20, 50), new AABB(100, 950, 100, 850));
+
 		BufferStrategy strategy = getBufferStrategy(); // this Game's BufferStrategy
 		Graphics2D g = (Graphics2D) strategy.getDrawGraphics(); // get the next Graphics object from the strategy
 		render.screen.drawScreen(g); // draw the rendered image onto the Graphics object
@@ -163,6 +203,11 @@ public class Game extends Canvas implements Runnable {
 	 * Checks state conditions like screenshots and devmode
 	 */
 	private void checkStatus() {
+
+		for (FunctionController control : gameStateControls) {
+			control.tick();
+		}
+
 		if (Keyboard.Control.SCREENSHOT.pressed()) {
 			if (!screenshotOrdered) { // if the screenshot key was up before
 				render.screen.screenshot();
@@ -206,24 +251,36 @@ public class Game extends Canvas implements Runnable {
 			devModeOrdered = false;
 		}
 
-		if (!Keyboard.Control.FULLSCREEN.pressed()) {
-			if (!fullscreenOrdered) {
-				if (!contextManager.isFullscreen()) {
-					contextManager.goFullscreen();
-				} else {
-					contextManager.goWindowed();
-				}
-				fullscreenOrdered = true;
-				setupGraphics();
-			}
+		/*
+		 * if (!Keyboard.Control.FULLSCREEN.pressed()) {
+		 * if (!fullscreenOrdered) {
+		 * if (!contextManager.isFullscreen()) {
+		 * contextManager.goFullscreen();
+		 * } else {
+		 * contextManager.goWindowed();
+		 * }
+		 * fullscreenOrdered = true;
+		 * setupGraphics();
+		 * }
+		 * } else {
+		 * fullscreenOrdered = false;
+		 * }
+		 */
+	}
+
+	public void toggleFullscreen() {
+		if (!contextManager.isFullscreen()) {
+			contextManager.goFullscreen();
 		} else {
-			fullscreenOrdered = false;
+			contextManager.goWindowed();
 		}
+		setupGraphics();
 	}
 
 	private void setupGraphics() {
 		this.createBufferStrategy(3);
 		render = new Render(new Screen(getWidth(), getHeight()));
+		requestFocus();
 	}
 
 	public void save(ArteWriter aw) {

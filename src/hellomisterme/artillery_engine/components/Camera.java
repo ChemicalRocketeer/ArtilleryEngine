@@ -1,8 +1,8 @@
 package hellomisterme.artillery_engine.components;
 
 import hellomisterme.artillery_engine.Tick;
-import hellomisterme.artillery_engine.io.Keyboard;
-import hellomisterme.artillery_engine.io.Keyboard.Control;
+import hellomisterme.artillery_engine.controls.Keyboard;
+import hellomisterme.artillery_engine.controls.Keyboard.Control;
 import hellomisterme.artillery_engine.util.Transform;
 import hellomisterme.artillery_engine.util.Vector;
 

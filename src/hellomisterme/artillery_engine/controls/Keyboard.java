@@ -1,4 +1,4 @@
-package hellomisterme.artillery_engine.io;
+package hellomisterme.artillery_engine.controls;
 
 import hellomisterme.artillery_engine.Err;
 
@@ -22,12 +22,12 @@ import java.util.Scanner;
  */
 public class Keyboard implements KeyListener {
 	
-	// All possible keys (but not actually all the theoretically POSSIBLE keys because that would be an immense array)
+	// All normal keyboard keys
 	private static BitSet keys = new BitSet(KeyEvent.KEY_LAST);
 	
 	public static final String SETTINGS_FILE = "settings.txt";
 	
-	public static enum Controls {
+	public static enum Control {
 		UP				(new int[] {KeyEvent.VK_W}),
 		DOWN			(new int[] {KeyEvent.VK_S}),
 		LEFT			(new int[] {KeyEvent.VK_A}),
@@ -50,7 +50,7 @@ public class Keyboard implements KeyListener {
 		private final int[] defaultCodes;
 		private int[] codes;
 		
-		Controls(int[] codes) {
+		Control(int[] codes) {
 			this.defaultCodes = codes;
 			this.codes = defaultCodes;
 		}
@@ -81,7 +81,7 @@ public class Keyboard implements KeyListener {
 		}
 	}
 	
-	public Keyboard() {
+	static {
 		readSettingsFile();
 	}
 	
@@ -115,7 +115,7 @@ public class Keyboard implements KeyListener {
 			while (!(line = in.readLine().replaceAll("\\s", "").replaceAll("\\t", "")).toUpperCase().equals("}")) {
 				if (!line.equals("")) settings += line;
 			}
-			for (Controls c : Controls.values()) {
+			for (Control c : Control.values()) {
 				c.setKeyCodes(settings);
 			}
 			in.close();
@@ -125,7 +125,7 @@ public class Keyboard implements KeyListener {
 		}
 	}
 	
-	public static boolean pressed(Controls c) {
+	public static boolean pressed(Control c) {
 		return c.pressed();
 	}
 	
@@ -156,15 +156,27 @@ public class Keyboard implements KeyListener {
 		return keys.get(keyCode);
 	}
 	
+	/** Sets all key values to false */
+	public void reset() {
+		for (int i = keys.nextSetBit(0); i >= 0; i = keys.nextSetBit(i + 1)) {
+			keys.clear(i);
+		}
+	}
+
 	/**
-	 * Called by JVM when a key is pressed. Do not call this method unless you are making a robot.
+	 * Called by JVM when a key is pressed.
 	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() < keys.size()) {
-			keys.set(e.getKeyCode(), true);
+		keyPressed(e.getKeyCode());
+	}
+
+	/** Can be called by the program to fake/force a key press. Has the same effect as keyPressed(KeyEvent e) */
+	public void keyPressed(int keyCode) {
+		if (keyCode < keys.size()) {
+			keys.set(keyCode);
 		} else {
-			Err.error("Invalid key press: " + e.getKeyCode());
+			Err.error("Invalid key press: " + keyCode);
 		}
 	}
 	
@@ -173,10 +185,15 @@ public class Keyboard implements KeyListener {
 	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() < keys.size()) {
-			keys.set(e.getKeyCode(), false);
+		keyReleased(e.getKeyCode());
+	}
+
+	/** Can be called by the program to fake/force a key release. Has the same effect as keyReleased(KeyEvent e) */
+	public void keyReleased(int keyCode) {
+		if (keyCode < keys.size()) {
+			keys.clear(keyCode);
 		} else {
-			Err.error("Invalid key release: " + e.getKeyCode());
+			Err.error("Invalid key release: " + keyCode);
 		}
 	}
 	

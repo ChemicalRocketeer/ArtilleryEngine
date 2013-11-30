@@ -1,7 +1,7 @@
 package hellomisterme.artillery_engine.components.scripts;
 
 import hellomisterme.artillery_engine.components.physics.FreeBody;
-import hellomisterme.artillery_engine.io.Keyboard;
+import hellomisterme.artillery_engine.controls.Keyboard;
 import hellomisterme.artillery_engine.rendering.Render;
 import hellomisterme.artillery_engine.rendering.Renderable;
 

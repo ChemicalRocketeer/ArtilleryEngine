@@ -1,6 +1,7 @@
 package hellomisterme.artillery_engine.rendering;
 
 import hellomisterme.artillery_engine.components.Camera;
+import hellomisterme.artillery_engine.geometry.AABB;
 import hellomisterme.artillery_engine.util.Transform;
 import hellomisterme.artillery_engine.util.Vector;
 
@@ -31,6 +32,13 @@ public class Render {
 		this.screen = screen;
 	}
 	
+	public void textureArea(Texture texture, AABB area) {
+		Vector areaPos = new Vector(area.left, area.top);
+		Vector areaSize = new Vector(area.right, area.bottom).sub(areaPos);
+		areaPos = toScreenSpace(areaPos);
+		screen.textureArea(texture, new AABB(areaPos, areaSize.x, areaSize.y));
+	}
+
 	/**
 	 * Draws pixel data at the indicated point
 	 * 
@@ -77,6 +85,7 @@ public class Render {
 		g.setTransform(graphicsTransform);
 	}
 	
+	/** Converts a Vector from world space to screen space. Does not change the given vector. */
 	public Vector toScreenSpace(Vector point) {
 		Vector result = new Vector(point).sub(camera.position);
 		result.rotate(-camera.rotation);

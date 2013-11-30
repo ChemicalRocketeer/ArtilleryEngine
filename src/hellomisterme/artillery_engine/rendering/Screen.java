@@ -1,5 +1,7 @@
 package hellomisterme.artillery_engine.rendering;
 
+import hellomisterme.artillery_engine.geometry.AABB;
+import hellomisterme.artillery_engine.geometry.AABBint;
 import hellomisterme.artillery_engine.io.Screenshot;
 import hellomisterme.artillery_engine.util.MathUtils;
 import hellomisterme.artillery_engine.util.Transform;
@@ -22,6 +24,7 @@ public class Screen {
 	public final int width, height, centerX, centerY;
 
 	public static final RenderingHints speedHints = getSpeedHints();
+
 	private static RenderingHints getSpeedHints() {
 		RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 		hints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
@@ -34,6 +37,7 @@ public class Screen {
 	}
 
 	public static final RenderingHints qualityHints = getQualityHints();
+
 	private static RenderingHints getQualityHints() {
 		RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		hints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -60,6 +64,26 @@ public class Screen {
 		centerY = height / 2;
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); // link the 'pixels' array to image's pixel data
+	}
+
+	public void textureArea(Texture texture, AABB area) {
+		AABBint cropped = cropToScreen(new AABBint(area));
+		PixelData img = texture.getImage();
+		int imgWidth = img.getWidth();
+		int imgHeight = img.getHeight();
+		int xOffset = imgWidth - (texture.getXOffset() % imgWidth) + cropped.left - (int) area.left;
+		int yOffset = imgHeight - (texture.getYOffset() % imgWidth) + cropped.top - (int) area.top;
+		int croppedHeight = cropped.bottom - cropped.top;
+		int croppedWidth = cropped.right - cropped.left;
+
+		// loop through the pixels in Screen that are going to be changed
+		int pixelsIndex;
+		for (int y = 0; y < croppedHeight; y++) {
+			for (int x = 0; x < croppedWidth; x++) {
+				pixelsIndex = (y + cropped.top) * width + x + cropped.left;
+				pixels[pixelsIndex] = blendRGB(pixels[pixelsIndex], img.getPixels()[((y + yOffset) % imgHeight) * imgWidth + ((x + xOffset) % imgWidth)]);
+			}
+		}
 	}
 
 	/**
@@ -186,9 +210,9 @@ public class Screen {
 	 * Alpha values closer to 255 will make the returned color closer to src, while alpha values closer to 0 will make it closer to dest.
 	 * 
 	 * @param dest
-	 *            the rgb color to be blended (the "bottom" color)
+	 *        the rgb color to be blended (the "bottom" color)
 	 * @param src
-	 *            the argb color to be blended (the "top" color)
+	 *        the argb color to be blended (the "top" color)
 	 * @return the two colors blended together as an opaque rgb value
 	 */
 	public static int blendRGB(int src, int dest) {
@@ -217,6 +241,18 @@ public class Screen {
 		graphics.rotate(t.rotation, -center.x, -center.y);
 		graphics.drawImage(img, null, 0, 0);
 		graphics.dispose();
+	}
+
+	private AABBint cropToScreen(AABBint box) {
+		if (box.left < 0)
+			box.left = 0;
+		if (box.right > width)
+			box.right = width;
+		if (box.top < 0)
+			box.top = 0;
+		if (box.bottom > height)
+			box.bottom = height;
+		return box;
 	}
 
 	/**

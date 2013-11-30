@@ -48,6 +48,7 @@ public class SpriteSheet {
 	}
 
 	public void remove(String path) {
+		// TODO use iterator
 		for (ImageWrapper i : images) {
 			if (i.PATH.equals(path))
 				images.remove(i);

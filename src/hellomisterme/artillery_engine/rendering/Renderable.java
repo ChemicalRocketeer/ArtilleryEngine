@@ -11,5 +11,6 @@ public interface Renderable {
 	
 	public void render(Render render);
 	
+	/** Called after render if devmode is enabled */
 	public void devmodeRender(Render render);
 }
